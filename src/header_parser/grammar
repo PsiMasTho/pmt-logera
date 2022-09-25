@@ -1,0 +1,11 @@
+%class-name HeaderParser
+
+%scanner ../header_scanner/header_scanner.h
+%scanner-class-name HeaderScanner
+%token  MONTH
+
+%%
+
+expr:
+    MONTH
+;

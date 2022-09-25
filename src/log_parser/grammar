@@ -1,0 +1,12 @@
+%class-name LogParser
+
+%scanner ../log_scanner/log_scanner.h
+%scanner-class-name LogScanner
+
+%token  MONTH
+
+%%
+
+expr:
+    MONTH
+;

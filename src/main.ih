@@ -1,0 +1,12 @@
+#include "args/args.h"
+#include "csv_data/csv_data.h"
+#include "header_parser/header_parser.h"
+#include "log_parser/log_parser.h"
+
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+    // todo: put this into a class if needed
+int run(Args& args);
