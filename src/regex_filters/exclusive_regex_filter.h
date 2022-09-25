@@ -6,19 +6,19 @@
 class ExclusiveRegexFilter final : public RegexFilterBase
 {
 public:
-	explicit ExclusiveRegexFilter(std::regex expr);
+    explicit ExclusiveRegexFilter(std::regex expr);
 
-	bool accept(std::string const& str) override;
+    bool accept(std::string const& str) override;
 };
 
 inline ExclusiveRegexFilter::ExclusiveRegexFilter(std::regex expr)
 :
-	RegexFilterBase(expr)
+    RegexFilterBase(expr)
 {}
 
 inline bool ExclusiveRegexFilter::accept(std::string const& str)
 {
-	return !regex_match(str, d_regex);
+    return !regex_match(str, d_regex);
 }
 
 #endif

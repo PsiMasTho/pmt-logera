@@ -6,19 +6,19 @@
 class InclusiveRegexFilter final : public RegexFilterBase
 {
 public:
-	explicit InclusiveRegexFilter(std::regex expr);
+    explicit InclusiveRegexFilter(std::regex expr);
 
-	bool accept(std::string const& str) override;
+    bool accept(std::string const& str) override;
 };
 
 inline InclusiveRegexFilter::InclusiveRegexFilter(std::regex expr)
 :
-	RegexFilterBase(expr)
+    RegexFilterBase(expr)
 {}
 
 inline bool InclusiveRegexFilter::accept(std::string const& str)
 {
-	return regex_match(str, d_regex);
+    return regex_match(str, d_regex);
 }
 
 #endif

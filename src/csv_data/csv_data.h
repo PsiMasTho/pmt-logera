@@ -8,7 +8,7 @@
 class CsvData
 {
 public:
-	void write(std::ostream& out, RegexFilterBase* filter);
+    void write(std::ostream& out, RegexFilterBase* filter);
 };
 
 #endif
