@@ -27,17 +27,7 @@ vector<filesystem::path> Args::cvtFunc<vector<filesystem::path>>(string const& v
 }
 
 template <>
-InclusiveRegexFilter Args::cvtFunc<InclusiveRegexFilter>(string const& valStr)
+regex Args::cvtFunc<regex>(string const& valStr)
 {
-    InclusiveRegexFilter ret{ regex(valStr) };
-
-    return ret;
-}
-
-template <>
-ExclusiveRegexFilter Args::cvtFunc<ExclusiveRegexFilter>(string const& valStr)
-{
-    ExclusiveRegexFilter ret{ regex(valStr) };
-
-    return ret;
+    return regex(valStr);
 }

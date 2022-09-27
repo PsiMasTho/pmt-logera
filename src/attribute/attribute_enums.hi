@@ -1,0 +1,12 @@
+enum ID : int
+{
+	REPS = 0,
+	WEIGHT,
+	TIME,
+	DURATION,
+	DISTANCE,
+	ENERGY,
+	RPE,
+
+	_COUNT
+};

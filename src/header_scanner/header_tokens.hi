@@ -1,5 +1,0 @@
-enum Token
-{
-    MONTH = 257,
-    VAR_NAME,
-};

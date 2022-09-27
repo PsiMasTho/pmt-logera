@@ -11,19 +11,18 @@ BUILD_DIR = ./build
 SOURCE_DIR = ./src
 
 LOG_PARSER_DIR = $(SOURCE_DIR)/log_parser
-LOG_SCANNER_DIR = $(SOURCE_DIR)/log_scanner
-
 HEADER_PARSER_DIR = $(SOURCE_DIR)/header_parser
-HEADER_SCANNER_DIR = $(SOURCE_DIR)/header_scanner
+
+SCANNER_DIR = $(SOURCE_DIR)/scanner
 
 # All .cc files
 SOURCE = $(wildcard src/*.cc) 	 			 \
+		 $(wildcard src/fmt/*.cc) 	 		 \
 		 $(wildcard src/args/*.cc)			 \
 		 $(wildcard src/log_parser/*.cc)     \
-		 $(wildcard src/log_scanner/*.cc)    \
 		 $(wildcard src/regex_filters/*.cc)	 \
 		 $(wildcard src/header_parser/*.cc)  \
-		 $(wildcard src/header_scanner/*.cc) \
+		 $(wildcard src/scanner/*.cc) \
 
 
 # All .o files go to build dir.
@@ -51,8 +50,7 @@ $(BUILD_DIR)/%.o: %.cc
 
 .PHONY: run_flexc++
 run_flexc++:
-	flexc++ $(LOG_SCANNER_DIR)/lexer --target-directory=$(LOG_SCANNER_DIR)/ --filenames=log_scanner
-	flexc++ $(HEADER_SCANNER_DIR)/lexer --target-directory=$(HEADER_SCANNER_DIR)/ --filenames=header_scanner
+	flexc++ $(SCANNER_DIR)/lexer --target-directory=$(SCANNER_DIR)/ --filenames=scanner
 
 .PHONY: run_bisonc++
 run_bisonc++:

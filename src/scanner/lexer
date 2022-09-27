@@ -1,0 +1,21 @@
+%class-name = "Scanner"
+
+%%
+
+    // ignore spaces, tabs and newlines
+[ \t\n]+
+
+    // ignore comments
+#.*\n
+
+^"decl "								return Token::BEGIN_DECL;
+
+"$"[0-9a-zA-Z,:.]+                      return Token::VALUE;
+
+">"[ \t]+"attr:"					    return Token::BEGIN_ATTR;
+
+"%"[a-zA-Z]+							return Token::ATTR;
+
+[a-zA-Z_]+								return Token::IDENT;
+
+.                                    	return matched()[0];

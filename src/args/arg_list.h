@@ -10,7 +10,7 @@ CLI_ARG_OPT(SQ(m), inputFiles,      std::vector<std::filesystem::path>, std::nul
 CLI_ARG_OPT(SQ(d), inputFilesDir,   std::filesystem::path             , std::nullopt)
 CLI_ARG_OPT(SQ(o), outputFile,      std::filesystem::path             , std::nullopt)
 
-CLI_ARG_OPT(SQ(I), inclusiveFilter, InclusiveRegexFilter              , std::nullopt)
-CLI_ARG_OPT(SQ(E), exclusiveFilter, ExclusiveRegexFilter              , std::nullopt)
+CLI_ARG_OPT(SQ(I), inclusiveFilter, std::regex                        , std::nullopt)
+CLI_ARG_OPT(SQ(E), exclusiveFilter, std::regex                        , std::nullopt)
 #undef CLI_ARG_OPT
 #undef SQ

@@ -1,7 +1,7 @@
 %class-name LogParser
 
-%scanner ../log_scanner/log_scanner.h
-%scanner-class-name LogScanner
+%scanner ../scanner/scanner.h
+%scanner-class-name Scanner
 
 %token  MONTH
 
