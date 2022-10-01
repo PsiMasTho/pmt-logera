@@ -8,34 +8,30 @@ enum
     FAIL
 };
 
-bool validateArgs(Args& args);
-
-int run(Args& args)
+int run()
 {
-    if (validateArgs(args) != SUCCESS)
-        return FAIL;
-
+    /*
+    Options const& opt = Options::instance();
         // set the filter, or nullptr if there is none
     std::function<bool(std::string)> filter;
-    if (args.d_inclusiveFilter.has_value())
-        filter = [&args](std::string str){return regex_match(str, args.d_inclusiveFilter.value());};
-    else if (args.d_exclusiveFilter.has_value())
-        filter = [&args](std::string str){return !regex_match(str, args.d_exclusiveFilter.value());};
-    else
-        filter = [](std::string){return true;};
 
-    cout << "accept? " << (filter("hello") ? "YES!" : "NO!") << endl;
-
-    return SUCCESS;
-}
-
-bool validateArgs(Args& args)
-{
-    if (args.d_inclusiveFilter.has_value() && args.d_exclusiveFilter.has_value())
+    switch (opt.filterType())
     {
-        cerr << "Error: cannot specify -E flag and -I flag together.\n";
-        return FAIL;
+        case FilterType::INCLUSIVE:
+            filter = [&opt](std::string str){return regex_match(str, opt.filterRegex());};
+        break;
+        case FilterType::EXCLUSIVE:
+            filter = [&opt](std::string str){return !regex_match(str, opt.filterRegex());};
+        break;
+        default:
+            filter = [](std::string){return true;};
+        break;
     }
 
+    ifstream headerStream(opt.headerFile());
+    HeaderData headerData;
+    HeaderParser headerParser(headerData, headerStream);
+
     return SUCCESS;
+    */
 }

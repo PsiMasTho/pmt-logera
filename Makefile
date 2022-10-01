@@ -16,14 +16,7 @@ HEADER_PARSER_DIR = $(SOURCE_DIR)/header_parser
 SCANNER_DIR = $(SOURCE_DIR)/scanner
 
 # All .cc files
-SOURCE = $(wildcard src/*.cc) 	 			 \
-		 $(wildcard src/fmt/*.cc) 	 		 \
-		 $(wildcard src/args/*.cc)			 \
-		 $(wildcard src/log_parser/*.cc)     \
-		 $(wildcard src/regex_filters/*.cc)	 \
-		 $(wildcard src/header_parser/*.cc)  \
-		 $(wildcard src/scanner/*.cc) \
-
+SOURCE := $(shell find $(SOURCE_DIR) -iname '*.cc')
 
 # All .o files go to build dir.
 OBJ = $(SOURCE:%.cc=$(BUILD_DIR)/%.o)

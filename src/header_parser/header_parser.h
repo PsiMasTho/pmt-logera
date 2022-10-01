@@ -17,14 +17,18 @@
     // If you need to include additional headers in this file 
     // you should do so after these comment-lines.
 
+#include "../header_data/header_data.h"
+#include <iosfwd>
+
 
 class HeaderParser: public HeaderParserBase
 {
     // $insert scannerobject
-    Scanner d_scanner;
+    Scanner       d_scanner;
+    HeaderData    d_headerData;
         
     public:
-        HeaderParser() = default;
+        HeaderParser(HeaderData& headerData, std::istream& headerStream);
         int parse();
 
     private:

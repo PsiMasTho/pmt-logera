@@ -1,8 +1,12 @@
 #include "main.ih"
 
-auto main(int, char** argv) -> int
+auto main(int argc, char** argv) -> int
+try
 <%
-    unique_ptr<Args> args = make_unique<Args>(argv);
-
-    return run(*args);
+    Options& opts = Options::initialize(Args("d:m:E:I:o:", argv));
+    cout << opts.headerFile() << endl;
+%>
+catch(char const* e)
+<%
+    cerr << e << '\n';
 %>

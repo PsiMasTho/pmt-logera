@@ -1,13 +1,16 @@
-#include "args/args.h"
 #include "header_parser/header_parser.h"
 #include "log_parser/log_parser.h"
+#include "options/options.h"
+#include "args/args.h"
 
 #include <iostream>
 #include <memory>
 #include <fstream>
 #include <regex>
+#include <algorithm>
+#include <filesystem>
 
 using namespace std;
 
     // todo: put this into a class if needed
-int run(Args& args);
+int run();

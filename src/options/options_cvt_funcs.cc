@@ -1,14 +1,10 @@
-#include "args.h"
-#include <sstream>
-#include <algorithm>
-#include <iterator>
-#include <regex>
+#include "options.ih"
 
 using namespace std;
 
     // expects a single path to either a directory or a file, not checked if file exists
 template <>
-filesystem::path Args::cvtFunc<filesystem::path>(string const& valStr)
+filesystem::path Options::cvtFunc<filesystem::path>(string const& valStr)
 {
     filesystem::path ret(valStr);
 
@@ -17,7 +13,7 @@ filesystem::path Args::cvtFunc<filesystem::path>(string const& valStr)
 
     // expects one or more paths seperated by a single space, not checked if files exist
 template <>
-vector<filesystem::path> Args::cvtFunc<vector<filesystem::path>>(string const& valStr)
+vector<filesystem::path> Options::cvtFunc<vector<filesystem::path>>(string const& valStr)
 {
     vector<filesystem::path> ret;
     istringstream iss(valStr);
@@ -27,7 +23,7 @@ vector<filesystem::path> Args::cvtFunc<vector<filesystem::path>>(string const& v
 }
 
 template <>
-regex Args::cvtFunc<regex>(string const& valStr)
+regex Options::cvtFunc<regex>(string const& valStr)
 {
     return regex(valStr);
 }

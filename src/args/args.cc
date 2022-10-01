@@ -1,55 +1,101 @@
 #include "args.h"
-#include <memory>
+#include <regex>
 
 using namespace std;
 
-Args::Args(char** argv)
+Args::Args(char const* optStr, char** argv)
 :
-    d_argMap{}
+	d_optTypeMap{},
+	d_optValMap{}
 {
-    registerArgs();
-    loadArgv(argv);
+	fillTypeMap(optStr);
+	fillValMap(argv);
 }
 
-void Args::registerArgs()
+string const* Args::option(char option) const
 {
-    #define CLI_ARG_OPT(letter, name, Type, unused) registerArg<Type>(d_ ## name, #name); addArg(letter, #name);
-    #include "arg_list.h"
+		// check if the option is valid
+	auto itr1 = d_optTypeMap.find(option);
+	if (itr1 == d_optTypeMap.end())
+		throw "Unknown option.";
+	
+	auto itr2 = d_optValMap.find(option);
+	if (itr2 == d_optValMap.end()) // option not specified
+		return nullptr;
+	else
+		return &itr2->second; // is specified, return string (may be empty)
+		
 }
 
-void Args::addArg(char letter, string const& name)
+void Args::fillTypeMap(string const& optStr)
 {
-    d_argMap[letter] = name;
+	regex const optRegex(R"([a-z]\:{0,2})", regex::ECMAScript | regex::optimize | regex::icase);
+
+	for (auto itr = sregex_iterator(optStr.begin(), optStr.end(), optRegex); itr != sregex_iterator(); ++itr)
+	{                    
+		smatch const match(*itr);
+        
+		char const optCh = match.str().front();
+		Type optType;
+
+		if (match.str().size() > 1)
+		{
+			string const optTypeStr(match.str().substr(1));
+			if (optTypeStr == ":")
+				optType = Type::REQUIRED;
+			else if (optTypeStr == "::")
+				optType = Type::OPTIONAL;
+		}
+		else
+			optType = Type::NONE;
+
+		d_optTypeMap[optCh] = optType;
+    }   
 }
 
-void Args::loadArgv(char** argv)
+void Args::fillValMap(char** argv)
 {
-        // no arguments passed (only program name)
-    if (!argv[1])
-        return;
+	if (!argv[1])
+    	return;
 
-    vector<pair<char, string>> argValPairs;
+    vector<pair<char, string>> optValPairs;
     
-    /* <char>   <string>
+    /* char		string
     ------------------------
-        -a   "value string 1..."
-        -b   "value string 2..."
+        -arg1   "val1 val2 val3..."
+        -arg2   "val1 val2 val3..."
         ...
     */
 
-    for (size_t i = 1; argv[i]; ++i)
+    for (int i = 1; argv[i]; ++i)
     {
         if (argv[i][0] == '-') // then opt
-            argValPairs.push_back({argv[i][1], {}});
+            optValPairs.push_back({argv[i][1], {}});
         else
-            argValPairs.back().second += string(&argv[i][0]) + " "s;
+		{
+			if (optValPairs.empty())
+				throw "Invalid arguments.";
+            else
+			{
+				string const delim = optValPairs.back().second.empty() ? string{} : " "s;
+				optValPairs.back().second += delim + string(&argv[i][0]);
+			}
+		}
     }
 
-    // remove trailing space
-    for (auto &[arg, val] : argValPairs)
-        if (!val.empty())
-            val.pop_back();
-
-    for (auto [arg, val] : argValPairs)
-        set(d_argMap[arg], val);
+    for (auto [opt, val] : optValPairs)
+	{
+		if (d_optTypeMap.contains(opt))
+		{
+			Type const optType = d_optTypeMap[opt];
+        	if (val.empty() && (optType == Type::NONE || optType == Type::OPTIONAL))
+				d_optValMap[opt] = val;
+			else if (!val.empty() && (optType == Type::OPTIONAL || optType == Type::REQUIRED))
+				d_optValMap[opt] = val;
+			else
+				throw "Invalid arguments.";
+		}
+		else
+			throw "Unknown option.";
+	}
 }

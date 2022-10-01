@@ -1,37 +1,35 @@
-#ifndef INCLUDED_ARGS_H
-#define INCLUDED_ARGS_H
+#ifndef INCLUDED_ARG_H
+#define INCLUDED_ARG_H
+/*
+*	A simplified version of the Arg class found in lib bobcat
+*/
 
-#include "../args_base/args_base.h"
-#include <string>
 #include <unordered_map>
+#include <string>
+#include <optional>
 
-    // begin headers for "arg_list.h"
-#include <vector>
-#include <filesystem>
-#include <regex>
-    // end headers for "arg_list.h"
-
-class Args : public ArgsBase<Args>
+class Args
 {
-        // maps arg letters to variable names e.g. arg -f: {f, filenames}
-    std::unordered_map<char, std::string> d_argMap;
+	enum Type
+	{
+		NONE,
+		REQUIRED,
+		OPTIONAL
+	};
+
+	std::unordered_map<char, Type>		  d_optTypeMap;
+	std::unordered_map<char, std::string> d_optValMap;
 
 public:
-    Args(char** argv);
-    Args(Args const&) = default;
-    Args(Args&&) =      default;
-    ~Args() =           default;
+	Args(char const* optStr, char** argv);
 
-    #define CLI_ARG_OPT(unused0, name, Type, defaultVal) std::optional< Type > d_ ## name = defaultVal;
-    #include "arg_list.h"
-
-    template <typename Type>
-    static Type cvtFunc(std::string const& valStr);
+		// returns nullptr if option isnt specified, returns empty string if it is specified
+		// with no arguments, returns filled string if it's specified and has arguments
+	std::string const* option(char option) const;
 
 private:
-    void registerArgs();
-    void addArg(char letter, std::string const& name);
-    void loadArgv(char** argv);
+	void fillTypeMap(std::string const& optStr);
+	void fillValMap(char** argv);
 };
 
 #endif
