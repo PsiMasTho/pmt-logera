@@ -8,9 +8,9 @@
 
 class Writer
 {
-	LogData const& d_data;
-	std::ostream&  d_out;
-	std::function<bool(std::string const&)> d_identFilter;
+    LogData const& d_data;
+    std::ostream&  d_out;
+    std::function<bool(std::string const&)> d_identFilter;
 
 public:
     Writer(LogData const& data, std::ostream& out, std::function<bool(std::string const&)> identFilter);
