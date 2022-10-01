@@ -10,7 +10,6 @@ enum
 
 int run()
 {
-    /*
     Options const& opt = Options::instance();
         // set the filter, or nullptr if there is none
     std::function<bool(std::string)> filter;
@@ -33,5 +32,4 @@ int run()
     HeaderParser headerParser(headerData, headerStream);
 
     return SUCCESS;
-    */
 }

@@ -1,8 +1,13 @@
 #include "options.ih"
 
-std::filesystem::path const& Options::headerFile() const
+filesystem::path const& Options::headerFile() const
 {
     return d_headerFile;
+}
+
+std::filesystem::path const& Options::outputFile() const
+{
+    return d_outputFile;
 }
 
 vector<filesystem::path> Options::logFiles() const
@@ -15,7 +20,7 @@ FilterType Options::filterType() const
     return d_filterType;
 }
 
-std::regex const& Options::filterRegex() const
+regex const& Options::filterRegex() const
 {
     return d_filterRegex;
 }

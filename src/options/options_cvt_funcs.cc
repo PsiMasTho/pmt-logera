@@ -6,9 +6,7 @@ using namespace std;
 template <>
 filesystem::path Options::cvtFunc<filesystem::path>(string const& valStr)
 {
-    filesystem::path ret(valStr);
-
-    return ret;
+    return filesystem::path{valStr};
 }
 
     // expects one or more paths seperated by a single space, not checked if files exist

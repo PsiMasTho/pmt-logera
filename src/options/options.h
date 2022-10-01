@@ -18,9 +18,10 @@ enum FilterType
 
 class Options
 {
-    static std::unique_ptr<Options>    s_instance;
+    static std::unique_ptr<Options>          s_instance;
 
     std::filesystem::path const              d_headerFile;
+    std::filesystem::path const              d_outputFile;
     std::vector<std::filesystem::path> const d_logFiles;
     FilterType const                         d_filterType;
     std::regex const                         d_filterRegex;
@@ -32,6 +33,7 @@ public:
 
         // accessors
     std::filesystem::path const& headerFile() const;
+    std::filesystem::path const& outputFile() const;
     std::vector<std::filesystem::path> logFiles() const;
     FilterType filterType() const;
     std::regex const& filterRegex() const;
@@ -46,6 +48,7 @@ private:
 
         // assigning the member variables from the strings in Args
     decltype(d_headerFile)  setHeaderFile(Args const& args);
+    decltype(d_outputFile)  setOutputFile(Args const& args);
     decltype(d_logFiles)    setLogFiles(Args const& args);
     decltype(d_filterType)  setFilterType(Args const& args);
     decltype(d_filterRegex) setFilterRegex(Args const& args);
