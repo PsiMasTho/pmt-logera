@@ -2,6 +2,6 @@
 
 LogParser::LogParser(istream& logStream, LogData& logData)
 :
-	d_scanner(logStream),
-	d_logData(logData)
+    d_scanner(logStream),
+    d_logData(logData)
 {}
