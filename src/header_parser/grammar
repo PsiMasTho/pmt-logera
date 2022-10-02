@@ -1,11 +1,57 @@
-%class-name HeaderParser
+%token DECL_VAR
+%token IDENT
+%token DECL_ATTR
+%token ATTR
 
-%scanner ../scanner/scanner.h
-%scanner-class-name Scanner
-%token  MONTH
+    // unused
+%token DATE
+%token VALUE
+
+%stype std::string
 
 %%
 
-expr:
-    MONTH
+input:
+    // empty
+|
+    input line
+;
+
+line:
+    declare_attribute
+|
+    declare_variable
+;
+
+identifier:
+    IDENT
+    {
+        $$ = d_scanner.matched();
+    }
+;
+
+attribute:
+    ATTR
+    {
+        $$ = d_scanner.matched();
+    }
+;
+
+declare_variable:
+    DECL_VAR identifier
+    {
+        d_ret->addVar($2);
+    }
+|
+    declare_variable attribute
+    {
+        d_ret->addAttrToLastVar($2);
+    }
+;
+
+declare_attribute:
+    DECL_ATTR attribute
+    {
+        d_ret->addAttr($2);
+    }
 ;

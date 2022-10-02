@@ -28,8 +28,44 @@ int run()
     }
 
     ifstream headerStream(opt.headerFile());
-    HeaderData headerData;
-    HeaderParser headerParser(headerData, headerStream);
+
+/*
+//
+    ifstream logStream(opt.logFiles()[0]);
+    Scanner scanner(headerStream);
+    while (int tok = scanner.lex())
+    {
+        switch (tok)
+        {
+            case Scanner::Token::DECL_ATTR:
+            cout << "DECL_ATTR" << '\n';
+            break;
+            case Scanner::Token:: DECL_VAR:
+            cout << "DECL_VAR" << '\n';
+            break;
+            case Scanner::Token:: IDENT:
+            cout << "IDENT" << '\n';
+            break;
+            case Scanner::Token:: VALUE:
+            cout << "VALUE" << '\n';
+            break;
+            case Scanner::Token:: ATTR:
+            cout << "ATTR" << '\n';
+            break;
+            case Scanner::Token:: DATE:
+            cout << "DATE" << '\n';
+            break;
+            default:
+            cout << scanner.matched() << '\n';
+            break;
+        };
+    }
+//
+*/
+
+    std::unique_ptr<HeaderData> headerData = HeaderParser(headerStream).genHeader();
+
+    headerData->debugPrint();
 
     return SUCCESS;
 }

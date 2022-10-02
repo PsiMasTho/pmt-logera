@@ -6,6 +6,7 @@
 // $insert baseclass_h
 #include "scannerbase.h"
 
+#include "token_enums.h"
 
 // $insert classHead
 class Scanner: public ScannerBase
@@ -17,7 +18,6 @@ class Scanner: public ScannerBase
         
         // $insert lexFunctionDecl
         int lex();
-        #include "token_enums.hi"
 
     private:
         int lex_();

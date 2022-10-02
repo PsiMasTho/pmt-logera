@@ -1,6 +1,8 @@
 CXX = g++ # note: clang++ gives a lot of warnings for the code bisonc++ and flexc++ generates
-CXX_FLAGS = -ggdb3 -O0 -Wall -std=c++20
-CXX_LDFLAGS =
+#CXX_FLAGS = -s -Ofast -march=native -std=c++20
+CXX_FLAGS = -ggdb3 -O0 -Wall -std=c++20 -fsanitize=address
+#CXX_LDFLAGS = -flto
+CXX_LDFLAGS = -fsanitize=address
 
 # Final binary
 BIN = Logera
@@ -48,7 +50,7 @@ run_flexc++:
 .PHONY: run_bisonc++
 run_bisonc++:
 	bisonc++ $(LOG_PARSER_DIR)/grammar --target-directory=$(LOG_PARSER_DIR)/ --filenames=log_parser
-	bisonc++ $(HEADER_PARSER_DIR)/grammar --target-directory=$(HEADER_PARSER_DIR)/ --filenames=header_parser
+	bisonc++ $(HEADER_PARSER_DIR)/grammar --target-directory=$(HEADER_PARSER_DIR)/ --filenames=header_parser --no-lines --scanner=$(SCANNER_DIR)/scanner.h --class-name HeaderParser --token-path=../scanner/token_enums.h
 
 .PHONY: clean
 clean:

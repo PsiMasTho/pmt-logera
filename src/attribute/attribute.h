@@ -2,17 +2,23 @@
 #define INCLUDED_ATTRIBUTE_H
 
 #include <string>
-#include <optional>
+#include <regex>
+#include <functional>
 
-namespace Attribute
+class Attribute
 {
-    #include "attribute_enums.hi"
+	std::string d_name;
+	std::function<bool(std::string const&)> d_checkValueRegex;
 
-        // checks if the given string %attr is an attribute, returns
-        // the ID inside the std::optional if yes
-    std::optional<ID> 	 validateAttrStr(std::string const& attr);
-    
-    bool 				 validateValueStr(ID attr, std::string const& value);
-}
+public:
+	explicit Attribute(std::string const& name);
+	Attribute(std::string const& name, std::regex expr);
+	Attribute(Attribute const&) = default;
+	Attribute(Attribute&&) = default;
+	~Attribute() = default;
+
+	std::string const& name() const;
+	bool validValue(std::string const& value) const;
+};
 
 #endif

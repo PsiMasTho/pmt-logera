@@ -1,7 +1,13 @@
 #include "header_parser.ih"
 
-HeaderParser::HeaderParser(HeaderData& headerData, std::istream& headerStream)
+HeaderParser::HeaderParser(std::istream& headerStream)
 :
 	d_scanner(headerStream),
-	d_headerData(headerData)
+	d_ret(new HeaderData)
 {}
+
+unique_ptr<HeaderData> HeaderParser::genHeader()
+{
+	parse();
+	return move(exchange(d_ret, nullptr));
+}

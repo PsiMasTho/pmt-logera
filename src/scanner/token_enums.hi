@@ -1,8 +1,0 @@
-enum Token
-{
-    BEGIN_DECL = 257,
-    IDENT,
-    BEGIN_ATTR,
-    VALUE,
-    ATTR
-};

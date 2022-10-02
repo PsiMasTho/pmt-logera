@@ -1,5 +1,7 @@
 %class-name = "Scanner"
 
+month          "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
+
 %%
 
     // ignore spaces, tabs and newlines
@@ -8,14 +10,16 @@
     // ignore comments
 #.*\n
 
-^"decl "								return Token::BEGIN_DECL;
+[0-9]{1,2}{month}[0-9]{4}               return Tokens::Tokens_::DATE;
 
-"$"[0-9a-zA-Z,:.]+                      return Token::VALUE;
+"$"[0-9a-zA-Z,:.]+                      return Tokens::Tokens_::VALUE;
 
-">"[ \t]+"attr:"					    return Token::BEGIN_ATTR;
+">attr"					                return Tokens::Tokens_::DECL_ATTR;
 
-"%"[a-zA-Z]+							return Token::ATTR;
+">var"                                  return Tokens::Tokens_::DECL_VAR;
 
-[a-zA-Z_]+								return Token::IDENT;
+"%"[a-zA-Z]+							return Tokens::Tokens_::ATTR;
+
+[a-zA-Z_]+								return Tokens::Tokens_::IDENT;
 
 .                                    	return matched()[0];
