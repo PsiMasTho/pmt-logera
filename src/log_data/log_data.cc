@@ -14,6 +14,17 @@ LogData::LogData(HeaderData& headerData)
 	d_lastVar{}
 {}
 
+LogData::const_iterator LogData::cbegin()
+{
+	return const_iterator(this, d_dateToLogLineMap.cbegin());
+}
+
+LogData::const_iterator LogData::cend()
+{
+	return const_iterator(this, d_dateToLogLineMap.cend());
+}
+
+
 void LogData::setActiveDate(Date const& date)
 {
 	d_dateToLogLineMap.insert({date, {}});

@@ -7,6 +7,8 @@
 #include "options/options.h"
 #include "args/args.h"
 
+#include "writer/writer.h"
+
 #include <iostream>
 #include <memory>
 #include <fstream>

@@ -1,6 +1,7 @@
 #ifndef INCLUDED_LOG_DATA_H
 #define INCLUDED_LOG_DATA_H
 
+#include "log_line.h"
 #include "../date/date.h"
 
 class HeaderData;
@@ -9,15 +10,11 @@ class HeaderData;
 #include <map>
 #include <vector>
 #include <string>
+#include <iterator>
+#include <utility>
 
 class LogData
 {
-	struct LogLine
-	{
-		std::string 			 varName;
-		std::vector<std::string> attrVals;
-	};
-
 	using DateToLogLineMap = std::map<Date, std::vector<LogLine>>;
 
 	HeaderData& 				   d_headerData;
@@ -26,7 +23,12 @@ class LogData
 	std::string					   d_lastVar;
 
 public:
+	#include "const_iterator.hi"
+
 	LogData(HeaderData& headerData);
+
+	const_iterator cbegin();
+	const_iterator cend();
 
 	void setActiveDate(Date const& date);
 	void startNewLogLineForNewVar(std::string const& varName);

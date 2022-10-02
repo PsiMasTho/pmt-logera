@@ -12,7 +12,6 @@ try
 
     for (auto& entry : opts.logFiles())
         cout << "LOG: " << entry << '\n';
-
     cout << "##############################\n";
 
     run();

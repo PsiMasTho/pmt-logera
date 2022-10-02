@@ -13,6 +13,20 @@ enum
 int run()
 {
     Options const& opt = Options::instance();
+
+    ifstream headerStream(opt.headerFile());
+
+    unique_ptr<HeaderData> headerData = HeaderParser(headerStream).genHeader();
+
+    LogData logData(*headerData);
+
+    for (auto const& logPath : opt.logFiles())
+    {
+        ifstream logStream(logPath);
+        LogParser logParser(logStream, logData);
+        logParser.parse();
+    }
+
         // set the filter, or nullptr if there is none
     std::function<bool(std::string)> filter;
 
@@ -29,23 +43,11 @@ int run()
         break;
     }
 
-    ifstream headerStream(opt.headerFile());
-
-    unique_ptr<HeaderData> headerData = HeaderParser(headerStream).genHeader();
-    headerData->debugPrint();
-
-    cout << "##############################\n";
-
-    LogData logData(*headerData);
-
-    for (auto const& logPath : opt.logFiles())
+    Writer writer(opt.outputFile(), filter);
+    for (auto itr = logData.cbegin(); itr != logData.cend(); ++itr)
     {
-        ifstream logStream(logPath);
-        LogParser logParser(logStream, logData);
-        logParser.parse();
+        auto& [date, line] = *itr;
+        writer.write(date, line);
     }
-
-    logData.debugPrint();
-
     return SUCCESS;
 }
