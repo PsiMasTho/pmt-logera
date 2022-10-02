@@ -6,7 +6,7 @@
 
 struct LogLine
 {
-    std::string 			 varName;
+    std::string              varName;
     std::vector<std::string> attrVals;
 };
 

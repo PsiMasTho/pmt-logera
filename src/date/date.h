@@ -10,7 +10,7 @@ class Date
     friend bool operator<(Date const& lhs, Date const& rhs);
 
     std::chrono::year_month_day d_date;
-    std::string			        d_string;
+    std::string                 d_string;
 
 public:
     explicit Date(std::string const& dateStr);

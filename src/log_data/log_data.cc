@@ -10,7 +10,7 @@ LogData::LogData(HeaderData& headerData)
 :
     d_headerData{headerData},
     d_dateToLogLineMap{},
-     d_lastDate{nullopt},
+    d_lastDate{nullopt},
     d_lastVar{}
 {}
 

@@ -1,7 +1,7 @@
 #ifndef INCLUDED_ARG_H
 #define INCLUDED_ARG_H
 /*
-*	A simplified version of the Arg class found in lib bobcat
+*    A simplified version of the Arg class found in lib bobcat
 */
 
 #include <unordered_map>
@@ -17,7 +17,7 @@ class Args
         OPTIONAL
     };
 
-    std::unordered_map<char, Type>		  d_optTypeMap;
+    std::unordered_map<char, Type>        d_optTypeMap;
     std::unordered_map<char, std::string> d_optValMap;
 
 public:

@@ -6,7 +6,7 @@ bool LogData::const_iterator::operator==(const_iterator const& other) const
 {
     if(isEnd())
         return other.isEnd();
-      if(other.isEnd())
+    if(other.isEnd())
         return false;
 
     return (d_mapItr == other.d_mapItr) && (d_vecIdx && other.d_vecIdx);
@@ -40,8 +40,8 @@ LogData::const_iterator& LogData::const_iterator::operator++()
 LogData::const_iterator LogData::const_iterator::operator++(int)
 {
     const_iterator tmp(*this);
-      operator++(); // prefix-increment this
-      return tmp;   // return value before increment
+    operator++(); // prefix-increment this
+    return tmp;   // return value before increment
 }
 
 pair<Date, LogLine> const& LogData::const_iterator::operator*() const

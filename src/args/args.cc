@@ -60,7 +60,7 @@ void Args::fillValMap(char** argv)
 
     vector<pair<char, string>> optValPairs;
     
-    /* char		string
+    /* char        string
     ------------------------
         -arg1   "val1 val2 val3..."
         -arg2   "val1 val2 val3..."

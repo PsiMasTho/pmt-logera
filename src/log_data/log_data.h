@@ -17,10 +17,10 @@ class LogData
 {
     using DateToLogLineMap = std::map<Date, std::vector<LogLine>>;
 
-    HeaderData& 				   d_headerData;
-    DateToLogLineMap 			   d_dateToLogLineMap;
-    std::optional<Date> 		   d_lastDate;
-    std::string					   d_lastVar;
+    HeaderData&         d_headerData;
+    DateToLogLineMap    d_dateToLogLineMap;
+    std::optional<Date> d_lastDate;
+    std::string         d_lastVar;
 
 public:
     #include "const_iterator.hi"

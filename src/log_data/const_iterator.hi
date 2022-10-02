@@ -1,4 +1,3 @@
-
     // nested inside LogData
 class const_iterator final : public std::iterator<
                                         std::input_iterator_tag,   // iterator_category
@@ -6,18 +5,18 @@ class const_iterator final : public std::iterator<
                                         std::ptrdiff_t,            // difference_type
                                         std::pair<Date, LogLine>*, // pointer
                                         std::pair<Date, LogLine>&  // reference
-                                        >
+                                                 >
 {
     friend class LogData;
-    LogData* 											 d_parent;
+    LogData*                                             d_parent;
     std::map<Date, std::vector<LogLine>>::const_iterator d_mapItr;
-    size_t 												 d_vecIdx;
-    std::pair<Date, LogLine> 							 d_value;
+    size_t                                               d_vecIdx;
+    std::pair<Date, LogLine>                             d_value;
 
 public:
     bool operator==(const_iterator const& other) const;
     bool operator!=(const_iterator const& other) const;
-    const_iterator& operator++(); 	 // prefix
+    const_iterator& operator++();      // prefix
     const_iterator operator++(int); // postfix
 
     std::pair<Date, LogLine> const& operator*() const;
