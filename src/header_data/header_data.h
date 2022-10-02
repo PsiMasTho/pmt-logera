@@ -34,6 +34,7 @@ public:
     bool doesAttrExist(size_t* idx, std::string const& attrName) const;
 
     size_t getAttrCount() const;
+    std::string const& getAttrName(size_t idx) const;
 };
 
 #endif

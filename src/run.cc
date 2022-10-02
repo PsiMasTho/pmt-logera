@@ -43,7 +43,15 @@ int run()
         break;
     }
 
-    Writer writer(opt.outputFile(), filter);
+    Writer writer(opt.outputFile(), filter, ";");
+
+    {
+        vector<string> headerLine{"Date", "Var"};
+        for (size_t idx = 0; idx < headerData->getAttrCount(); ++idx)
+            headerLine.push_back(headerData->getAttrName(idx));
+        writer.write(headerLine);
+    }
+
     for (auto itr = logData.cbegin(); itr != logData.cend(); ++itr)
     {
         auto& [date, line] = *itr;

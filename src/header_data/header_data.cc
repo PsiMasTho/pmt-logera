@@ -80,3 +80,8 @@ size_t HeaderData::getAttrCount() const
 {
 	return d_attrs.size();
 }
+
+string const& HeaderData::getAttrName(size_t idx) const
+{
+	return d_attrs[idx].name();
+}
