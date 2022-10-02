@@ -52,7 +52,7 @@ bool HeaderData::doesVarHaveAttr(std::string const& varName, std::string const& 
 }
 
 #include <iostream>
-void HeaderData::debugPrint()
+void HeaderData::debugPrint() const
 {
 	for (auto [varName, idxSet] : d_vars)
 	{
@@ -74,4 +74,9 @@ bool HeaderData::doesAttrExist(size_t* idx, std::string const& attrName) const
 			*idx = distance(d_attrs.begin(), itr);
 		return true;
 	}
+}
+
+size_t HeaderData::getAttrCount() const
+{
+	return d_attrs.size();
 }

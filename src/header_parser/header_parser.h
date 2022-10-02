@@ -18,7 +18,6 @@
     // you should do so after these comment-lines.
 
 #include "../header_data/header_data.h"
-#include <memory>
 
 class HeaderParser: public HeaderParserBase
 {

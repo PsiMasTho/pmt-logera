@@ -29,10 +29,11 @@ public:
 
     bool doesVarHaveAttr(std::string const& varName, std::string const& attrName);
 
-    void debugPrint();
+    void debugPrint() const;
 
-private:
     bool doesAttrExist(size_t* idx, std::string const& attrName) const;
+
+    size_t getAttrCount() const;
 };
 
 #endif

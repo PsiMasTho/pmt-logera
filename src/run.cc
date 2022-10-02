@@ -2,6 +2,8 @@
 
 #include "scanner/scanner.h"
 
+#include "debug.h"
+
 enum
 {
     SUCCESS = 0,
@@ -29,43 +31,21 @@ int run()
 
     ifstream headerStream(opt.headerFile());
 
-/*
-//
-    ifstream logStream(opt.logFiles()[0]);
-    Scanner scanner(headerStream);
-    while (int tok = scanner.lex())
-    {
-        switch (tok)
-        {
-            case Scanner::Token::DECL_ATTR:
-            cout << "DECL_ATTR" << '\n';
-            break;
-            case Scanner::Token:: DECL_VAR:
-            cout << "DECL_VAR" << '\n';
-            break;
-            case Scanner::Token:: IDENT:
-            cout << "IDENT" << '\n';
-            break;
-            case Scanner::Token:: VALUE:
-            cout << "VALUE" << '\n';
-            break;
-            case Scanner::Token:: ATTR:
-            cout << "ATTR" << '\n';
-            break;
-            case Scanner::Token:: DATE:
-            cout << "DATE" << '\n';
-            break;
-            default:
-            cout << scanner.matched() << '\n';
-            break;
-        };
-    }
-//
-*/
-
-    std::unique_ptr<HeaderData> headerData = HeaderParser(headerStream).genHeader();
-
+    unique_ptr<HeaderData> headerData = HeaderParser(headerStream).genHeader();
     headerData->debugPrint();
+
+    cout << "##############################\n";
+
+    LogData logData(*headerData);
+
+    for (auto const& logPath : opt.logFiles())
+    {
+        ifstream logStream(logPath);
+        LogParser logParser(logStream, logData);
+        logParser.parse();
+    }
+
+    logData.debugPrint();
 
     return SUCCESS;
 }

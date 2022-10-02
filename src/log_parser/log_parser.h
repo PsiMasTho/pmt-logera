@@ -17,14 +17,16 @@
     // If you need to include additional headers in this file 
     // you should do so after these comment-lines.
 
+class LogData;
 
 class LogParser: public LogParserBase
 {
     // $insert scannerobject
-    Scanner d_scanner;
+    Scanner  d_scanner;
+    LogData& d_logData;
         
     public:
-        LogParser() = default;
+        LogParser(std::istream& logStream, LogData& logData);
         int parse();
 
     private:

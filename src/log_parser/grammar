@@ -1,12 +1,76 @@
-%class-name LogParser
+%token DECL_VAR
+%token IDENT
+%token DECL_ATTR
+%token ATTR
 
-%scanner ../scanner/scanner.h
-%scanner-class-name Scanner
+    // unused
+%token DATE
+%token VALUE
 
-%token  MONTH
+%stype std::string
 
 %%
 
-expr:
-    MONTH
+input:
+    // empty
+|
+    input line
+;
+
+line:
+    date '\n'
+    {
+       d_logData.setActiveDate(Date($1));
+    }
+|
+    assign_attributes
+|
+    '\n'
+;
+
+date:
+    DATE
+    {
+        $$ = d_scanner.matched();
+    }
+;
+
+value:
+    VALUE
+    {
+        $$ = d_scanner.matched();
+    }
+;
+
+assign_attributes:
+    identifier ':' '\n' attribute value
+    {
+        d_logData.startNewLogLineForNewVar($1);
+        d_logData.addAttrToActiveVar($4, $5);
+    }
+|
+    assign_attributes attribute value
+    {
+        d_logData.addAttrToActiveVar($2, $3);
+    }
+|
+    '\n' attribute value
+    {
+        d_logData.startNewLogLineForActiveVar();
+        d_logData.addAttrToActiveVar($2, $3);
+    }
+;
+
+identifier:
+    IDENT
+    {
+        $$ = d_scanner.matched();
+    }
+;
+
+attribute:
+    ATTR
+    {
+        $$ = d_scanner.matched();
+    }
 ;

@@ -18,9 +18,11 @@ input:
 ;
 
 line:
-    declare_attribute
+    declare_attribute '\n'
 |
-    declare_variable
+    declare_variable '\n'
+|
+    '\n'
 ;
 
 identifier:

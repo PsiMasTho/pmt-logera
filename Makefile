@@ -49,7 +49,7 @@ run_flexc++:
 
 .PHONY: run_bisonc++
 run_bisonc++:
-	bisonc++ $(LOG_PARSER_DIR)/grammar --target-directory=$(LOG_PARSER_DIR)/ --filenames=log_parser
+	bisonc++ $(LOG_PARSER_DIR)/grammar --target-directory=$(LOG_PARSER_DIR)/ --filenames=log_parser --no-lines --scanner=$(SCANNER_DIR)/scanner.h --class-name LogParser --token-path=../scanner/token_enums.h
 	bisonc++ $(HEADER_PARSER_DIR)/grammar --target-directory=$(HEADER_PARSER_DIR)/ --filenames=header_parser --no-lines --scanner=$(SCANNER_DIR)/scanner.h --class-name HeaderParser --token-path=../scanner/token_enums.h
 
 .PHONY: clean

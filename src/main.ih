@@ -1,5 +1,9 @@
 #include "header_parser/header_parser.h"
+#include "header_data/header_data.h"
+
 #include "log_parser/log_parser.h"
+#include "log_data/log_data.h"
+
 #include "options/options.h"
 #include "args/args.h"
 

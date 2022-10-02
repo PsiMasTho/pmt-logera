@@ -5,7 +5,7 @@ month          "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"
 %%
 
     // ignore spaces, tabs and newlines
-[ \t\n]+
+[ \t]+
 
     // ignore comments
 #.*\n
@@ -21,5 +21,7 @@ month          "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"
 "%"[a-zA-Z]+							return Tokens::Tokens_::ATTR;
 
 [a-zA-Z_]+								return Tokens::Tokens_::IDENT;
+
+'\n'                                    return '\n';
 
 .                                    	return matched()[0];
