@@ -59,7 +59,7 @@ constexpr char _toLower(char ch)
     return _tolowerLookup[ch];
 }
 
-constexpr bool _icaseStrCmp(char const *a, char const *b)
+constexpr bool _icaseStrCmp(char const* a, char const* b)
 {
     return _toLower(*a) == _toLower(*b) && (*a == '\0' || _icaseStrCmp(a + 1, b + 1));
 }
