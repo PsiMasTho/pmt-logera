@@ -35,7 +35,7 @@ identifier:
 attribute:
     ATTR
     {
-        $$ = d_scanner.matched();
+        $$ = std::string(d_scanner.matched()).substr(1);
     }
 ;
 

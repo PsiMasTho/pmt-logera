@@ -38,7 +38,7 @@ date:
 value:
     VALUE
     {
-        $$ = d_scanner.matched();
+        $$ = std::string(d_scanner.matched()).substr(1); // skip '$' char
     }
 ;
 
@@ -71,6 +71,6 @@ identifier:
 attribute:
     ATTR
     {
-        $$ = d_scanner.matched();
+        $$ = std::string(d_scanner.matched()).substr(1);
     }
 ;
