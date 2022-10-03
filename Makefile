@@ -1,8 +1,8 @@
 CXX = g++ # note: clang++ gives a lot of warnings for the code bisonc++ and flexc++ generates
-#CXX_FLAGS = -s -Ofast -march=native -std=c++20
-CXX_FLAGS = -ggdb3 -O0 -Wall -std=c++20 -fsanitize=address
-#CXX_LDFLAGS = -flto
-CXX_LDFLAGS = -fsanitize=address
+CXX_FLAGS = -s -Ofast -march=native -std=c++20
+#CXX_FLAGS = -ggdb3 -O0 -Wall -std=c++20 -fsanitize=address
+CXX_LDFLAGS = -flto
+#CXX_LDFLAGS = -fsanitize=address
 
 # Final binary
 BIN = Logera
@@ -45,7 +45,7 @@ $(BUILD_DIR)/%.o: %.cc
 
 .PHONY: run_flexc++
 run_flexc++:
-	flexc++ $(SCANNER_DIR)/lexer --target-directory=$(SCANNER_DIR)/ --filenames=scanner
+	flexc++ $(SCANNER_DIR)/lexer --target-directory=$(SCANNER_DIR)/ --filenames=scanner --no-lines
 
 .PHONY: run_bisonc++
 run_bisonc++:
