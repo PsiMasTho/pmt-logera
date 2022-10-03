@@ -38,12 +38,12 @@ size_t Attributes::getCount() const
 
 size_t Attributes::getIdx(std::string const& name) const
 {
-    auto const itr = lower_bound(begin(d_names), end(d_names), name, less<>{});
+    auto const [begitr, enditr] = equal_range(begin(d_names), end(d_names), name, less<>{});
 
-    if (itr == d_names.end())
-        throw "Queried unknown attribute";
+    if (distance(begitr, enditr) != 1)
+        throw "Queried unknown attribute: "s + name;
 
-    return distance(begin(d_names), itr);
+    return distance(begin(d_names), begitr);
 }
 
 string const& Attributes::getName(size_t idx) const

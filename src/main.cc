@@ -9,7 +9,11 @@ try
 
     run();
 %>
-catch(char const* e)
+catch (char const* e)
+<%
+    cerr << e << '\n';
+%>
+catch (string const&e)
 <%
     cerr << e << '\n';
 %>

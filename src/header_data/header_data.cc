@@ -15,7 +15,7 @@ void HeaderData::addVar(string const& varName)
 {
     auto const [itr, success] = d_vars.insert({varName, {}});
     if (!success)
-        throw "Bad header file";
+        throw "Failed declaring variable: "s + varName;
     else
         d_lastVarItr = itr;
 }
@@ -33,7 +33,7 @@ void HeaderData::addAttr(std::string const& attrName, std::regex attrRegex)
 void HeaderData::addAttrToLastVar(std::string const& attrName)
 {
     if (d_lastVarItr == d_vars.end())
-        throw "Attemtpting to add attribute without a variable";
+        throw "Attemtpting to add attribute without a variable: "s + attrName;
 
     d_lastVarItr->second[d_attrs.getIdx(attrName)] = true;
 }
@@ -42,7 +42,7 @@ bool HeaderData::doesVarHaveAttr(std::string const& varName, std::string const& 
 {
     auto const itr = d_vars.find(varName);
     if (itr == d_vars.end())
-        throw "Unknown variable queried";
+        throw "Unknown variable queried"s + varName;
     else
         return itr->second[d_attrs.getIdx(attrName)];
 }
