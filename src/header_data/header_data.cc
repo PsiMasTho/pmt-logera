@@ -22,19 +22,20 @@ void HeaderData::addVar(string const& varName)
 
 void HeaderData::addAttr(string const& attrName)
 {
-    d_attrs.emplace_back(attrName);
+    d_attrs.push_back(attrName);
 }
 
 void HeaderData::addAttr(std::string const& attrName, std::regex attrRegex)
 {
-    d_attrs.emplace_back(attrName, attrRegex);
+    d_attrs.push_back(attrName, attrRegex);
 }
 
 void HeaderData::addAttrToLastVar(std::string const& attrName)
 {
-    if (d_lastVarItr != d_vars.end())
-        if (size_t idx; doesAttrExist(&idx, attrName))
-            d_lastVarItr->second.insert(idx);
+    if (d_lastVarItr == d_vars.end())
+        throw "Attemtpting to add attribute without a variable";
+
+    d_lastVarItr->second[d_attrs.getIdx(attrName)] = true;
 }
 
 bool HeaderData::doesVarHaveAttr(std::string const& varName, std::string const& attrName)
@@ -43,45 +44,20 @@ bool HeaderData::doesVarHaveAttr(std::string const& varName, std::string const& 
     if (itr == d_vars.end())
         throw "Unknown variable queried";
     else
+        return itr->second[d_attrs.getIdx(attrName)];
+}
+
+Attributes const& HeaderData::getAttributes() const
+{
+    return d_attrs;
+}
+
+#include <ostream>
+void HeaderData::debugPrint(ostream& out) const
+{
+    for (auto [varName, idxBits] : d_vars)
     {
-        if (size_t idx; doesAttrExist(&idx, attrName))
-            return itr->second.contains(idx);
-        else
-            throw "Unknow attribute queried";
+        out << "VAR: " << varName << '\n';
+        out << "\tATTRS: " << idxBits.to_string() << '\n';
     }
-}
-
-#include <iostream>
-void HeaderData::debugPrint() const
-{
-    for (auto [varName, idxSet] : d_vars)
-    {
-        cout << "VAR: " << varName << '\n';
-        for (auto idx : idxSet)
-            cout << '\t' << d_attrs[idx].name() << '\n';
-    }
-}
-
-bool HeaderData::doesAttrExist(size_t* idx, std::string const& attrName) const
-{
-    auto const itr = find_if(begin(d_attrs), end(d_attrs), [&attrName](auto const& elem){return elem.name() == attrName;});
-
-    if (itr == d_attrs.end())
-        return false;
-    else
-    {
-        if (idx)
-            *idx = distance(d_attrs.begin(), itr);
-        return true;
-    }
-}
-
-size_t HeaderData::getAttrCount() const
-{
-    return d_attrs.size();
-}
-
-string const& HeaderData::getAttrName(size_t idx) const
-{
-    return d_attrs[idx].name();
 }

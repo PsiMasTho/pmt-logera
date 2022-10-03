@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <regex>
 #include <memory>
+#include <iosfwd>
 
 class Args;
 
@@ -37,6 +38,9 @@ public:
     std::vector<std::filesystem::path> logFiles() const;
     FilterType filterType() const;
     std::regex const& filterRegex() const;
+
+        // print
+    void debugPrint(std::ostream& out) const;
         
 private:
     Options(Args const& args);

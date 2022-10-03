@@ -47,8 +47,8 @@ int run()
 
     {
         vector<string> headerLine{"Date", "Var"};
-        for (size_t idx = 0; idx < headerData->getAttrCount(); ++idx)
-            headerLine.push_back(headerData->getAttrName(idx));
+        for (size_t idx = 0; idx < headerData->getAttributes().getCount(); ++idx)
+            headerLine.push_back(headerData->getAttributes().getName(idx));
         writer.write(headerLine);
     }
 

@@ -25,3 +25,14 @@ Options::Options(Args const& args)
     d_filterRegex{setFilterRegex(args)}
 {}
 
+void Options::debugPrint(std::ostream& out) const
+{
+    out << "##############################\n";
+    out << "HEADER: " << headerFile() << '\n';
+    out << "##############################\n";
+    out << "OUTPUT: " << outputFile() << '\n';
+    out << "##############################\n";
+    for (auto& entry : logFiles())
+        out << "LOG: " << entry << '\n';
+    out << "##############################\n";
+}

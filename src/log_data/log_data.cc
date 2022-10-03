@@ -33,20 +33,19 @@ void LogData::setActiveDate(Date const& date)
 
 void LogData::startNewLogLineForNewVar(std::string const& varName)
 {
-    d_dateToLogLineMap[d_lastDate.value()].push_back({varName, vector<string>(d_headerData.getAttrCount(), ""s)});
+    d_dateToLogLineMap[d_lastDate.value()].push_back({varName, vector<string>(d_headerData.getAttributes().getCount(), ""s)});
     d_lastVar = varName;
 }
 
 void LogData::startNewLogLineForActiveVar()
 {
-    d_dateToLogLineMap[d_lastDate.value()].push_back({d_lastVar, vector<string>(d_headerData.getAttrCount(), ""s)});
+    d_dateToLogLineMap[d_lastDate.value()].push_back({d_lastVar, vector<string>(d_headerData.getAttributes().getCount(), ""s)});
 }
 
 void LogData::addAttrToActiveVar(std::string const& attrName, std::string const& attrVal)
 {
-    if (size_t idx; d_headerData.doesAttrExist(&idx, attrName))
-        if (d_headerData.doesVarHaveAttr(d_lastVar, attrName))
-            d_dateToLogLineMap[d_lastDate.value()].back().attrVals[idx] = attrVal;
+    if (d_headerData.doesVarHaveAttr(d_lastVar, attrName))
+        d_dateToLogLineMap[d_lastDate.value()].back().attrVals[d_headerData.getAttributes().getIdx(attrName)] = attrVal;
 }
 
 void LogData::debugPrint() const
