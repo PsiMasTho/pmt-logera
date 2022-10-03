@@ -10,6 +10,7 @@ struct Tokens
         IDENT,
         DECL_ATTR,
         ATTR,
+        REGEX,
         DATE,
         VALUE,
     };

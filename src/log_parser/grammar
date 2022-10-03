@@ -1,9 +1,10 @@
+%token-path ../scanner/token_enums.h
+
 %token DECL_VAR
 %token IDENT
 %token DECL_ATTR
 %token ATTR
-
-    // unused
+%token REGEX
 %token DATE
 %token VALUE
 

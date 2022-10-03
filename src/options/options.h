@@ -19,8 +19,6 @@ enum FilterType
 
 class Options
 {
-    static std::unique_ptr<Options>          s_instance;
-
     std::filesystem::path const              d_headerFile;
     std::filesystem::path const              d_outputFile;
     std::vector<std::filesystem::path> const d_logFiles;
@@ -28,9 +26,7 @@ class Options
     std::regex const                         d_filterRegex;
 
 public:
-    static Options& initialize(Args const& args);
-    static Options& instance();
-    Options(Options const&) = delete;
+    Options(Args const& args);
 
         // accessors
     std::filesystem::path const& headerFile() const;
@@ -43,8 +39,6 @@ public:
     void debugPrint(std::ostream& out) const;
         
 private:
-    Options(Args const& args);
-
         // converts a string to a given type e.g. string of space seperated
         // paths to a vector of filesystem::path
     template <typename Type>

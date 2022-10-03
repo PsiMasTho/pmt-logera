@@ -28,6 +28,9 @@ void scanFile(std::filesystem::path const& pth)
             case Tokens::Tokens_::VALUE:
                 cout << "VALUE\n";
             break;
+            case Tokens::Tokens_::REGEX:
+                cout << "REGEX\n";
+            break;
             case '\n':
                 cout << "NEWLINE\n";
             break;

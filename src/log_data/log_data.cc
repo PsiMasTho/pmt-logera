@@ -2,62 +2,59 @@
 
 #include "../header_data/header_data.h"
 
-#include <iostream>
+#include <algorithm>
+#include <execution>
 
 using namespace std;
 
 LogData::LogData(HeaderData& headerData)
 :
+    d_logLines{},
     d_headerData{headerData},
-    d_dateToLogLineMap{},
-    d_lastDate{nullopt},
-    d_lastVar{}
+    d_curDate{nullopt},
+    d_curVar{nullopt}
 {}
-
-LogData::const_iterator LogData::cbegin()
-{
-    return const_iterator(this, d_dateToLogLineMap.cbegin());
-}
-
-LogData::const_iterator LogData::cend()
-{
-    return const_iterator(this, d_dateToLogLineMap.cend());
-}
-
 
 void LogData::setActiveDate(Date const& date)
 {
-    d_dateToLogLineMap.insert({date, {}});
-    d_lastDate.emplace(date);
+    d_curDate = date;
 }
 
 void LogData::startNewLogLineForNewVar(std::string const& varName)
 {
-    d_dateToLogLineMap[d_lastDate.value()].push_back({varName, vector<string>(d_headerData.getAttributes().getCount(), ""s)});
-    d_lastVar = varName;
+    if (!d_curDate.has_value())
+        throw "Log with no date detected";
+
+    d_curVar = varName;
+    d_logLines.push_back(pair(d_curDate.value(), pair(d_curVar.value(), vector<string>(d_headerData.getAttributes().getCount(), ""s))));
 }
 
 void LogData::startNewLogLineForActiveVar()
 {
-    d_dateToLogLineMap[d_lastDate.value()].push_back({d_lastVar, vector<string>(d_headerData.getAttributes().getCount(), ""s)});
+    d_logLines.push_back(pair(d_curDate.value(), pair(d_curVar.value(), vector<string>(d_headerData.getAttributes().getCount(), ""s))));
 }
 
 void LogData::addAttrToActiveVar(std::string const& attrName, std::string const& attrVal)
 {
-    if (d_headerData.doesVarHaveAttr(d_lastVar, attrName))
-        d_dateToLogLineMap[d_lastDate.value()].back().attrVals[d_headerData.getAttributes().getIdx(attrName)] = attrVal;
+    if (!d_curVar.has_value())
+        throw "Attempting to add attribute without a variable";
+
+    if (!d_headerData.doesVarHaveAttr(d_curVar.value(), attrName))
+        throw "Variable: "s + d_curVar.value() + " does not have attribute: "s + attrName;
+
+    size_t const idx = d_headerData.getAttributes().getIdx(attrName);
+    if (!d_headerData.getAttributes().validValue(idx, attrVal))
+        throw "Invalid value: "s + attrVal + " for Attribute: " + attrName;
+
+    d_logLines.back().second.second[idx] = attrVal;
 }
 
-void LogData::debugPrint() const
+vector<pair<Date, LogData::LogLine>> const& LogData::getLines() const
 {
-    for (auto [date, loglines] : d_dateToLogLineMap)
-    {
-        cout << date.to_string() << '\n';
-        for (auto line : loglines)
-        {
-            cout << "\tName: " << line.varName << '\n';
-            for (auto attr : line.attrVals)
-                cout << "\t\tAttribute val: " << attr << '\n';
-        }
-    }
+    return d_logLines;
+}
+
+void LogData::sortLinesByDate()
+{
+    stable_sort(execution::par_unseq, begin(d_logLines), end(d_logLines), [](auto const& lhs, auto const& rhs){return lhs.first < rhs.first;});
 }

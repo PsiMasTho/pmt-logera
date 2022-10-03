@@ -19,4 +19,4 @@
 using namespace std;
 
     // todo: put this into a class if needed
-int run();
+int run(Options const& opt);

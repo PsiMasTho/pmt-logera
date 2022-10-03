@@ -27,7 +27,7 @@ public:
     HeaderData();
     void addVar(std::string const& varName);
     void addAttr(std::string const& attrName);
-    void addAttr(std::string const& attrName, std::regex attrRegex);
+    void addRegexToLastAttr(std::string const& expr);
     void addAttrToLastVar(std::string const& attrName);
 
     bool doesVarHaveAttr(std::string const& varName, std::string const& attrName);

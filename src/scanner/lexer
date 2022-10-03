@@ -3,14 +3,23 @@
 month          "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 
 %%
-
-    // ignore spaces, tabs and newlines
-[ \t]+
-
     // ignore comments
 #.*\n
 
+    // ignore spaces and tabs on their own
+[ \t]+
+
 [0-9]{1,2}{month}[0-9]{4}               return Tokens::Tokens_::DATE;
+
+';'[[:print:]]{-}[;]+';'                {
+                                            push(';');
+                                            return Tokens::Tokens_::REGEX;
+                                        }
+
+';'[[:print:]]{-}[;]+'\n'               {
+                                            push('\n');
+                                            return Tokens::Tokens_::REGEX;
+                                        }
 
 "$"[0-9a-zA-Z,:.]+                      return Tokens::Tokens_::VALUE;
 

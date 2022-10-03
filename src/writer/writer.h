@@ -17,7 +17,7 @@ class Writer
 
 public:
     Writer(std::filesystem::path const& outfile, std::function<bool(std::string const&)> identFilter, std::string const& delim);
-    void write(Date const& date, LogLine const& logLine);
+    void write(Date const& date, LogData::LogLine const& logLine);
     void write(std::vector<std::string> const& vec);
 };
 

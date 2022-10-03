@@ -4,16 +4,16 @@
 auto main(int argc, char** argv) -> int
 try
 <%
-    Options& opts = Options::initialize(Args("d:m:E:I:o:", argv));
+    Options opts(Args("d:m:E:I:o:", argv));
     opts.debugPrint(cerr);
 
-    run();
+    run(opts);
 %>
 catch (char const* e)
 <%
     cerr << e << '\n';
 %>
-catch (string const&e)
+catch (string const& e)
 <%
     cerr << e << '\n';
 %>

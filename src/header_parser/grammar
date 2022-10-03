@@ -1,9 +1,10 @@
+%token-path ../scanner/token_enums.h
+
 %token DECL_VAR
 %token IDENT
 %token DECL_ATTR
 %token ATTR
-
-    // unused
+%token REGEX
 %token DATE
 %token VALUE
 
@@ -20,6 +21,8 @@ input:
 line:
     declare_attribute '\n'
 |
+    declare_attribute assign_regex '\n'
+|
     declare_variable '\n'
 |
     '\n'
@@ -35,7 +38,16 @@ identifier:
 attribute:
     ATTR
     {
-        $$ = std::string(d_scanner.matched()).substr(1);
+        $$ = string(d_scanner.matched()).substr(1);
+    }
+;
+
+regular_expr:
+    REGEX
+    {
+        string txt(d_scanner.matched());
+            // removing all ';'. Then removing leading and trailing spaces and '\n'
+        $$ = trim(removeCh(txt, ';'));
     }
 ;
 
@@ -55,5 +67,17 @@ declare_attribute:
     DECL_ATTR attribute
     {
         d_ret->addAttr($2);
+    }
+;
+
+assign_regex:
+    regular_expr
+    {
+        d_ret->addRegexToLastAttr($1);
+    }
+|
+    assign_regex regular_expr
+    {
+        d_ret->addRegexToLastAttr($2);
     }
 ;

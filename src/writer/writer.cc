@@ -1,5 +1,4 @@
 #include "writer.h"
-#include "../log_data/log_line.h"
 
 #include <utility>
 
@@ -12,14 +11,14 @@ Writer::Writer(filesystem::path const& outfile, function<bool(string const&)> id
     d_delim{delim}
 {}
 
-void Writer::write(Date const& date, LogLine const& logLine)
+void Writer::write(Date const& date, LogData::LogLine const& logLine)
 {
         // only write if the filter accepts
-    if (!d_identFilter(logLine.varName))
+    if (!d_identFilter(logLine.first))
         return;
 
-    d_out << date.to_string() << ";" << logLine.varName;
-    for (auto const& val : logLine.attrVals)
+    d_out << date.to_string() << ";" << logLine.first;
+    for (auto const& val : logLine.second)
         d_out << d_delim << val;
     d_out << '\n';
 }

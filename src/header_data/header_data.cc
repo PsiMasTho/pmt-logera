@@ -6,8 +6,8 @@ using namespace std;
 
 HeaderData::HeaderData()
 :
-    d_attrs{},
     d_vars{},
+    d_attrs{},
     d_lastVarItr{d_vars.end()}
 {}
 
@@ -22,12 +22,12 @@ void HeaderData::addVar(string const& varName)
 
 void HeaderData::addAttr(string const& attrName)
 {
-    d_attrs.push_back(attrName);
+    d_attrs.addAttr(attrName);
 }
 
-void HeaderData::addAttr(std::string const& attrName, std::regex attrRegex)
+void HeaderData::addRegexToLastAttr(std::string const& expr)
 {
-    d_attrs.push_back(attrName, attrRegex);
+    d_attrs.addRegexToLastAttr(expr);
 }
 
 void HeaderData::addAttrToLastVar(std::string const& attrName)

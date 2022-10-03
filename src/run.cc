@@ -10,10 +10,8 @@ enum
     FAIL
 };
 
-int run()
+int run(Options const& opt)
 {
-    Options const& opt = Options::instance();
-
     ifstream headerStream(opt.headerFile());
 
     unique_ptr<HeaderData> headerData = HeaderParser(headerStream).genHeader();
@@ -27,7 +25,9 @@ int run()
         logParser.parse();
     }
 
-        // set the filter, or nullptr if there is none
+    logData.sortLinesByDate();
+
+        // set the filter
     std::function<bool(std::string)> filter;
 
     switch (opt.filterType())
@@ -44,7 +44,6 @@ int run()
     }
 
     Writer writer(opt.outputFile(), filter, ";");
-
     {
         vector<string> headerLine{"Date", "Var"};
         for (size_t idx = 0; idx < headerData->getAttributes().getCount(); ++idx)
@@ -52,10 +51,8 @@ int run()
         writer.write(headerLine);
     }
 
-    for (auto itr = logData.cbegin(); itr != logData.cend(); ++itr)
-    {
-        auto& [date, line] = *itr;
+    for (auto const& [date, line] : logData.getLines())
         writer.write(date, line);
-    }
+
     return SUCCESS;
 }

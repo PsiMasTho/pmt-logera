@@ -1,59 +1,55 @@
 #include "attributes.h"
 
 #include <algorithm>
-#include <utility>
+#include <execution>
+#include <regex>
 
 using namespace std;
 
-namespace
+Attributes::Attributes()
+:
+    d_attrs{}
+{}
+
+void Attributes::addAttr(string const& name)
 {
-    template< typename T>
-    typename vector<T>::iterator
-    insert_sorted(vector<T>& vec, T const& item)
-    {
-        return vec.insert(upper_bound(begin(vec), end(vec), item, less<>{}), item);
-    }
+    d_attrs.push_back(pair(name, vector<CheckStringFun>{}));
 }
 
-void Attributes::push_back(string const& name)
+void Attributes::addRegexToLastAttr(std::string const& expr)
 {
-    insertSorted(name, [](string const&){return true;});
-}
+    if (d_attrs.empty())
+        throw "Trying to add regex without an attribute: "s + expr;
 
-void Attributes::push_back(string const& name, regex expr)
-{
-    insertSorted(name, [&expr](string const& str){return regex_match(str, expr);});
+    d_attrs.back().second.push_back([expr](string const& str){return regex_match(str, regex(expr, regex::optimize));});
 }
 
 bool Attributes::validValue(size_t idx, string const& value) const
 {
-    return d_checkValueRegexFuncs[idx](value);
+        // does any regex match?
+    if (d_attrs[idx].second.empty())
+        return true;
+
+    return any_of(execution::par_unseq, begin(d_attrs[idx].second), end(d_attrs[idx].second), [value](auto& fun){return fun(value);});
 }
 
 size_t Attributes::getCount() const
 {
         // assuming d_names.size() == d_checkValueRegexFuncs.size()
-    return d_names.size();
+    return d_attrs.size();
 }
 
 size_t Attributes::getIdx(std::string const& name) const
 {
-    auto const [begitr, enditr] = equal_range(begin(d_names), end(d_names), name, less<>{});
+    auto const itr = find_if(execution::par_unseq, begin(d_attrs), end(d_attrs), [&name](auto const& attr){return attr.first == name;});
 
-    if (distance(begitr, enditr) != 1)
+    if (itr == end(d_attrs))
         throw "Queried unknown attribute: "s + name;
 
-    return distance(begin(d_names), begitr);
+    return distance(begin(d_attrs), itr);
 }
 
 string const& Attributes::getName(size_t idx) const
 {
-    return d_names[idx];
-}
-
-void Attributes::insertSorted(std::string const& name, CheckStringFun fun)
-{
-    auto const nameItr = insert_sorted(d_names, name);
-    auto const funcItr = d_checkValueRegexFuncs.begin() + distance(begin(d_names), nameItr);
-    d_checkValueRegexFuncs.insert(funcItr, fun);
+    return d_attrs[idx].first;
 }
