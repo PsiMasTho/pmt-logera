@@ -1,0 +1,21 @@
+month          "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
+
+%%
+    // ignore comments
+#.*\n
+
+    // ignore spaces and tabs on their own
+[ \t]+
+
+[0-9]{1,2}{month}[0-9]{4}               return LogTokens::Tokens_::DATE;
+
+"$"[0-9a-zA-Z,:.]+                      return LogTokens::Tokens_::VALUE;
+
+
+"%"[a-zA-Z]+							return LogTokens::Tokens_::ATTR;
+
+[a-zA-Z_]+								return LogTokens::Tokens_::IDENT;
+
+'\n'                                    return '\n';
+
+.                                    	return matched()[0];

@@ -4,9 +4,7 @@ Options::Options(Args const& args)
 :
     d_headerFile{setHeaderFile(args)},
     d_outputFile{setOutputFile(args)},
-    d_logFiles{setLogFiles(args)},
-    d_filterType{setFilterType(args)},
-    d_filterRegex{setFilterRegex(args)}
+    d_logFiles{setLogFiles(args)}
 {}
 
 void Options::debugPrint(std::ostream& out) const

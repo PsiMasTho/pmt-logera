@@ -14,13 +14,3 @@ vector<filesystem::path> const& Options::logFiles() const
 {
     return d_logFiles;
 }
-
-FilterType Options::filterType() const
-{
-    return d_filterType;
-}
-
-regex const& Options::filterRegex() const
-{
-    return d_filterRegex;
-}

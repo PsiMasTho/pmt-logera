@@ -1,12 +1,13 @@
-%token-path ../scanner/token_enums.h
+%token-path ../header_scanner/header_token_enums.h
+
+%scanner ../header_scanner/header_scanner.h
+%scanner-class-name HeaderScanner
 
 %token DECL_VAR
 %token IDENT
 %token DECL_ATTR
 %token ATTR
 %token REGEX
-%token DATE
-%token VALUE
 
 %stype std::string
 

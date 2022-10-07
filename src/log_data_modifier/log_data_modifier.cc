@@ -56,11 +56,11 @@ void LogDataModifier::addAttrToCurrentLine(std::string const& attrName, std::str
     string const& curVar = d_target->d_lines.back().front();
 
     if (!d_headerData.doesVarHaveAttr(curVar, attrName))
-        throw "Variable: "s + curVar + " does not have attribute: "s + attrName;
+        throw "Variable: \""s + curVar + "\" does not have attribute: \""s + attrName + '\"';
 
     size_t const idx = d_headerData.getAttributes().getIdx(attrName);
     if (!d_headerData.getAttributes().validValue(idx, attrVal))
-        throw "Invalid value: "s + attrVal + " for Attribute: " + attrName;
+        throw "Invalid value: \""s + attrVal + "\". For attribute: \"" + attrName + '\"';
 
     d_target->d_lines.back()[idx + 1] = attrVal;
 }

@@ -1,7 +1,7 @@
-#ifndef INCLUDED_TOKEN_ENUMS_
-#define INCLUDED_TOKEN_ENUMS_
+#ifndef INCLUDED_HEADER_TOKEN_ENUMS_
+#define INCLUDED_HEADER_TOKEN_ENUMS_
 
-struct Tokens
+struct HeaderTokens
 {
     // Symbolic tokens:
     enum Tokens_
@@ -11,8 +11,6 @@ struct Tokens
         DECL_ATTR,
         ATTR,
         REGEX,
-        DATE,
-        VALUE,
     };
 
 };

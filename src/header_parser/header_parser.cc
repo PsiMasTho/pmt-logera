@@ -1,5 +1,9 @@
 #include "header_parser.ih"
 
+#include "../header_data/header_data.h"
+#include "util.h"
+#include <utility>
+
 HeaderParser::HeaderParser(filesystem::path path)
 :
     d_stream(path),

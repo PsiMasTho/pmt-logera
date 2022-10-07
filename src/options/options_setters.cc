@@ -78,29 +78,3 @@ decltype(Options::d_logFiles)    Options::setLogFiles(Args const& args)
     return ret;
 }
 
-decltype(Options::d_filterType)  Options::setFilterType(Args const& args)
-{
-    if (args.option('E') && args.option('I'))
-        throw "Specify one or none of: -E <expr> or -I <expr>";
-
-    if (args.option('E') || args.option('I'))
-        return args.option('E') ? FilterType::EXCLUSIVE : FilterType::INCLUSIVE;
-
-    return FilterType::NONE;
-}
-
-decltype(Options::d_filterRegex) Options::setFilterRegex(Args const& args)
-{
-    if (args.option('E') && args.option('I'))
-        throw "Specify one or none of: -E <expr> or -I <expr>";
-
-    regex ret;
-
-    if (args.option('E'))
-        ret = cvtFunc<regex>(*args.option('E'));
-    else if (args.option('I'))
-        ret = cvtFunc<regex>(*args.option('I'));
-
-    return ret;
-}
-

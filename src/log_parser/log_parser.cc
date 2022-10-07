@@ -1,5 +1,9 @@
 #include "log_parser.ih"
 
+#include "../log_data/log_data.h"
+#include "../header_data/header_data.h"
+#include "../date/date.h"
+
 LogParser::LogParser(filesystem::path const& path, HeaderData const& headerData)
 :
     d_stream(path),

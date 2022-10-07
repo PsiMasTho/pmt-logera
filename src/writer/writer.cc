@@ -4,19 +4,14 @@
 
 using namespace std;
 
-Writer::Writer(filesystem::path const& outfile, function<bool(string const&)> identFilter, std::string const& delim)
+Writer::Writer(filesystem::path const& outfile, std::string const& delim)
 :
     d_out(outfile),
-    d_identFilter(identFilter),
     d_delim{delim}
 {}
 
 void Writer::write(Date const& date, LogData::LogLine const& logLine)
 {
-        // only write if the filter accepts
-    if (!d_identFilter(logLine.front()))
-        return;
-
     d_out << date.to_string() << ";";
     for (auto const& val : logLine)
         d_out << d_delim << val;

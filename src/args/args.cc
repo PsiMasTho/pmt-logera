@@ -17,7 +17,7 @@ string const* Args::option(char option) const
         // check if the option is valid
     auto itr1 = d_optTypeMap.find(option);
     if (itr1 == d_optTypeMap.end())
-        throw "Unknown option.";
+        throw "Unknown option: "s + option;
     
     auto itr2 = d_optValMap.find(option);
     if (itr2 == d_optValMap.end()) // option not specified
@@ -74,7 +74,7 @@ void Args::fillValMap(char** argv)
         else
         {
             if (optValPairs.empty())
-                throw "Invalid arguments.";
+                throw "Invalid arguments."s;
             else
             {
                 string const delim = optValPairs.back().second.empty() ? string{} : " "s;
@@ -93,9 +93,9 @@ void Args::fillValMap(char** argv)
             else if (!val.empty() && (optType == Type::OPTIONAL || optType == Type::REQUIRED))
                 d_optValMap[opt] = val;
             else
-                throw "Invalid arguments.";
+                throw "Invalid arguments."s;
         }
         else
-            throw "Unknown option.";
+            throw "Unknown option: "s + opt;
     }
 }

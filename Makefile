@@ -1,8 +1,8 @@
 CXX = g++-12 # note: clang++ gives a lot of warnings for the code bisonc++ and flexc++ generates
-CXX_FLAGS = -s -Ofast -march=native -std=c++20
-#CXX_FLAGS = -ggdb3 -O0 -Wall -fsanitize=address -std=c++20
-CXX_LDFLAGS = -flto -lpthread -ltbb
-#CXX_LDFLAGS = -fsanitize=address
+#CXX_FLAGS = -s -Ofast -march=native -std=c++20
+CXX_FLAGS = -ggdb3 -O0 -Wall -fsanitize=address -std=c++20
+#CXX_LDFLAGS = -flto -lpthread -ltbb
+CXX_LDFLAGS = -fsanitize=address -ltbb
 
 # Final binary
 BIN = Logara
@@ -15,7 +15,8 @@ SOURCE_DIR = ./src
 LOG_PARSER_DIR = $(SOURCE_DIR)/log_parser
 HEADER_PARSER_DIR = $(SOURCE_DIR)/header_parser
 
-SCANNER_DIR = $(SOURCE_DIR)/scanner
+LOG_SCANNER_DIR = $(SOURCE_DIR)/log_scanner
+HEADER_SCANNER_DIR = $(SOURCE_DIR)/header_scanner
 
 # All .cc files
 SOURCE := $(shell find $(SOURCE_DIR) -iname '*.cc')
@@ -45,12 +46,13 @@ $(BUILD_DIR)/%.o: %.cc
 
 .PHONY: run_flexc++
 run_flexc++:
-	flexc++ $(SCANNER_DIR)/lexer --target-directory=$(SCANNER_DIR)/ --filenames=scanner --no-lines
+	flexc++ $(LOG_SCANNER_DIR)/lexer    --target-directory=$(LOG_SCANNER_DIR)/    --filenames=log_scanner    --no-lines --class-name LogScanner
+	flexc++ $(HEADER_SCANNER_DIR)/lexer --target-directory=$(HEADER_SCANNER_DIR)/ --filenames=header_scanner --no-lines --class-name HeaderScanner
 
 .PHONY: run_bisonc++
 run_bisonc++:
-	bisonc++ $(LOG_PARSER_DIR)/grammar --target-directory=$(LOG_PARSER_DIR)/ --filenames=log_parser --no-lines --scanner=$(SCANNER_DIR)/scanner.h --class-name LogParser
-	bisonc++ $(HEADER_PARSER_DIR)/grammar --target-directory=$(HEADER_PARSER_DIR)/ --filenames=header_parser --no-lines --scanner=$(SCANNER_DIR)/scanner.h --class-name HeaderParser
+	bisonc++ $(LOG_PARSER_DIR)/grammar    --target-directory=$(LOG_PARSER_DIR)/    --filenames=log_parser    --no-lines --class-name LogParser    --token-class=LogTokens
+	bisonc++ $(HEADER_PARSER_DIR)/grammar --target-directory=$(HEADER_PARSER_DIR)/ --filenames=header_parser --no-lines --class-name HeaderParser --token-class=HeaderTokens
 
 .PHONY: clean
 clean:

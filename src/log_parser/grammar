@@ -1,10 +1,10 @@
-%token-path ../scanner/token_enums.h
+%token-path ../log_scanner/log_token_enums.h
 
-%token DECL_VAR
+%scanner ../log_scanner/log_scanner.h
+%scanner-class-name LogScanner
+
 %token IDENT
-%token DECL_ATTR
 %token ATTR
-%token REGEX
 %token DATE
 %token VALUE
 

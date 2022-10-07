@@ -19,9 +19,3 @@ vector<filesystem::path> Options::cvtFunc<vector<filesystem::path>>(string const
     
     return ret;
 }
-
-template <>
-regex Options::cvtFunc<regex>(string const& valStr)
-{
-    return regex(valStr);
-}

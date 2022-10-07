@@ -22,18 +22,14 @@ class Options
     std::filesystem::path const              d_headerFile;
     std::filesystem::path const              d_outputFile;
     std::vector<std::filesystem::path> const d_logFiles;
-    FilterType const                         d_filterType;
-    std::regex const                         d_filterRegex;
 
 public:
-    Options(Args const& args);
+    explicit Options(Args const& args);
 
         // accessors
     std::filesystem::path const& headerFile() const;
     std::filesystem::path const& outputFile() const;
     std::vector<std::filesystem::path> const& logFiles() const;
-    FilterType filterType() const;
-    std::regex const& filterRegex() const;
 
         // print
     void debugPrint(std::ostream& out) const;
@@ -48,8 +44,6 @@ private:
     decltype(d_headerFile)  setHeaderFile(Args const& args);
     decltype(d_outputFile)  setOutputFile(Args const& args);
     decltype(d_logFiles)    setLogFiles(Args const& args);
-    decltype(d_filterType)  setFilterType(Args const& args);
-    decltype(d_filterRegex) setFilterRegex(Args const& args);
 };
 
 #endif

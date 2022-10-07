@@ -1,0 +1,29 @@
+
+%%
+    // ignore comments
+#.*\n
+
+    // ignore spaces and tabs on their own
+[ \t]+
+
+';'[[:print:]]{-}[;]+';'                {
+                                            push(';');
+                                            return HeaderTokens::Tokens_::REGEX;
+                                        }
+
+';'[[:print:]]{-}[;]+'\n'               {
+                                            push('\n');
+                                            return HeaderTokens::Tokens_::REGEX;
+                                        }
+
+">attr"					                return HeaderTokens::Tokens_::DECL_ATTR;
+
+">var"                                  return HeaderTokens::Tokens_::DECL_VAR;
+
+"%"[a-zA-Z]+							return HeaderTokens::Tokens_::ATTR;
+
+[a-zA-Z_]+								return HeaderTokens::Tokens_::IDENT;
+
+'\n'                                    return '\n';
+
+.                                    	return matched()[0];
