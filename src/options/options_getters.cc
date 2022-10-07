@@ -10,7 +10,7 @@ std::filesystem::path const& Options::outputFile() const
     return d_outputFile;
 }
 
-vector<filesystem::path> Options::logFiles() const
+vector<filesystem::path> const& Options::logFiles() const
 {
     return d_logFiles;
 }

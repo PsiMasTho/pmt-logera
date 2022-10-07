@@ -17,17 +17,21 @@
     // If you need to include additional headers in this file 
     // you should do so after these comment-lines.
 
-#include "../header_data/header_data.h"
+#include <fstream>
+#include <filesystem>
+
+class HeaderData;
 
 class HeaderParser: public HeaderParserBase
 {
     // $insert scannerobject
+    std::ifstream               d_stream;
     Scanner                     d_scanner;
     std::unique_ptr<HeaderData> d_ret;
         
     public:
-        HeaderParser(std::istream& headerStream);
-        std::unique_ptr<HeaderData> genHeader();
+        HeaderParser(std::filesystem::path path);
+        std::unique_ptr<HeaderData> gen();
 
     private:
         int parse();

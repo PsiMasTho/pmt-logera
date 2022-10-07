@@ -38,11 +38,11 @@ void HeaderData::addAttrToLastVar(std::string const& attrName)
     d_lastVarItr->second[d_attrs.getIdx(attrName)] = true;
 }
 
-bool HeaderData::doesVarHaveAttr(std::string const& varName, std::string const& attrName)
+bool HeaderData::doesVarHaveAttr(std::string const& varName, std::string const& attrName) const
 {
     auto const itr = d_vars.find(varName);
     if (itr == d_vars.end())
-        throw "Unknown variable queried"s + varName;
+        throw "Unknown variable queried: "s + varName;
     else
         return itr->second[d_attrs.getIdx(attrName)];
 }

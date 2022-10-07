@@ -29,8 +29,9 @@ inline void HeaderParser::exceptionHandler(std::exception const &exc)
 
     // Add here includes that are only required for the compilation 
     // of HeaderParser's sources.
-#include <utility>
+#include "../header_data/header_data.h"
 #include "util.h"
+#include <utility>
 
     // UN-comment the next using-declaration if you want to use
     // int HeaderParser's sources symbols from the namespace std without

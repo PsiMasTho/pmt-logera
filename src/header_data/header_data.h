@@ -30,7 +30,7 @@ public:
     void addRegexToLastAttr(std::string const& expr);
     void addAttrToLastVar(std::string const& attrName);
 
-    bool doesVarHaveAttr(std::string const& varName, std::string const& attrName);
+    bool doesVarHaveAttr(std::string const& varName, std::string const& attrName) const;
 
     Attributes const& getAttributes() const;
 

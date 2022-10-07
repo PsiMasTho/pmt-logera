@@ -31,7 +31,7 @@ public:
         // accessors
     std::filesystem::path const& headerFile() const;
     std::filesystem::path const& outputFile() const;
-    std::vector<std::filesystem::path> logFiles() const;
+    std::vector<std::filesystem::path> const& logFiles() const;
     FilterType filterType() const;
     std::regex const& filterRegex() const;
 

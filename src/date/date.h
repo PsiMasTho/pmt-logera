@@ -3,15 +3,18 @@
 
 #include <chrono>
 #include <string>
+#include <optional>
 
 class Date
 {
-    std::chrono::year_month_day d_date;
+    std::optional<std::chrono::year_month_day> d_date;
 
 public:
     explicit Date(std::string const& dateStr);
+    Date() = default;
 
     std::string to_string() const;
+    bool ok() const;
 
     friend auto operator<=>(Date const&, Date const&) = default;
 };

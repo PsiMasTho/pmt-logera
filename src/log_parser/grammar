@@ -21,7 +21,7 @@ input:
 line:
     date '\n'
     {
-       d_logData.setActiveDate(Date($1));
+       d_logDataModifier.setDate(Date($1));
     }
 |
     assign_attributes
@@ -46,19 +46,19 @@ value:
 assign_attributes:
     identifier ':' '\n' attribute value
     {
-        d_logData.startNewLogLineForNewVar($1);
-        d_logData.addAttrToActiveVar($4, $5);
+        d_logDataModifier.startNewLineForNewVar($1);
+        d_logDataModifier.addAttrToCurrentLine($4, $5);
     }
 |
     assign_attributes attribute value
     {
-        d_logData.addAttrToActiveVar($2, $3);
+        d_logDataModifier.addAttrToCurrentLine($2, $3);
     }
 |
     '\n' attribute value
     {
-        d_logData.startNewLogLineForActiveVar();
-        d_logData.addAttrToActiveVar($2, $3);
+        d_logDataModifier.startNewLineForOldVar();
+        d_logDataModifier.addAttrToCurrentLine($2, $3);
     }
 ;
 

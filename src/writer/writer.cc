@@ -14,11 +14,11 @@ Writer::Writer(filesystem::path const& outfile, function<bool(string const&)> id
 void Writer::write(Date const& date, LogData::LogLine const& logLine)
 {
         // only write if the filter accepts
-    if (!d_identFilter(logLine.first))
+    if (!d_identFilter(logLine.front()))
         return;
 
-    d_out << date.to_string() << ";" << logLine.first;
-    for (auto const& val : logLine.second)
+    d_out << date.to_string() << ";";
+    for (auto const& val : logLine)
         d_out << d_delim << val;
     d_out << '\n';
 }

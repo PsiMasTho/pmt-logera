@@ -17,17 +17,27 @@
     // If you need to include additional headers in this file 
     // you should do so after these comment-lines.
 
+#include "../log_data_modifier/log_data_modifier.h"
+
+#include <memory>
+#include <filesystem>
+#include <fstream>
+
 class LogData;
+class HeaderData;
 
 class LogParser: public LogParserBase
 {
     // $insert scannerobject
-    Scanner  d_scanner;
-    LogData& d_logData;
-        
+    std::ifstream            d_stream;
+    Scanner                  d_scanner;
+    LogDataModifier          d_logDataModifier;
+    std::unique_ptr<LogData> d_ret;
+
     public:
-        LogParser(std::istream& logStream, LogData& logData);
+        LogParser(std::filesystem::path const& path, HeaderData const& headerData);
         int parse();
+        std::unique_ptr<LogData> gen();
 
     private:
         void error();                   // called on (syntax) errors
