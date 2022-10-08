@@ -13,9 +13,6 @@ void scanHeader(std::filesystem::path const& pth)
     {
         switch (tok)
         {
-            case HeaderTokens::Tokens_::ATTR:
-                cout << "ATTR\n";
-            break;
             case HeaderTokens::Tokens_::DECL_ATTR:
                 cout << "DECL_ATTR\n";
             break;
@@ -24,9 +21,6 @@ void scanHeader(std::filesystem::path const& pth)
             break;
             case HeaderTokens::Tokens_::IDENT:
                 cout << "IDENT\n";
-            break;
-            case HeaderTokens::Tokens_::REGEX:
-                cout << "REGEX\n";
             break;
             case '\n':
                 cout << "NEWLINE\n";
@@ -47,11 +41,14 @@ void scanLog(std::filesystem::path const& pth)
     {
         switch (tok)
         {
-            case LogTokens::Tokens_::ATTR:
-                cout << "ATTR\n";
+            case LogTokens::Tokens_::VAR:
+                cout << "VAR\n";
             break;
             case LogTokens::Tokens_::IDENT:
                 cout << "IDENT\n";
+            break;
+            case LogTokens::Tokens_::DATE:
+                cout << "DATE\n";
             break;
             case '\n':
                 cout << "NEWLINE\n";

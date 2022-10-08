@@ -6,8 +6,6 @@
 %token DECL_VAR
 %token IDENT
 %token DECL_ATTR
-%token ATTR
-%token REGEX
 
 %stype std::string
 
@@ -22,8 +20,6 @@ input:
 line:
     declare_attribute '\n'
 |
-    declare_attribute assign_regex '\n'
-|
     declare_variable '\n'
 |
     '\n'
@@ -32,53 +28,32 @@ line:
 identifier:
     IDENT
     {
-        $$ = d_scanner.matched();
-    }
-;
-
-attribute:
-    ATTR
-    {
-        $$ = string(d_scanner.matched()).substr(1);
-    }
-;
-
-regular_expr:
-    REGEX
-    {
         string txt(d_scanner.matched());
             // removing all ';'. Then removing leading and trailing spaces and '\n'
         $$ = trim(removeCh(txt, ';'));
     }
 ;
 
+declare_attribute:
+    DECL_ATTR identifier ';'
+    {
+        d_ret->addAttr($2);
+    }
+|
+    declare_attribute identifier ';'
+    {
+        d_ret->addRegexToLastAttr($2);
+    }
+;
+
 declare_variable:
-    DECL_VAR identifier
+    DECL_VAR identifier ';'
     {
         d_ret->addVar($2);
     }
 |
-    declare_variable attribute
+    declare_variable identifier ';'
     {
         d_ret->addAttrToLastVar($2);
-    }
-;
-
-declare_attribute:
-    DECL_ATTR attribute
-    {
-        d_ret->addAttr($2);
-    }
-;
-
-assign_regex:
-    regular_expr
-    {
-        d_ret->addRegexToLastAttr($1);
-    }
-|
-    assign_regex regular_expr
-    {
-        d_ret->addRegexToLastAttr($2);
     }
 ;

@@ -1,5 +1,7 @@
 #include "main.ih"
 
+#include "debug.h"
+
 enum
 {
     SUCCESS = 0,
@@ -18,7 +20,6 @@ int main(int argc, char** argv)
 try
 {
     Options opts(Args("d:m:o:", argv));
-
     opts.debugPrint(cerr);
 
     unique_ptr<HeaderData> headerData = HeaderParser(opts.headerFile()).gen();
@@ -31,7 +32,7 @@ try
 
         // parse logs in paralell
         // avoid par_unseq because it ignores mutexes
-    for_each(execution::seq, begin(opts.logFiles()), end(opts.logFiles()), [&](auto const& pth)
+    for_each(execution::par, begin(opts.logFiles()), end(opts.logFiles()), [&](auto const& pth)
     {
         LogParser logParser(pth, *headerData);
         try

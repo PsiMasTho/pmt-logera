@@ -8,11 +8,8 @@ struct HeaderTokens
     {
         DECL_VAR = 257,
         IDENT,
-        DECL_ATTR,
-        ATTR,
-        REGEX,
+        DECL_ATTR
     };
-
 };
 
 #endif

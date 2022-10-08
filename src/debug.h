@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
-void scanFile(std::filesystem::path const& pth);
+void scanHeader(std::filesystem::path const& pth);
+void scanLog(std::filesystem::path const& pth);
 
 #endif

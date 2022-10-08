@@ -7,9 +7,8 @@ struct LogTokens
     enum Tokens_
     {
         IDENT = 257,
-        ATTR,
         DATE,
-        VALUE,
+        VAR
     };
 
 };

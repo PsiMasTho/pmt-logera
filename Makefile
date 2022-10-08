@@ -1,8 +1,8 @@
 CXX = g++-12 # note: clang++ gives a lot of warnings for the code bisonc++ and flexc++ generates
-#CXX_FLAGS = -s -Ofast -march=native -std=c++20
-CXX_FLAGS = -ggdb3 -O0 -Wall -fsanitize=address -std=c++20
-#CXX_LDFLAGS = -flto -lpthread -ltbb
-CXX_LDFLAGS = -fsanitize=address -ltbb
+CXX_FLAGS = -s -Ofast -march=native -std=c++20
+#CXX_FLAGS = -ggdb3 -O0 -Wall -fsanitize=address -std=c++20
+CXX_LDFLAGS = -flto -lpthread -ltbb
+#CXX_LDFLAGS = -fsanitize=address -ltbb
 
 # Final binary
 BIN = Logara

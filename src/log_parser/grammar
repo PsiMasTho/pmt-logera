@@ -4,9 +4,8 @@
 %scanner-class-name LogScanner
 
 %token IDENT
-%token ATTR
 %token DATE
-%token VALUE
+%token VAR
 
 %stype std::string
 
@@ -24,7 +23,9 @@ line:
        d_logDataModifier.setDate(Date($1));
     }
 |
-    assign_attributes
+    variable '\n'
+|
+    assign_vals_to_attrs '\n'
 |
     '\n'
 ;
@@ -36,29 +37,12 @@ date:
     }
 ;
 
-value:
-    VALUE
+variable:
+    VAR
     {
-        $$ = std::string(d_scanner.matched()).substr(1); // skip '$' char
-    }
-;
-
-assign_attributes:
-    identifier ':' '\n' attribute value
-    {
-        d_logDataModifier.startNewLineForNewVar($1);
-        d_logDataModifier.addAttrToCurrentLine($4, $5);
-    }
-|
-    assign_attributes attribute value
-    {
-        d_logDataModifier.addAttrToCurrentLine($2, $3);
-    }
-|
-    '\n' attribute value
-    {
-        d_logDataModifier.startNewLineForOldVar();
-        d_logDataModifier.addAttrToCurrentLine($2, $3);
+        string txt = d_scanner.matched();
+        txt.pop_back(); // ':'
+        d_logDataModifier.startNewLineForNewVar(txt);
     }
 ;
 
@@ -69,9 +53,14 @@ identifier:
     }
 ;
 
-attribute:
-    ATTR
+assign_vals_to_attrs:
+    identifier identifier ';'
     {
-        $$ = std::string(d_scanner.matched()).substr(1);
+        d_logDataModifier.addAttrToCurrentLine($1, $2);
+    }
+|
+    assign_vals_to_attrs identifier identifier ';'
+    {
+        d_logDataModifier.addAttrToCurrentLine($2, $3);
     }
 ;
