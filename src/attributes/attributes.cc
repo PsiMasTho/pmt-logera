@@ -2,9 +2,18 @@
 
 #include <algorithm>
 #include <execution>
-#include <regex>
 
 using namespace std;
+
+Attributes::RegexMatchLambda::RegexMatchLambda(std::string const& rexpr)
+:
+    d_regex(rexpr, regex::optimize)
+{}
+
+bool Attributes::RegexMatchLambda::operator()(std::string const& str) const
+{
+    return regex_match(str, d_regex);
+}
 
 Attributes::Attributes()
 :
@@ -13,7 +22,7 @@ Attributes::Attributes()
 
 void Attributes::addAttr(string const& name)
 {
-    d_attrs.push_back(pair(name, vector<CheckStringFun>{}));
+    d_attrs.push_back(pair(name, vector<RegexMatchLambda>{}));
 }
 
 void Attributes::addRegexToLastAttr(std::string const& expr)
@@ -21,10 +30,7 @@ void Attributes::addRegexToLastAttr(std::string const& expr)
     if (d_attrs.empty())
         throw "Trying to add regex without an attribute: "s + expr;
 
-        // *IMPORTANT* constructing the regex outside the lambda (~10x speedup vs constructing inside)
-    regex const rexpr(expr, regex::optimize);
-
-    d_attrs.back().second.push_back([rexpr](string const& str){return regex_match(str, rexpr);});
+    d_attrs.back().second.push_back(RegexMatchLambda(expr));
 }
 
 bool Attributes::validValue(size_t idx, string const& value) const
@@ -33,7 +39,7 @@ bool Attributes::validValue(size_t idx, string const& value) const
     if (d_attrs[idx].second.empty())
         return true;
 
-    return any_of(execution::par_unseq, begin(d_attrs[idx].second), end(d_attrs[idx].second), [value](auto& fun){return fun(value);});
+    return any_of(execution::par_unseq, begin(d_attrs[idx].second), end(d_attrs[idx].second), [value](auto const& fun){return fun(value);});
 }
 
 size_t Attributes::getCount() const

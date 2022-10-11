@@ -27,6 +27,8 @@ line:
 |
     assign_vals_to_attrs '\n'
 |
+    assign_vals_to_attrs EOF
+|
     '\n'
 ;
 
@@ -42,7 +44,7 @@ variable:
     {
         string txt = d_scanner.matched();
         txt.pop_back(); // ':'
-        d_logDataModifier.startNewLineForNewVar(txt);
+        d_logDataModifier.setActiveVar(txt);
     }
 ;
 
@@ -56,7 +58,7 @@ identifier:
 assign_vals_to_attrs:
     identifier identifier ';'
     {
-        d_logDataModifier.addAttrToCurrentLine($1, $2);
+        d_logDataModifier.addAttrToNewLine($1, $2);
     }
 |
     assign_vals_to_attrs identifier identifier ';'

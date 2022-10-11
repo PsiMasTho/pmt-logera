@@ -8,7 +8,7 @@
 
 inline void HeaderParser::error()
 {
-    std::cerr << "Syntax error\n";
+    throw std::string("Syntax error in header.");
 }
 
 // $insert lex

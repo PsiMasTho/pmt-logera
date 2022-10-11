@@ -10,7 +10,8 @@ using namespace std;
 LogDataModifier::LogDataModifier(LogData* target, HeaderData const& headerData)
 :
     d_target{target},
-	d_headerData{headerData}
+	d_headerData{headerData},
+    d_activeVar{}
 {}
 
 void LogDataModifier::setTarget(LogData* target)
@@ -23,40 +24,36 @@ void LogDataModifier::setDate(Date const& date)
     d_target->d_date = date;
 }
 
-void LogDataModifier::startNewLineForNewVar(std::string const& varName)
+void LogDataModifier::setActiveVar(string const& varName)
 {
     if (!d_target->d_date.ok())
         throw "Log with bad date detected"s;
 
-        // make enough room for all attributes + var name
-    d_target->d_lines.emplace_back(d_headerData.getAttributes().getCount() + 1, ""s);
-    d_target->d_lines.back().front().assign(varName);
+    d_activeVar = varName;
 }
 
-void LogDataModifier::startNewLineForOldVar()
+void LogDataModifier::addAttrToNewLine(string const& attrName, string const& attrVal)
 {
     if (!d_target->d_date.ok())
         throw "Log with bad date detected"s;
-    if (d_target->d_lines.empty())
-        throw "Adding new line without old variable"s;
-
-    string const& curVar = d_target->d_lines.back().front();
+    if (d_activeVar.empty())
+        throw "Adding new line without active variable"s;
     
     d_target->d_lines.emplace_back(d_headerData.getAttributes().getCount() + 1, ""s);
-    d_target->d_lines.back().front().assign(curVar);
+    d_target->d_lines.back().front().assign(d_activeVar);
+
+    addAttrToCurrentLine(attrName, attrVal);
 }
 
-void LogDataModifier::addAttrToCurrentLine(std::string const& attrName, std::string const& attrVal)
+void LogDataModifier::addAttrToCurrentLine(string const& attrName, string const& attrVal)
 {
     if (!d_target->d_date.ok())
         throw "Log with bad date detected"s;
     if (d_target->d_lines.back().front().empty())
         throw "Attempting to add attribute with no variable"s;
 
-    string const& curVar = d_target->d_lines.back().front();
-
-    if (!d_headerData.doesVarHaveAttr(curVar, attrName))
-        throw "Variable: \""s + curVar + "\" does not have attribute: \""s + attrName + '\"';
+    if (!d_headerData.doesVarHaveAttr(d_activeVar, attrName))
+        throw "Variable: \""s + d_activeVar + "\" does not have attribute: \""s + attrName + '\"';
 
     size_t const idx = d_headerData.getAttributes().getIdx(attrName);
     if (!d_headerData.getAttributes().validValue(idx, attrVal))

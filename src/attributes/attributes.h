@@ -5,11 +5,19 @@
 #include <functional>
 #include <utility>
 #include <optional>
+#include <regex>
 
 class Attributes
 {
-    using CheckStringFun = std::function<bool(std::string const&)>;
-    using Attribute = std::pair<std::string, std::vector<CheckStringFun>>;
+    class RegexMatchLambda
+    {
+        std::regex const d_regex;
+    public:
+        RegexMatchLambda(std::string const& rexpr);
+        bool operator()(std::string const& str) const;
+    };
+
+    using Attribute = std::pair<std::string, std::vector<RegexMatchLambda>>;
 
     std::vector<Attribute> d_attrs;
 

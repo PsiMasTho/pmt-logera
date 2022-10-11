@@ -1,7 +1,5 @@
 #include "main.ih"
 
-#include "debug.h"
-
 enum
 {
     SUCCESS = 0,
@@ -68,7 +66,7 @@ try
             
             exceptions.pop();
         }
-        cerr << "No output was generated.";
+        cerr << "No output was generated.\n";
         return FAIL;
     }
 

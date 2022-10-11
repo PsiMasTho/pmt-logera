@@ -20,7 +20,11 @@ input:
 line:
     declare_attribute '\n'
 |
+    declare_attribute EOF
+|
     declare_variable '\n'
+|
+    declare_variable EOF
 |
     '\n'
 ;

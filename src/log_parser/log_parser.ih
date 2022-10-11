@@ -5,10 +5,11 @@
 // $insert class.h
 #include "log_parser.h"
 
+#include <string>
 
 inline void LogParser::error()
 {
-    std::cerr << "Syntax error\n";
+    throw std::string("Syntax error in log.");
 }
 
 // $insert lex
