@@ -5,7 +5,7 @@ CXX_LDFLAGS = -flto -lpthread -ltbb
 #CXX_LDFLAGS = -fsanitize=address -ltbb
 
 # Final binary
-BIN = Logara
+BIN = Logera
 
 # Executible, object files and .d files go here
 BUILD_DIR = ./build

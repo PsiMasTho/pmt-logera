@@ -2,17 +2,19 @@
 
 #include <algorithm>
 #include <execution>
+#include <regex>
 
 using namespace std;
 
-Attributes::RegexMatchLambda::RegexMatchLambda(std::string const& rexpr)
-:
-    d_regex(rexpr, regex::optimize)
-{}
-
-bool Attributes::RegexMatchLambda::operator()(std::string const& str) const
+namespace
 {
-    return regex_match(str, d_regex);
+    class RegexMatchLambda
+    {
+        regex const d_regex;
+    public:
+        RegexMatchLambda(string const& rexpr);
+        bool operator()(string const& str) const;
+    };
 }
 
 Attributes::Attributes()
@@ -22,7 +24,7 @@ Attributes::Attributes()
 
 void Attributes::addAttr(string const& name)
 {
-    d_attrs.push_back(pair(name, vector<RegexMatchLambda>{}));
+    d_attrs.push_back(pair(name, vector<RegexMatchChecker>{}));
 }
 
 void Attributes::addRegexToLastAttr(std::string const& expr)
@@ -35,10 +37,11 @@ void Attributes::addRegexToLastAttr(std::string const& expr)
 
 bool Attributes::validValue(size_t idx, string const& value) const
 {
-        // does any regex match?
+        // if no regex is defined, then assume it's a match
     if (d_attrs[idx].second.empty())
         return true;
 
+        // does any regex match?
     return any_of(execution::par_unseq, begin(d_attrs[idx].second), end(d_attrs[idx].second), [value](auto const& fun){return fun(value);});
 }
 
@@ -61,4 +64,17 @@ size_t Attributes::getIdx(std::string const& name) const
 string const& Attributes::getName(size_t idx) const
 {
     return d_attrs[idx].first;
+}
+
+namespace
+{
+    RegexMatchLambda::RegexMatchLambda(string const& rexpr)
+    :
+        d_regex(rexpr, regex::optimize)
+    {}
+
+    bool RegexMatchLambda::operator()(string const& str) const
+    {
+        return regex_match(str, d_regex);
+    }
 }
