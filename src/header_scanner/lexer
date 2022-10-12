@@ -1,3 +1,4 @@
+nl             "\r\n"|"\n"
 
 %%
 
@@ -10,7 +11,7 @@
 
 [[:print:]]{-}[ \t\n;]+					return HeaderTokens::Tokens_::IDENT;
 
-#.*\n                                   return '\n';
-'\n'                                    return '\n';
+#.*{nl}                                 |
+{nl}                                    return HeaderTokens::Tokens_::NEWLINE;
 
 .                                    	return matched()[0];

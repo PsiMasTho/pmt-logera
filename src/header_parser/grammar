@@ -6,6 +6,7 @@
 %token DECL_VAR
 %token IDENT
 %token DECL_ATTR
+%token NEWLINE
 
 %stype std::string
 
@@ -18,15 +19,15 @@ input:
 ;
 
 line:
-    declare_attribute '\n'
+    declare_attribute NEWLINE
 |
     declare_attribute EOF
 |
-    declare_variable '\n'
+    declare_variable NEWLINE
 |
     declare_variable EOF
 |
-    '\n'
+    NEWLINE
 ;
 
 identifier:

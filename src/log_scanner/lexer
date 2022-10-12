@@ -1,4 +1,5 @@
 month          "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
+nl             "\r\n"|"\n"
 
 %%
 
@@ -11,7 +12,7 @@ month          "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"
 
 [[:print:]]{-}[ \t\n;]+					return LogTokens::Tokens_::IDENT;
 
-#.*\n                                   return '\n';
-'\n'                                    return '\n';
+#.*{nl}                                 |
+{nl}                                    return LogTokens::Tokens_::NEWLINE;
 
 .                                    	return matched()[0];

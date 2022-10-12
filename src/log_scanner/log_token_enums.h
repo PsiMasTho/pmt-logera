@@ -8,7 +8,8 @@ struct LogTokens
     {
         IDENT = 257,
         DATE,
-        VAR
+        VAR,
+        NEWLINE
     };
 
 };

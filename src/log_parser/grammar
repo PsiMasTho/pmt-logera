@@ -6,6 +6,7 @@
 %token IDENT
 %token DATE
 %token VAR
+%token NEWLINE
 
 %stype std::string
 
@@ -18,18 +19,18 @@ input:
 ;
 
 line:
-    date '\n'
+    date NEWLINE
     {
        d_logDataModifier.setDate(Date($1));
     }
 |
-    variable '\n'
+    variable NEWLINE
 |
-    assign_vals_to_attrs '\n'
+    assign_vals_to_attrs NEWLINE
 |
     assign_vals_to_attrs EOF
 |
-    '\n'
+    NEWLINE
 ;
 
 date:
