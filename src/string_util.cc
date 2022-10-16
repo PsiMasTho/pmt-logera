@@ -26,13 +26,13 @@ string& trim(string& str, const char* ws)
     return _ltrim(_rtrim(str, ws), ws);
 }
 
-void eraseAndReplace(string* target, string const& erase, string const& replace)
+void eraseAndReplace(string* target, string const& toErase, string const& toReplace)
 {
-    size_t const pos = target->find(erase);
+    size_t const pos = target->find(toErase);
     if (pos != string::npos)
     {
-        target->erase(pos, erase.size());
-        target->insert(pos, replace);
+        target->erase(pos, toErase.size());
+        target->insert(pos, toReplace);
     }
 }
 
