@@ -10,7 +10,7 @@ using namespace std;
 constexpr chrono::month _strToM(string const& monthStr);
 
 chrono::year_month_day _strToYMD(string const& ymdStr);
-string _ymdToStr(chrono::year_month_day ymd);
+string                 _ymdToStr(chrono::year_month_day ymd);
 
 constexpr char _toLower(char ch);
 constexpr bool _icaseStrCmp(char const* a, char const* b);

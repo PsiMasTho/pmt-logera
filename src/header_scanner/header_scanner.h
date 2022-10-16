@@ -10,31 +10,30 @@
 #include "header_token_enums.h"
 
 // $insert classHead
-class HeaderScanner: public HeaderScannerBase
-{
-    public:
-        HeaderScanner(std::filesystem::path const &infile);
-        
-        // $insert lexFunctionDecl
-        int lex();
+class HeaderScanner : public HeaderScannerBase {
+public:
+    HeaderScanner(std::filesystem::path const& infile);
 
-    private:
-        int lex_();
-        int executeAction_(size_t ruleNr);
+    // $insert lexFunctionDecl
+    int lex();
 
-        void print();
-        void preCode();     // re-implement this function for code that must 
-                            // be exec'ed before the patternmatching starts
+private:
+    int lex_();
+    int executeAction_(size_t ruleNr);
 
-        void postCode(PostEnum_ type);    
-                            // re-implement this function for code that must 
-                            // be exec'ed after the rules's actions.
+    void print();
+    void preCode(); // re-implement this function for code that must
+        // be exec'ed before the patternmatching starts
+
+    void postCode(PostEnum_ type);
+    // re-implement this function for code that must
+    // be exec'ed after the rules's actions.
 };
 
-inline HeaderScanner::HeaderScanner(std::filesystem::path const &infile)
-:
-    HeaderScannerBase(infile, "-")
-{}
+inline HeaderScanner::HeaderScanner(std::filesystem::path const& infile)
+    : HeaderScannerBase(infile, "-")
+{
+}
 
 // $insert inlineLexFunction
 inline int HeaderScanner::lex()
@@ -42,21 +41,19 @@ inline int HeaderScanner::lex()
     return lex_();
 }
 
-inline void HeaderScanner::preCode() 
+inline void HeaderScanner::preCode()
 {
     // optionally replace by your own code
 }
 
-inline void HeaderScanner::postCode([[maybe_unused]] PostEnum_ type) 
+inline void HeaderScanner::postCode([[maybe_unused]] PostEnum_ type)
 {
     // optionally replace by your own code
 }
 
-inline void HeaderScanner::print() 
+inline void HeaderScanner::print()
 {
     print_();
 }
 
-
 #endif // HeaderScanner_H_INCLUDED_
-

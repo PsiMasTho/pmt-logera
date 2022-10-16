@@ -7,11 +7,10 @@
 #include <vector>
 #include <string>
 
-    // class representing data of a single file
-class LogData
-{
+// class representing data of a single file
+class LogData {
 public:
-        //LogLine.get(0) == var name
+    //LogLine.get(0) == var name
     using LogLine = SparseArray<std::string>;
 
 private:
@@ -22,9 +21,8 @@ private:
 
 public:
     LogData() = default;
-    Date const& getDate() const;
+    Date const&                 getDate() const;
     std::vector<LogLine> const& getLines() const;
 };
-
 
 #endif

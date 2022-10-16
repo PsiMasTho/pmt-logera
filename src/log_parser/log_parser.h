@@ -13,8 +13,7 @@
 #include <fstream>
 #include <filesystem>
 
-class LogParser: public LogParserBase
-{
+class LogParser : public LogParserBase {
     std::string const& d_matched;
 
     // $insert scannerobject
@@ -22,26 +21,25 @@ class LogParser: public LogParserBase
 
     LogDataModifier          d_logDataModifier;
     std::unique_ptr<LogData> d_ret;
-        
-    public:
-        LogParser(std::filesystem::path const& path, HeaderData const& headerData);
-        int parse();
-        std::unique_ptr<LogData> gen();
 
-    private:
-        void error();                   // called on (syntax) errors
-        int lex();                      // returns the next token from the
-                                        // lexical scanner. 
-        void print();                   // use, e.g., d_token, d_loc
-        void exceptionHandler(std::exception const &exc);
+public:
+    LogParser(std::filesystem::path const& path, HeaderData const& headerData);
+    int                      parse();
+    std::unique_ptr<LogData> gen();
+
+private:
+    void error(); // called on (syntax) errors
+    int  lex(); // returns the next token from the
+        // lexical scanner.
+    void print(); // use, e.g., d_token, d_loc
+    void exceptionHandler(std::exception const& exc);
 
     // support functions for parse():
-        void executeAction_(int ruleNr);
-        void errorRecovery_();
-        void nextCycle_();
-        void nextToken_();
-        void print_();
+    void executeAction_(int ruleNr);
+    void errorRecovery_();
+    void nextCycle_();
+    void nextToken_();
+    void print_();
 };
-
 
 #endif

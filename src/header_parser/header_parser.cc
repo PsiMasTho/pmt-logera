@@ -4,12 +4,12 @@
 #include <utility>
 
 HeaderParser::HeaderParser(filesystem::path path)
-:
-    d_stream(path),
-    d_matched(d_scanner.matched()),
-    d_scanner(path),
-    d_ret{nullptr}
-{}
+    : d_stream(path)
+    , d_matched(d_scanner.matched())
+    , d_scanner(path)
+    , d_ret { nullptr }
+{
+}
 
 unique_ptr<HeaderData> HeaderParser::gen()
 {
@@ -33,7 +33,7 @@ void HeaderParser::error()
     cerr << "At line: " << d_scanner.lineNr() << '\n';
 }
 
-void HeaderParser::exceptionHandler(exception const &exc)         
+void HeaderParser::exceptionHandler(exception const& exc)
 {
     cerr << "Error in header file: " << d_scanner.filename() << '\n';
     cerr << '\t' << exc.what() << '\n';

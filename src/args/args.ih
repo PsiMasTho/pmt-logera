@@ -6,9 +6,4 @@
 
 using namespace std;
 
-enum ValType : uint8_t
-{
-    WITHOUT = 1,
-    REQUIRED,
-    OPTIONAL
-};
+enum ValType : uint8_t { WITHOUT = 1, REQUIRED, OPTIONAL };

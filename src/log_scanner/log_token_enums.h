@@ -1,17 +1,14 @@
 #ifndef INCLUDED_LOG_TOKEN_ENUMS_
 #define INCLUDED_LOG_TOKEN_ENUMS_
 
-struct LogTokens
-{
+struct LogTokens {
     // Symbolic tokens:
-    enum Tokens_
-    {
+    enum Tokens_ {
         IDENT = 257,
         DATE,
         VAR,
         NEWLINE,
     };
-
 };
 
 #endif

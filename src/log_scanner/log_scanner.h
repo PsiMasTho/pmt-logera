@@ -4,37 +4,36 @@
 #define LogScanner_H_INCLUDED_
 
 // $insert baseclass_h
-#include "log_scannerbase.h"\
+#include "log_scannerbase.h"
 
 #include <filesystem>
 #include "log_token_enums.h"
 
 // $insert classHead
-class LogScanner: public LogScannerBase
-{
-    public:
-        explicit LogScanner(std::filesystem::path const &infile);
-        
-        // $insert lexFunctionDecl
-        int lex();
+class LogScanner : public LogScannerBase {
+public:
+    explicit LogScanner(std::filesystem::path const& infile);
 
-    private:
-        int lex_();
-        int executeAction_(size_t ruleNr);
+    // $insert lexFunctionDecl
+    int lex();
 
-        void print();
-        void preCode();     // re-implement this function for code that must 
-                            // be exec'ed before the patternmatching starts
+private:
+    int lex_();
+    int executeAction_(size_t ruleNr);
 
-        void postCode(PostEnum_ type);    
-                            // re-implement this function for code that must 
-                            // be exec'ed after the rules's actions.
+    void print();
+    void preCode(); // re-implement this function for code that must
+        // be exec'ed before the patternmatching starts
+
+    void postCode(PostEnum_ type);
+    // re-implement this function for code that must
+    // be exec'ed after the rules's actions.
 };
 
-inline LogScanner::LogScanner(std::filesystem::path const &infile)
-:
-    LogScannerBase(infile, "-")
-{}
+inline LogScanner::LogScanner(std::filesystem::path const& infile)
+    : LogScannerBase(infile, "-")
+{
+}
 
 // $insert inlineLexFunction
 inline int LogScanner::lex()
@@ -42,21 +41,19 @@ inline int LogScanner::lex()
     return lex_();
 }
 
-inline void LogScanner::preCode() 
+inline void LogScanner::preCode()
 {
     // optionally replace by your own code
 }
 
-inline void LogScanner::postCode([[maybe_unused]] PostEnum_ type) 
+inline void LogScanner::postCode([[maybe_unused]] PostEnum_ type)
 {
     // optionally replace by your own code
 }
 
-inline void LogScanner::print() 
+inline void LogScanner::print()
 {
     print_();
 }
 
-
 #endif // LogScanner_H_INCLUDED_
-

@@ -5,9 +5,8 @@
 #include <functional>
 #include <utility>
 
-class Attributes
-{
-        // function to check a string against a bound regex
+class Attributes {
+    // function to check a string against a bound regex
     using RegexMatchChecker = std::function<bool(std::string const&)>;
     using Attribute = std::pair<std::string, std::vector<RegexMatchChecker>>;
 
@@ -20,8 +19,8 @@ public:
 
     bool validValue(size_t idx, std::string const& value) const;
 
-    size_t getCount() const;
-    size_t getIdx(std::string const& name) const;
+    size_t             getCount() const;
+    size_t             getIdx(std::string const& name) const;
     std::string const& getName(size_t idx) const;
 };
 

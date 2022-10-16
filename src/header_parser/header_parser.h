@@ -13,34 +13,32 @@
 #include <fstream>
 #include <iosfwd>
 
-class HeaderParser: public HeaderParserBase
-{
-    std::ifstream               d_stream;
-    std::string const&          d_matched;
+class HeaderParser : public HeaderParserBase {
+    std::ifstream      d_stream;
+    std::string const& d_matched;
     // $insert scannerobject
     HeaderScanner d_scanner;
 
     std::unique_ptr<HeaderData> d_ret;
-        
-    public:
-        HeaderParser(std::filesystem::path path);
-        int parse();
-        std::unique_ptr<HeaderData> gen();
 
-    private:
-        void error();                   // called on (syntax) errors
-        int lex();                      // returns the next token from the
-                                        // lexical scanner. 
-        void print();                   // use, e.g., d_token, d_loc
-        void exceptionHandler(std::exception const &exc);
+public:
+    HeaderParser(std::filesystem::path path);
+    int                         parse();
+    std::unique_ptr<HeaderData> gen();
+
+private:
+    void error(); // called on (syntax) errors
+    int  lex(); // returns the next token from the
+        // lexical scanner.
+    void print(); // use, e.g., d_token, d_loc
+    void exceptionHandler(std::exception const& exc);
 
     // support functions for parse():
-        void executeAction_(int ruleNr);
-        void errorRecovery_();
-        void nextCycle_();
-        void nextToken_();
-        void print_();
+    void executeAction_(int ruleNr);
+    void errorRecovery_();
+    void nextCycle_();
+    void nextToken_();
+    void print_();
 };
-
 
 #endif

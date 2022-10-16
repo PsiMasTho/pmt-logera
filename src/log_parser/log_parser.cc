@@ -5,12 +5,12 @@
 #include "../date/date.h"
 
 LogParser::LogParser(filesystem::path const& path, HeaderData const& headerData)
-:
-    d_matched{d_scanner.matched()},
-    d_scanner(path),
-    d_logDataModifier(nullptr, headerData),
-    d_ret{nullptr}
-{}
+    : d_matched { d_scanner.matched() }
+    , d_scanner(path)
+    , d_logDataModifier(nullptr, headerData)
+    , d_ret { nullptr }
+{
+}
 
 unique_ptr<LogData> LogParser::gen()
 {
@@ -35,7 +35,7 @@ void LogParser::error()
     cerr << "At line: " << d_scanner.lineNr() << '\n';
 }
 
-void LogParser::exceptionHandler(exception const &exc)         
+void LogParser::exceptionHandler(exception const& exc)
 {
     cerr << "Error in log file: " << d_scanner.filename() << '\n';
     cerr << '\t' << exc.what() << '\n';

@@ -4,10 +4,8 @@
 #include <vector>
 #include <cstddef>
 
-template <typename T>
-class SparseArray
-{
-    std::vector<T> d_values;
+template <typename T> class SparseArray {
+    std::vector<T>    d_values;
     std::vector<bool> d_specified;
 
 public:

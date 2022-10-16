@@ -9,10 +9,9 @@
 
 class LogLine;
 
-class Writer
-{
-    std::ofstream                           d_out;
-    std::string                             d_delim;
+class Writer {
+    std::ofstream d_out;
+    std::string   d_delim;
 
 public:
     Writer(std::filesystem::path const& outfile, std::string const& delim);

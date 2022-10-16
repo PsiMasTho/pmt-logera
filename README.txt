@@ -1,9 +1,9 @@
 NAME
-	Logara - a Domain Specific Language used to convert workout logs to csv files.
+	Logera - a Domain Specific Language used to convert workout logs to csv files.
 
 SYNOPSIS
-	Logara -d <directory> [-o <output.csv>]
-	Logara -m <file.lh and files.txt...> [-o <output.csv>]
+	Logera -d <directory> [-o <output.csv>]
+	Logera -m <file.lh and files.txt...> [-o <output.csv>]
 
 DESCRIPTION
 	headers and logs should be saved with th
@@ -14,9 +14,9 @@ OPTIONS
 	-m = manually select files
 
 EXAMPLES
-	Logara -d logs/ -o data.csv # writes to data.csv
-	Logara -d logs/ 			# writes to stdout
-	Logara -m logs/header.lh logs/log1.txt logs/log2.txt -o data.csv
+	Logera -d logs/ -o data.csv # writes to data.csv
+	Logera -d logs/ 			# writes to stdout
+	Logera -m logs/header.lh logs/log1.txt logs/log2.txt -o data.csv
 
 INPUT FILES:
 	header:

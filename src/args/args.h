@@ -9,16 +9,15 @@
 
 #include <string>
 
-class Args
-{
+class Args {
     SparseArray<uint8_t>     d_types;
     SparseArray<std::string> d_vals;
 
 public:
     Args(char const* optNTBS, char const* const* argv);
 
-        // returns value of the option (can be an empty string). Sets 'wasSpecified' to true if the option
-        // was specified, otherwise the returned string is empty. 'wasSpecified' must not be a nullptr.
+    // returns value of the option (can be an empty string). Sets 'wasSpecified' to true if the option
+    // was specified, otherwise the returned string is empty. 'wasSpecified' must not be a nullptr.
     std::string const& option(bool* wasSpecified, char option) const;
 
 private:

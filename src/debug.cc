@@ -8,25 +8,23 @@ void scanHeader(std::filesystem::path const& pth)
 {
     HeaderScanner scanner(pth);
 
-    while (int tok = scanner.lex())
-    {
-        switch (tok)
-        {
+    while (int tok = scanner.lex()) {
+        switch (tok) {
             case HeaderTokens::Tokens_::DECL_ATTR:
                 cout << "DECL_ATTR\n";
-            break;
+                break;
             case HeaderTokens::Tokens_::DECL_VAR:
                 cout << "DECL_VAR\n";
-            break;
+                break;
             case HeaderTokens::Tokens_::IDENT:
                 cout << "IDENT\n";
-            break;
+                break;
             case '\n':
                 cout << "NEWLINE\n";
-            break;
+                break;
             default:
                 cout << scanner.matched() << '\n';
-            break;
+                break;
         }
     }
 }
@@ -35,25 +33,23 @@ void scanLog(std::filesystem::path const& pth)
 {
     LogScanner scanner(pth);
 
-    while (int tok = scanner.lex())
-    {
-        switch (tok)
-        {
+    while (int tok = scanner.lex()) {
+        switch (tok) {
             case LogTokens::Tokens_::VAR:
                 cout << "VAR\n";
-            break;
+                break;
             case LogTokens::Tokens_::IDENT:
                 cout << "IDENT\n";
-            break;
+                break;
             case LogTokens::Tokens_::DATE:
                 cout << "DATE\n";
-            break;
+                break;
             case '\n':
                 cout << "NEWLINE\n";
-            break;
+                break;
             default:
                 cout << scanner.matched() << '\n';
-            break;
+                break;
         }
     }
 }
