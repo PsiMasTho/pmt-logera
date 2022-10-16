@@ -2,15 +2,16 @@
 #define INCLUDED_ARGS_H
 
 /*
-*    A simplified version of the Arg class found in lib bobcat
-*/
+ *    A simplified version of the Arg class found in lib bobcat
+ */
 
 #include "../sparse_array/sparse_array.h"
 
 #include <string>
 
-class Args {
-    SparseArray<uint8_t>     d_types;
+class Args
+{
+    SparseArray<uint8_t> d_types;
     SparseArray<std::string> d_vals;
 
 public:

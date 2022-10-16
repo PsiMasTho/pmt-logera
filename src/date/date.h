@@ -2,10 +2,11 @@
 #define INCLUDED_DATE_H
 
 #include <chrono>
-#include <string>
 #include <optional>
+#include <string>
 
-class Date {
+class Date
+{
     std::optional<std::chrono::year_month_day> d_date;
 
 public:
@@ -13,7 +14,7 @@ public:
     Date() = default;
 
     std::string to_string() const;
-    bool        ok() const;
+    bool ok() const;
 
     friend auto operator<=>(Date const&, Date const&) = default;
 };

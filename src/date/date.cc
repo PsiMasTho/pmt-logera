@@ -3,7 +3,8 @@
 Date::Date(string const& dateStr)
     : d_date(_strToYMD(dateStr))
 {
-    if (!ok()) throw invalid_argument("Bad date string: "s + dateStr);
+    if(!ok())
+        throw invalid_argument("Bad date string: "s + dateStr);
 }
 
 string Date::to_string() const

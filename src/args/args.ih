@@ -1,9 +1,14 @@
 #include "args.h"
 
-#include <regex>
-#include <exception>
 #include <cstring>
+#include <exception>
+#include <regex>
 
 using namespace std;
 
-enum ValType : uint8_t { WITHOUT = 1, REQUIRED, OPTIONAL };
+enum ValType : uint8_t
+{
+    WITHOUT = 1,
+    REQUIRED,
+    OPTIONAL
+};

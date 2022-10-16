@@ -5,13 +5,14 @@
 
 using namespace std;
 
-namespace {
+namespace
+{
 // trim from left
 string& _ltrim(string& str, const char* ws = " \t\n\r\f\v");
 
 // trim from right
 string& _rtrim(string& str, const char* ws = " \t\n\r\f\v");
-}
+} // namespace
 
 string& removeCh(string& str, char ch)
 {
@@ -25,17 +26,18 @@ string& trim(string& str, const char* ws)
     return _ltrim(_rtrim(str, ws), ws);
 }
 
-void eraseAndReplace(
-    string* target, string const& toErase, string const& toReplace)
+void eraseAndReplace(string* target, string const& toErase, string const& toReplace)
 {
     size_t const pos = target->find(toErase);
-    if (pos != string::npos) {
+    if(pos != string::npos)
+    {
         target->erase(pos, toErase.size());
         target->insert(pos, toReplace);
     }
 }
 
-namespace {
+namespace
+{
 string& _ltrim(string& str, const char* ws)
 {
     str.erase(0, str.find_first_not_of(ws));
@@ -47,4 +49,4 @@ string& _rtrim(string& str, const char* ws)
     str.erase(str.find_last_not_of(ws) + 1);
     return str;
 }
-}
+} // namespace

@@ -2,32 +2,34 @@
 
 template <typename T>
 SparseArray<T>::SparseArray(size_t max)
-    : d_values {}
+    : d_values{}
     , d_specified(max, false)
-{
-}
+{ }
 
-template <typename T> void SparseArray<T>::set(size_t idx, T value)
+template <typename T>
+void SparseArray<T>::set(size_t idx, T value)
 {
-    size_t const countRhs
-        = std::count(cbegin(d_specified) + idx, cend(d_specified), true);
+    size_t const countRhs = std::count(cbegin(d_specified) + idx, cend(d_specified), true);
     d_values.insert(cend(d_values) - countRhs, std::move(value));
     d_specified[idx] = true;
 }
 
-template <typename T> bool SparseArray<T>::exists(size_t idx) const
+template <typename T>
+bool SparseArray<T>::exists(size_t idx) const
 {
     return d_specified[idx];
 }
 
-template <typename T> T const& SparseArray<T>::get(size_t idx) const
+template <typename T>
+T const& SparseArray<T>::get(size_t idx) const
 {
-    auto const cItr = cbegin(d_values)
-        + std::count(cbegin(d_specified), cbegin(d_specified) + idx, true);
+    auto const cItr =
+        cbegin(d_values) + std::count(cbegin(d_specified), cbegin(d_specified) + idx, true);
     return *cItr;
 }
 
-template <typename T> size_t SparseArray<T>::capacity() const
+template <typename T>
+size_t SparseArray<T>::capacity() const
 {
     return d_specified.size();
 }

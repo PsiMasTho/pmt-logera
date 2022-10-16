@@ -2,16 +2,17 @@
 #define INCLUDED_WRITER_H
 
 #include "../log_data/log_data.h"
-#include <fstream>
-#include <string>
-#include <functional>
 #include <filesystem>
+#include <fstream>
+#include <functional>
+#include <string>
 
 class LogLine;
 
-class Writer {
+class Writer
+{
     std::ofstream d_out;
-    std::string   d_delim;
+    std::string d_delim;
 
 public:
     Writer(std::filesystem::path const& outfile, std::string const& delim);

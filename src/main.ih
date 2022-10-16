@@ -1,22 +1,22 @@
-#include "header_parser/header_parser.h"
 #include "header_data/header_data.h"
+#include "header_parser/header_parser.h"
 
-#include "log_parser/log_parser.h"
 #include "log_data/log_data.h"
+#include "log_parser/log_parser.h"
 
-#include "options/options.h"
 #include "args/args.h"
+#include "options/options.h"
 
 #include "writer/writer.h"
 
+#include <algorithm>
+#include <execution>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <memory>
-#include <fstream>
-#include <regex>
-#include <algorithm>
-#include <filesystem>
-#include <execution>
-#include <thread>
 #include <queue>
+#include <regex>
+#include <thread>
 
 using namespace std;

@@ -1,10 +1,10 @@
-#include "options.h"
 #include "../args/args.h"
+#include "options.h"
 
-#include <sstream>
 #include <algorithm>
-#include <iterator>
-#include <iostream>
 #include <exception>
+#include <iostream>
+#include <iterator>
+#include <sstream>
 
 using namespace std;
