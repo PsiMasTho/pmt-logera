@@ -6,8 +6,7 @@
 
 void scanHeader(std::filesystem::path const& pth)
 {
-	ifstream stream(pth);
-    HeaderScanner scanner(stream);
+    HeaderScanner scanner(pth);
 
     while (int tok = scanner.lex())
     {
@@ -34,8 +33,7 @@ void scanHeader(std::filesystem::path const& pth)
 
 void scanLog(std::filesystem::path const& pth)
 {
-	ifstream stream(pth);
-    LogScanner scanner(stream);
+    LogScanner scanner(pth);
 
     while (int tok = scanner.lex())
     {
