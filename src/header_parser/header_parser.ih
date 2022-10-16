@@ -5,12 +5,6 @@
 // $insert class.h
 #include "header_parser.h"
 
-
-inline void HeaderParser::error()
-{
-    throw std::string("Syntax error in header.");
-}
-
 // $insert lex
 inline int HeaderParser::lex()
 {
@@ -21,16 +15,10 @@ inline void HeaderParser::print()
 {
 }
 
-inline void HeaderParser::exceptionHandler(std::exception const &exc)         
-{
-    throw;              // re-implement to handle exceptions thrown by actions
-}
-
-
     // Add here includes that are only required for the compilation 
     // of HeaderParser's sources.
 
-#include "util.h"
+#include "../string_util.h"
 #include <string>
 
     // UN-comment the next using-declaration if you want to use

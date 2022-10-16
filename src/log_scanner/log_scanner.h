@@ -6,15 +6,14 @@
 // $insert baseclass_h
 #include "log_scannerbase.h"\
 
+#include <filesystem>
 #include "log_token_enums.h"
 
 // $insert classHead
 class LogScanner: public LogScannerBase
 {
     public:
-        explicit LogScanner(std::istream &in = std::cin, std::ostream &out = std::cout, bool keepCwd = true);
-
-        LogScanner(std::string const &infile, std::string const &outfile, bool keepCwd = true);
+        explicit LogScanner(std::filesystem::path const &infile);
         
         // $insert lexFunctionDecl
         int lex();
@@ -32,15 +31,9 @@ class LogScanner: public LogScannerBase
                             // be exec'ed after the rules's actions.
 };
 
-// $insert scannerConstructors
-inline LogScanner::LogScanner(std::istream &in, std::ostream &out, bool keepCwd)
+inline LogScanner::LogScanner(std::filesystem::path const &infile)
 :
-    LogScannerBase(in, out, keepCwd)
-{}
-
-inline LogScanner::LogScanner(std::string const &infile, std::string const &outfile, bool keepCwd)
-:
-    LogScannerBase(infile, outfile, keepCwd)
+    LogScannerBase(infile, "-")
 {}
 
 // $insert inlineLexFunction

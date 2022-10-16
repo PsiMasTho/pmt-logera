@@ -6,15 +6,14 @@
 // $insert baseclass_h
 #include "header_scannerbase.h"
 
+#include <filesystem>
 #include "header_token_enums.h"
 
 // $insert classHead
 class HeaderScanner: public HeaderScannerBase
 {
     public:
-        explicit HeaderScanner(std::istream &in = std::cin, std::ostream &out = std::cout, bool keepCwd = true);
-
-        HeaderScanner(std::string const &infile, std::string const &outfile, bool keepCwd = true);
+        HeaderScanner(std::filesystem::path const &infile);
         
         // $insert lexFunctionDecl
         int lex();
@@ -32,15 +31,9 @@ class HeaderScanner: public HeaderScannerBase
                             // be exec'ed after the rules's actions.
 };
 
-// $insert scannerConstructors
-inline HeaderScanner::HeaderScanner(std::istream &in, std::ostream &out, bool keepCwd)
+inline HeaderScanner::HeaderScanner(std::filesystem::path const &infile)
 :
-    HeaderScannerBase(in, out, keepCwd)
-{}
-
-inline HeaderScanner::HeaderScanner(std::string const &infile, std::string const &outfile, bool keepCwd)
-:
-    HeaderScannerBase(infile, outfile, keepCwd)
+    HeaderScannerBase(infile, "-")
 {}
 
 // $insert inlineLexFunction

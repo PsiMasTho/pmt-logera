@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <execution>
+#include <exception>
 #include <regex>
 
 using namespace std;
@@ -30,7 +31,7 @@ void Attributes::addAttr(string const& name)
 void Attributes::addRegexToLastAttr(std::string const& expr)
 {
     if (d_attrs.empty())
-        throw "Trying to add regex without an attribute: "s + expr;
+        throw runtime_error("Trying to add regex without an attribute: "s + expr);
 
     d_attrs.back().second.push_back(RegexMatchLambda(expr));
 }
@@ -42,7 +43,7 @@ bool Attributes::validValue(size_t idx, string const& value) const
         return true;
 
         // does any regex match?
-    return any_of(execution::par_unseq, begin(d_attrs[idx].second), end(d_attrs[idx].second), [value](auto const& fun){return fun(value);});
+    return any_of(begin(d_attrs[idx].second), end(d_attrs[idx].second), [value](auto const& fun){return fun(value);});
 }
 
 size_t Attributes::getCount() const
@@ -53,10 +54,10 @@ size_t Attributes::getCount() const
 
 size_t Attributes::getIdx(std::string const& name) const
 {
-    auto const itr = find_if(execution::par_unseq, begin(d_attrs), end(d_attrs), [&name](auto const& attr){return attr.first == name;});
+    auto const itr = find_if(begin(d_attrs), end(d_attrs), [&name](auto const& attr){return attr.first == name;});
 
     if (itr == end(d_attrs))
-        throw "Queried unknown attribute: "s + name;
+        throw runtime_error("Queried unknown attribute: "s + name);
 
     return distance(begin(d_attrs), itr);
 }

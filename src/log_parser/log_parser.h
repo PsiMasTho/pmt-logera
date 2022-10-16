@@ -15,7 +15,7 @@
 
 class LogParser: public LogParserBase
 {
-    std::ifstream            d_stream;
+    std::string const& d_matched;
 
     // $insert scannerobject
     LogScanner d_scanner;

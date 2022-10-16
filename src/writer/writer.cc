@@ -13,8 +13,14 @@ Writer::Writer(filesystem::path const& outfile, std::string const& delim)
 void Writer::write(Date const& date, LogData::LogLine const& logLine)
 {
     d_out << date.to_string();
-    for (auto const& val : logLine)
-        d_out << d_delim << val;
+    for (size_t idx = 0; idx < logLine.capacity(); ++idx)
+    {
+        if (logLine.exists(idx))
+            d_out << d_delim << logLine.get(idx);
+        else
+            d_out << d_delim;
+    }
+        
     d_out << '\n';
 }
 

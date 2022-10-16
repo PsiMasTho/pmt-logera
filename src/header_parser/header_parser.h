@@ -11,11 +11,12 @@
 #include "../header_data/header_data.h"
 #include <filesystem>
 #include <fstream>
+#include <iosfwd>
 
 class HeaderParser: public HeaderParserBase
 {
     std::ifstream               d_stream;
-
+    std::string const&          d_matched;
     // $insert scannerobject
     HeaderScanner d_scanner;
 

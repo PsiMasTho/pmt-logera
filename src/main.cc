@@ -6,68 +6,37 @@ enum
     FAIL
 };
 
-struct exception_info
-{
-    filesystem::path path;
-    exception_ptr    exception;
-};
-
 vector<string> getHeaderLine(HeaderData const& header);
 
 int main(int argc, char** argv)
 try
 {
-    Options opts(Args("d:m:o:", argv));
-    opts.debugPrint(cerr);
+        // parse options, may throw
+    Options opts(Args("d:m:vo:", argv));
 
+    if(opts.verbose())
+        opts.verbosePrint(cerr);
+
+        // parse header
     unique_ptr<HeaderData> headerData = HeaderParser(opts.headerFile()).gen();
 
-    mutex excMutex;
-    mutex pushMutex;
-    queue<exception_info> exceptions;
+        // syntax error encountered
+    if (headerData == nullptr)
+        return FAIL;
 
     vector<unique_ptr<LogData>> parsedData;
 
-        // parse logs in paralell
-        // avoid par_unseq because it ignores mutexes
-    for_each(execution::par, begin(opts.logFiles()), end(opts.logFiles()), [&](auto const& pth)
+        // parse log files
+    for (auto const& pth : opts.logFiles())
     {
         LogParser logParser(pth, *headerData);
-        try
-        {
-            unique_ptr<LogData> logData = logParser.gen();
-            lock_guard const pushGuard(pushMutex);
-            parsedData.push_back(move(logData));
-        }
-        catch (...)
-        {
-            lock_guard const excGuard(excMutex);
-            exceptions.push({pth, current_exception()});
-        }
-    });
+        unique_ptr<LogData> logData = logParser.gen();
 
-    if (!exceptions.empty())
-    {
-        while (!exceptions.empty())
-        {
-            cerr << "Exception encountered when parsing: " << exceptions.front().path << '\n';
-            try
-            {
-                rethrow_exception(exceptions.front().exception);
-            }
-            catch(string const& exc)
-            {
-                cerr << '\t' << exc << '\n';
-            }
-            catch(...)
-            {
-                cerr << "Unknown exception.\n";
-            }
-            
-            exceptions.pop();
-        }
-        cerr << "No output was generated.\n";
-        return FAIL;
+            // syntax error encountered
+        if (logData == nullptr)
+            return FAIL;
+    
+        parsedData.push_back(move(logData));
     }
 
         // sort the output by date
@@ -77,20 +46,25 @@ try
     Writer writer(opts.outputFile(), ";");
     writer.write(getHeaderLine(*headerData));
 
+        // write all lines
     for (auto const& logDataPtr : parsedData)
         for (auto const& logLine  : logDataPtr->getLines())
             writer.write(logDataPtr->getDate(), logLine);
 
+    if (opts.verbose())
+        cout << "Done! Output written to: " << opts.outputFile() << '\n';
+
     return SUCCESS;
 }
-catch (string const& exc)
+catch (invalid_argument const& exc)
 {
-    cerr << "Exception encountered:\n";
-    cerr << '\t' << exc << '\n'; 
+    cerr << "Invalid arguments:\n";
+    cerr << '\t' << exc.what() << '\n';
+    return FAIL;
 }
 catch (...)
 {
-    cerr << "Unknown exception encountered.\n";
+    cerr << "Terminating due to unknown exception.\n";
 }
 
 vector<string> getHeaderLine(HeaderData const& header)

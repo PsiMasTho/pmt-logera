@@ -4,6 +4,7 @@
 #include "../date/date.h"
 
 #include <string>
+#include <exception>
 
 using namespace std;
 
@@ -27,7 +28,7 @@ void LogDataModifier::setDate(Date const& date)
 void LogDataModifier::setActiveVar(string const& varName)
 {
     if (!d_target->d_date.ok())
-        throw "Log with bad date detected"s;
+        throw runtime_error("Log with bad date detected");
 
     d_activeVar = varName;
 }
@@ -35,12 +36,12 @@ void LogDataModifier::setActiveVar(string const& varName)
 void LogDataModifier::addAttrToNewLine(string const& attrName, string const& attrVal)
 {
     if (!d_target->d_date.ok())
-        throw "Log with bad date detected"s;
+        throw runtime_error("Log with bad date detected");
     if (d_activeVar.empty())
-        throw "Adding new line without active variable"s;
+        throw runtime_error("Adding new line without active variable");
     
-    d_target->d_lines.emplace_back(d_headerData.getAttributes().getCount() + 1, ""s);
-    d_target->d_lines.back().front().assign(d_activeVar);
+    d_target->d_lines.emplace_back(d_headerData.getAttributes().getCount() + 1);
+    d_target->d_lines.back().set(0, d_activeVar);
 
     addAttrToCurrentLine(attrName, attrVal);
 }
@@ -48,16 +49,17 @@ void LogDataModifier::addAttrToNewLine(string const& attrName, string const& att
 void LogDataModifier::addAttrToCurrentLine(string const& attrName, string const& attrVal)
 {
     if (!d_target->d_date.ok())
-        throw "Log with bad date detected"s;
-    if (d_target->d_lines.back().front().empty())
-        throw "Attempting to add attribute with no variable"s;
+        throw runtime_error("Log with bad date detected"s);
+
+    if (!d_target->d_lines.back().exists(0))
+        throw runtime_error("Attempting to add attribute with no variable"s);
 
     if (!d_headerData.doesVarHaveAttr(d_activeVar, attrName))
-        throw "Variable: \""s + d_activeVar + "\" does not have attribute: \""s + attrName + '\"';
+        throw runtime_error("Variable: \""s + d_activeVar + "\" does not have attribute: \""s + attrName + '\"');
 
     size_t const idx = d_headerData.getAttributes().getIdx(attrName);
     if (!d_headerData.getAttributes().validValue(idx, attrVal))
-        throw "Invalid value: \""s + attrVal + "\". For attribute: \"" + attrName + '\"';
+        throw runtime_error("Invalid value: \""s + attrVal + "\". For attribute: \"" + attrName + '\"');
 
-    d_target->d_lines.back()[idx + 1] = attrVal;
+    d_target->d_lines.back().set(idx + 1, attrVal);
 }

@@ -3,6 +3,7 @@
 #include <array>
 #include <utility>
 #include <algorithm>
+#include <exception>
 
 using namespace std;
 

@@ -5,15 +5,12 @@ Date::Date(string const& dateStr)
     d_date(_strToYMD(dateStr))
 {
     if (!ok())
-        throw "Bad date string: "s + dateStr;
+        throw invalid_argument("Bad date string: "s + dateStr);
 }
 
 string Date::to_string() const
 {
-    if (!ok())
-        throw "Invalid date"s;
-    else
-        return _ymdToStr(d_date.value());
+    return _ymdToStr(d_date.value());
 }
 
 bool Date::ok() const

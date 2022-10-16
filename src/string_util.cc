@@ -1,6 +1,7 @@
-#include "util.h"
+#include "string_util.h"
 
 #include <algorithm>
+#include <string>
 
 using namespace std;
 
@@ -13,7 +14,7 @@ namespace
 	string& _rtrim(string& str, const char* ws = " \t\n\r\f\v");
 }
 
-std::string& removeCh(string& str, char ch)
+string& removeCh(string& str, char ch)
 {
 	str.erase(remove(begin(str), end(str), ch), end(str));
 	return str;
@@ -23,6 +24,16 @@ std::string& removeCh(string& str, char ch)
 string& trim(string& str, const char* ws)
 {
     return _ltrim(_rtrim(str, ws), ws);
+}
+
+void eraseAndReplace(string* target, string const& erase, string const& replace)
+{
+    size_t const pos = target->find(erase);
+    if (pos != string::npos)
+    {
+        target->erase(pos, erase.size());
+        target->insert(pos, replace);
+    }
 }
 
 namespace

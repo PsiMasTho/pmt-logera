@@ -4,9 +4,9 @@
 %scanner-class-name LogScanner
 
 %token IDENT
-%token DATE
-%token VAR
-%token NEWLINE
+       DATE
+       VAR
+       NEWLINE
 
 %stype std::string
 

@@ -4,9 +4,9 @@
 %scanner-class-name HeaderScanner
 
 %token DECL_VAR
-%token IDENT
-%token DECL_ATTR
-%token NEWLINE
+       IDENT
+       DECL_ATTR
+       NEWLINE
 
 %stype std::string
 

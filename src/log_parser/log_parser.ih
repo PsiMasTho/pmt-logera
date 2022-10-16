@@ -5,13 +5,6 @@
 // $insert class.h
 #include "log_parser.h"
 
-#include <string>
-
-inline void LogParser::error()
-{
-    throw std::string("Syntax error in log.");
-}
-
 // $insert lex
 inline int LogParser::lex()
 {
@@ -22,17 +15,13 @@ inline void LogParser::print()
 {
 }
 
-inline void LogParser::exceptionHandler(std::exception const &exc)         
-{
-    throw;              // re-implement to handle exceptions thrown by actions
-}
-
-
     // Add here includes that are only required for the compilation 
     // of LogParser's sources.
 
-#include "../date/date.h"
+#include <string>
 
+#include "../date/date.h"
+#include "../string_util.h"
 
     // UN-comment the next using-declaration if you want to use
     // int LogParser's sources symbols from the namespace std without
