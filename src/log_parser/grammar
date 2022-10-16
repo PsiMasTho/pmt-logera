@@ -1,5 +1,3 @@
-%token-path ../log_scanner/log_token_enums.h
-
 %scanner ../log_scanner/log_scanner.h
 %scanner-class-name LogScanner
 

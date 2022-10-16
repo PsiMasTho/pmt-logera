@@ -9,8 +9,9 @@ struct HeaderTokens
         DECL_VAR = 257,
         IDENT,
         DECL_ATTR,
-        NEWLINE
+        NEWLINE,
     };
+
 };
 
 #endif

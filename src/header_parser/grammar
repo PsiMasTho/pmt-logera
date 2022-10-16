@@ -1,5 +1,3 @@
-%token-path ../header_scanner/header_token_enums.h
-
 %scanner ../header_scanner/header_scanner.h
 %scanner-class-name HeaderScanner
 
