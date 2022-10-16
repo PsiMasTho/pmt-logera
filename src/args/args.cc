@@ -1,59 +1,57 @@
-#include "args.h"
-#include <regex>
+#include "args.ih"
 
 using namespace std;
 
-Args::Args(char const* optStr, char** argv)
+namespace
+{
+        // maps lowercase and uppercase chars to range [0, 52],
+        // expects a valid lowercase or uppercase ascii char
+    size_t mapCh(char ch);
+}
+
+Args::Args(char const* optNTBS, char const* const* argv)
 :
-    d_optTypeMap{},
-    d_optValMap{}
+    d_types(52),
+    d_vals(52)
 {
-    fillTypeMap(optStr);
-    fillValMap(argv);
+    setTypes(optNTBS);
+    setVals(argv);
 }
 
-string const* Args::option(char option) const
+std::string const& Args::option(bool* wasSpecified, char option) const
 {
-        // check if the option is valid
-    auto itr1 = d_optTypeMap.find(option);
-    if (itr1 == d_optTypeMap.end())
-        throw "Unknown option: "s + option;
-    
-    auto itr2 = d_optValMap.find(option);
-    if (itr2 == d_optValMap.end()) // option not specified
-        return nullptr;
+    if (!d_vals.exists(mapCh(option))) // option not specified
+    {
+        *wasSpecified = false;
+
+        static string emptyRet{};
+        return emptyRet;
+    }
     else
-        return &itr2->second; // is specified, return string (may be empty)
-        
+    {
+        *wasSpecified = true;
+        return d_vals.get(mapCh(option)); // is specified, return string (may be empty)
+    }
 }
 
-void Args::fillTypeMap(string const& optStr)
+void Args::setTypes(char const* optNTBS)
 {
-    regex const optRegex(R"([a-z]\:{0,2})", regex::ECMAScript | regex::optimize | regex::icase);
+    static regex const optRegex(R"([a-z]\:{0,2})", regex::ECMAScript | regex::optimize | regex::icase);
+    size_t const ntbsLen = strlen(optNTBS);
 
-    for (auto itr = sregex_iterator(optStr.begin(), optStr.end(), optRegex); itr != sregex_iterator(); ++itr)
-    {                    
-        smatch const match(*itr);
-        
-        char const optCh = match.str().front();
-        Type optType;
+    if (!ntbsLen)
+        return;
 
-        if (match.str().size() > 1)
-        {
-            string const optTypeStr(match.str().substr(1));
-            if (optTypeStr == ":")
-                optType = Type::REQUIRED;
-            else if (optTypeStr == "::")
-                optType = Type::OPTIONAL;
-        }
-        else
-            optType = Type::NONE;
-
-        d_optTypeMap[optCh] = optType;
-    }   
+    if (cmatch optMatch; regex_search(optNTBS, optMatch, optRegex))
+    {
+        char const ch = optMatch[0].str()[0];
+        size_t const matchLen = optMatch[0].length();
+        d_types.set(mapCh(ch), static_cast<ValType>(matchLen));
+        setTypes(optNTBS + matchLen);
+    }
 }
 
-void Args::fillValMap(char** argv)
+void Args::setVals(char const* const* argv)
 {
     if (!argv[1])
         return;
@@ -74,7 +72,7 @@ void Args::fillValMap(char** argv)
         else
         {
             if (optValPairs.empty())
-                throw "Invalid arguments."s;
+                throw invalid_argument{{}};
             else
             {
                 string const delim = optValPairs.back().second.empty() ? string{} : " "s;
@@ -85,17 +83,30 @@ void Args::fillValMap(char** argv)
 
     for (auto [opt, val] : optValPairs)
     {
-        if (d_optTypeMap.contains(opt))
+        if (d_types.exists(mapCh(opt)))
         {
-            Type const optType = d_optTypeMap[opt];
-            if (val.empty() && (optType == Type::NONE || optType == Type::OPTIONAL))
-                d_optValMap[opt] = val;
-            else if (!val.empty() && (optType == Type::OPTIONAL || optType == Type::REQUIRED))
-                d_optValMap[opt] = val;
-            else
-                throw "Invalid arguments."s;
+            uint8_t const optType = d_types.get(mapCh(opt));
+            if (val.empty() && (optType == ValType::WITHOUT || optType == ValType::OPTIONAL))
+                d_vals.set(mapCh(opt), val);
+            else if (!val.empty() && (optType == ValType::OPTIONAL || optType == ValType::REQUIRED))
+                d_vals.set(mapCh(opt), val);
+            else if (val.empty() && optType == ValType::REQUIRED)
+                throw invalid_argument("No value specified for argument: "s + '-' + opt);
+            else if (!val.empty() && optType == ValType::WITHOUT)
+                throw invalid_argument("Value specified for argument: "s + '-' + opt);
         }
         else
-            throw "Unknown option: "s + opt;
+            throw invalid_argument("Unknown option: "s + opt);
+    }
+}
+
+namespace
+{
+    size_t mapCh(char ch)
+    {
+        if (isupper(ch))
+            return ch - 65;
+        else
+            return ch - 97;
     }
 }

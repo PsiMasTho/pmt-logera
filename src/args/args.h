@@ -1,35 +1,29 @@
-#ifndef INCLUDED_ARG_H
-#define INCLUDED_ARG_H
+#ifndef INCLUDED_ARGS_H
+#define INCLUDED_ARGS_H
+
 /*
 *    A simplified version of the Arg class found in lib bobcat
 */
 
-#include <unordered_map>
+#include "../sparse_array/sparse_array.h"
+
 #include <string>
-#include <optional>
 
 class Args
 {
-    enum Type
-    {
-        NONE,
-        REQUIRED,
-        OPTIONAL
-    };
-
-    std::unordered_map<char, Type>        d_optTypeMap;
-    std::unordered_map<char, std::string> d_optValMap;
+    SparseArray<uint8_t>     d_types;
+    SparseArray<std::string> d_vals;
 
 public:
-    Args(char const* optStr, char** argv);
+    Args(char const* optNTBS, char const* const* argv);
 
-        // returns nullptr if option isnt specified, returns empty string if it is specified
-        // with no arguments, returns filled string if it's specified and has arguments
-    std::string const* option(char option) const;
+        // returns value of the option (can be an empty string). Sets 'wasSpecified' to true if the option
+        // was specified, otherwise the returned string is empty. 'wasSpecified' must not be a nullptr.
+    std::string const& option(bool* wasSpecified, char option) const;
 
 private:
-    void fillTypeMap(std::string const& optStr);
-    void fillValMap(char** argv);
+    void setTypes(char const* optNTBS);
+    void setVals(char const* const* argv);
 };
 
 #endif

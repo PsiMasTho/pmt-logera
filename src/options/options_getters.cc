@@ -1,16 +1,21 @@
 #include "options.ih"
 
-filesystem::path const& Options::headerFile() const
+decltype(Options::d_verbose) const& Options::verbose() const
+{
+    return d_verbose;
+}
+
+decltype(Options::d_headerFile) const& Options::headerFile() const
 {
     return d_headerFile;
 }
 
-std::filesystem::path const& Options::outputFile() const
+decltype(Options::d_outputFile) const& Options::outputFile() const
 {
     return d_outputFile;
 }
 
-vector<filesystem::path> const& Options::logFiles() const
+decltype(Options::d_logFiles) const& Options::logFiles() const
 {
     return d_logFiles;
 }

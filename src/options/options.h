@@ -19,6 +19,7 @@ enum FilterType
 
 class Options
 {
+    bool                                     d_verbose;
     std::filesystem::path const              d_headerFile;
     std::filesystem::path const              d_outputFile;
     std::vector<std::filesystem::path> const d_logFiles;
@@ -26,13 +27,16 @@ class Options
 public:
     explicit Options(Args const& args);
 
+    bool good() const;
+
         // accessors
-    std::filesystem::path const& headerFile() const;
-    std::filesystem::path const& outputFile() const;
-    std::vector<std::filesystem::path> const& logFiles() const;
+    decltype(d_verbose)    const& verbose() const;
+    decltype(d_headerFile) const& headerFile() const;
+    decltype(d_outputFile) const& outputFile() const;
+    decltype(d_logFiles)   const& logFiles() const;
 
         // print
-    void debugPrint(std::ostream& out) const;
+    void verbosePrint(std::ostream& out) const;
         
 private:
         // converts a string to a given type e.g. string of space seperated
@@ -41,6 +45,7 @@ private:
     static Type cvtFunc(std::string const& valStr);
 
         // assigning the member variables from the strings in Args
+    decltype(d_verbose)     setVerbose(Args const& args);
     decltype(d_headerFile)  setHeaderFile(Args const& args);
     decltype(d_outputFile)  setOutputFile(Args const& args);
     decltype(d_logFiles)    setLogFiles(Args const& args);
