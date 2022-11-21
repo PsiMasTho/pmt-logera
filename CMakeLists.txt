@@ -3,11 +3,29 @@ set(CMAKE_CXX_STANDARD 20)
 project(Logera VERSION 1.0.0 LANGUAGES CXX)
 
 ########################################################################
-# Source files
+# Program binary
 ########################################################################
-file(GLOB_RECURSE SOURCES "src/*.cc")
+file(GLOB_RECURSE PROJ_SOURCES "src/*.cc")
+list(REMOVE_ITEM PROJ_SOURCES "src/main.cc")
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+
+add_library(Proj STATIC ${PROJ_SOURCES})
+add_executable(${PROJECT_NAME} "src/main.cc")
+target_link_libraries(${PROJECT_NAME} Proj)
+
+########################################################################
+# Test binary
+########################################################################
+
+option(BUILD_TESTS "Build test program" OFF)
+
+if(BUILD_TESTS)
+    file(GLOB_RECURSE TEST_SOURCES "test/*.cc")
+    find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+    add_executable(unit_tests ${TEST_SOURCES})
+    target_compile_definitions(unit_tests PUBLIC BOOST_TEST_DYN_LINK)
+    target_link_libraries(unit_tests Proj Boost::unit_test_framework)
+endif(BUILD_TESTS)
 
 ########################################################################
 # Compiler flags
@@ -61,6 +79,11 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "DebugLIBCPP")
 
 endif()
 
+########################################################################
+# Messages
+########################################################################
+
 message(STATUS "Build type:     ${CMAKE_BUILD_TYPE}")
 message(STATUS "Compiler flags: ${CMAKE_CXX_FLAGS}")
+message(STATUS "Tests: ${BUILD_TESTS}")
 
