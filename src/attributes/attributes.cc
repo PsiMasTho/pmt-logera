@@ -20,7 +20,9 @@ void Attributes::addRegexToLastAttr(std::string const& expr)
     if(d_attrs.empty())
         throw runtime_error("Trying to add regex without an attribute: "s + expr);
 
-    d_attrs.back().second.push_back([rexpr = regex(expr, regex::optimize)](string const& expr){return regex_match(expr, rexpr);});
+    d_attrs.back().second.push_back([rexpr = regex(expr, regex::optimize)](string const& expr) {
+        return regex_match(expr, rexpr);
+    });
 }
 
 bool Attributes::validValue(size_t idx, string const& value) const

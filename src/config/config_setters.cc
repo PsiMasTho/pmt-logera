@@ -2,7 +2,7 @@
 
 decltype(Config::d_verbose) Config::setVerbose(Args const& args)
 {
-	auto const [specified_v, str_v] = args.option('v');
+    auto const [specified_v, str_v] = args.option('v');
 
     if(specified_v)
         return true;

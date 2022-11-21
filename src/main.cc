@@ -10,15 +10,14 @@ vector<string> getHeaderLine(HeaderData const& header);
 
 namespace
 {
-	Args::Opt const options[]
-    {
-        Args::Opt(Args::Opt::ValType::REQUIRED, "directory", 'd'),
-        Args::Opt(Args::Opt::ValType::REQUIRED, "manual",    'm'),
-        Args::Opt(Args::Opt::ValType::NONE,     "verbose",   'v'),
-        Args::Opt(Args::Opt::ValType::NONE,     "output",    'o'),
-    };
-    size_t const nOptions = size(options);
-}
+Args::Opt const options[]{
+    Args::Opt(Args::Opt::ValType::REQUIRED, "directory", 'd'),
+    Args::Opt(Args::Opt::ValType::REQUIRED, "manual", 'm'),
+    Args::Opt(Args::Opt::ValType::NONE, "verbose", 'v'),
+    Args::Opt(Args::Opt::ValType::NONE, "output", 'o'),
+};
+size_t const nOptions = size(options);
+} // namespace
 
 int main(int, char** argv)
 try
