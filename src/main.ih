@@ -5,18 +5,12 @@
 #include "log_parser/log_parser.h"
 
 #include "args/args.h"
-#include "options/options.h"
+#include "config/config.h"
 
 #include "writer/writer.h"
 
 #include <algorithm>
-#include <execution>
-#include <filesystem>
-#include <fstream>
 #include <iostream>
 #include <memory>
-#include <queue>
-#include <regex>
-#include <thread>
 
 using namespace std;

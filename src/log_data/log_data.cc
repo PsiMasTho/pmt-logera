@@ -3,7 +3,6 @@
 #include "../header_data/header_data.h"
 
 #include <algorithm>
-#include <execution>
 
 using namespace std;
 

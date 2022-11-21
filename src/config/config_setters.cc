@@ -1,12 +1,8 @@
-#include "options.ih"
+#include "config.ih"
 
-using namespace std;
-
-decltype(Options::d_verbose) Options::setVerbose(Args const& args)
+decltype(Config::d_verbose) Config::setVerbose(Args const& args)
 {
-    bool specified_v = false;
-
-    args.option(&specified_v, 'v');
+	auto const [specified_v, str_v] = args.option('v');
 
     if(specified_v)
         return true;
@@ -14,13 +10,10 @@ decltype(Options::d_verbose) Options::setVerbose(Args const& args)
         return false;
 }
 
-decltype(Options::d_headerFile) Options::setHeaderFile(Args const& args)
+decltype(Config::d_headerFile) Config::setHeaderFile(Args const& args)
 {
-    bool specified_d = false;
-    bool specified_m = false;
-
-    string const& str_d = args.option(&specified_d, 'd');
-    string const& str_m = args.option(&specified_m, 'm');
+    auto const [specified_d, str_d] = args.option('d');
+    auto const [specified_m, str_m] = args.option('m');
 
     if(specified_m && specified_d)
         throw invalid_argument("Specify either -m or -d");
@@ -58,28 +51,20 @@ decltype(Options::d_headerFile) Options::setHeaderFile(Args const& args)
     return ret;
 }
 
-decltype(Options::d_outputFile) Options::setOutputFile(Args const& args)
+decltype(Config::d_outputFile) Config::setOutputFile(Args const& args)
 {
-    filesystem::path ret;
-
-    bool specified_o = false;
-    string const& str_o = args.option(&specified_o, 'o');
+    auto const [specified_o, str_o] = args.option('o');
 
     if(!specified_o)
-        ret = filesystem::path{"out.csv"s};
+        return filesystem::path{"out.csv"s};
     else
-        ret = cvtFunc<filesystem::path>(str_o);
-
-    return ret;
+        return cvtFunc<filesystem::path>(str_o);
 }
 
-decltype(Options::d_logFiles) Options::setLogFiles(Args const& args)
+decltype(Config::d_logFiles) Config::setLogFiles(Args const& args)
 {
-    bool specified_d = false;
-    bool specified_m = false;
-
-    string const& str_d = args.option(&specified_d, 'd');
-    string const& str_m = args.option(&specified_m, 'm');
+    auto const [specified_d, str_d] = args.option('d');
+    auto const [specified_m, str_m] = args.option('m');
 
     if(specified_m && specified_d)
         throw invalid_argument("Specify either -m or -d");

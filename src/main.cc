@@ -8,17 +8,29 @@ enum
 
 vector<string> getHeaderLine(HeaderData const& header);
 
-int main(int argc, char** argv)
+namespace
+{
+	Args::Opt const options[]
+    {
+        Args::Opt(Args::Opt::ValType::REQUIRED, "directory", 'd'),
+        Args::Opt(Args::Opt::ValType::REQUIRED, "manual",    'm'),
+        Args::Opt(Args::Opt::ValType::NONE,     "verbose",   'v'),
+        Args::Opt(Args::Opt::ValType::NONE,     "output",    'o'),
+    };
+    size_t const nOptions = size(options);
+}
+
+int main(int, char** argv)
 try
 {
     // parse options, may throw
-    Options opts(Args("d:m:vo:", argv));
+    Config cfg(Args(options, nOptions, argv));
 
-    if(opts.verbose())
-        opts.verbosePrint(cerr);
+    if(cfg.verbose())
+        cfg.verbosePrint(cerr);
 
     // parse header
-    unique_ptr<HeaderData> headerData = HeaderParser(opts.headerFile()).gen();
+    unique_ptr<HeaderData> headerData = HeaderParser(cfg.headerFile()).gen();
 
     // syntax error encountered
     if(headerData == nullptr)
@@ -27,10 +39,9 @@ try
     vector<unique_ptr<LogData>> parsedData;
 
     // parse log files
-    for(auto const& pth : opts.logFiles())
+    for(auto const& pth : cfg.logFiles())
     {
-        LogParser logParser(pth, *headerData);
-        unique_ptr<LogData> logData = logParser.gen();
+        unique_ptr<LogData> logData = LogParser(pth, *headerData).gen();
 
         // syntax error encountered
         if(logData == nullptr)
@@ -45,7 +56,7 @@ try
     });
 
     // write header line
-    Writer writer(opts.outputFile(), ";");
+    Writer writer(cfg.outputFile(), ";");
     writer.write(getHeaderLine(*headerData));
 
     // write all lines
@@ -53,8 +64,8 @@ try
         for(auto const& logLine : logDataPtr->getLines())
             writer.write(logDataPtr->getDate(), logLine);
 
-    if(opts.verbose())
-        cout << "Done! Output written to: " << opts.outputFile() << '\n';
+    if(cfg.verbose())
+        cout << "Done! Output written to: " << cfg.outputFile() << '\n';
 
     return SUCCESS;
 }

@@ -2,22 +2,9 @@
 
 #include <algorithm>
 #include <exception>
-#include <execution>
 #include <regex>
 
 using namespace std;
-
-namespace
-{
-class RegexMatchLambda
-{
-    regex const d_regex;
-
-public:
-    RegexMatchLambda(string const& rexpr);
-    bool operator()(string const& str) const;
-};
-} // namespace
 
 Attributes::Attributes()
     : d_attrs{}
@@ -33,7 +20,7 @@ void Attributes::addRegexToLastAttr(std::string const& expr)
     if(d_attrs.empty())
         throw runtime_error("Trying to add regex without an attribute: "s + expr);
 
-    d_attrs.back().second.push_back(RegexMatchLambda(expr));
+    d_attrs.back().second.push_back([rexpr = regex(expr, regex::optimize)](string const& expr){return regex_match(expr, rexpr);});
 }
 
 bool Attributes::validValue(size_t idx, string const& value) const
@@ -69,15 +56,3 @@ string const& Attributes::getName(size_t idx) const
 {
     return d_attrs[idx].first;
 }
-
-namespace
-{
-RegexMatchLambda::RegexMatchLambda(string const& rexpr)
-    : d_regex(rexpr, regex::optimize)
-{ }
-
-bool RegexMatchLambda::operator()(string const& str) const
-{
-    return regex_match(str, d_regex);
-}
-} // namespace

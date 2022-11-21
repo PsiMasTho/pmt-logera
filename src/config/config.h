@@ -1,31 +1,23 @@
-#ifndef INCLUDED_OPTIONS_
-#define INCLUDED_OPTIONS_
+#ifndef INCLUDED_CONFIG_CONFIG_H
+#define INCLUDED_CONFIG_CONFIG_H
 
 #include <filesystem>
-#include <iosfwd>
 #include <memory>
-#include <regex>
 #include <string>
 #include <vector>
+#include <type_traits>
 
 class Args;
 
-enum FilterType
+class Config
 {
-    INCLUSIVE,
-    EXCLUSIVE,
-    NONE
-};
-
-class Options
-{
-    bool d_verbose;
+    bool const d_verbose;
     std::filesystem::path const d_headerFile;
     std::filesystem::path const d_outputFile;
     std::vector<std::filesystem::path> const d_logFiles;
 
 public:
-    explicit Options(Args const& args);
+    explicit Config(Args const& args);
 
     bool good() const;
 
