@@ -24,7 +24,7 @@ done < <(find . -type f -name "*.ih" "${findargs[@]}" -print0)
 
 while IFS= read -d $'\0' -r file ; do
     file_list=("${file_list[@]}" "$file")
-done < <(find . -type f -name "*.hi" "${findargs[@]}" -print0)
+done < <(find . -type f -name "*.inl" "${findargs[@]}" -print0)
 
 #echo "${file_list[@]}"
 #echo "${findargs[@]}"
