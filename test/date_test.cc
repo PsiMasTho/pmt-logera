@@ -3,18 +3,21 @@
 #include <boost/test/unit_test.hpp>
 
 #include <string>
+#include <type_traits>
 
 using namespace std;
 using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(date_tests)
 
+static_assert(is_nothrow_move_constructible<Date>::value, "Date should be noexcept MoveConstructible");
+
 BOOST_AUTO_TEST_CASE(nonthrow_construction)
 {
     Date a("01/02/1000");
     Date b("23/12/1992");
     Date c("08/02/2024");
-    Date d = b;
+    [[maybe_unused]] Date d = b;
 }
 
 BOOST_AUTO_TEST_CASE(throw_construction)
