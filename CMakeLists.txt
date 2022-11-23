@@ -56,25 +56,25 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugASAN")
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3 -fsanitize=address -Wall -Wextra -Wpedantic")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3 -fsanitize=address -Wall -Wextra -Wpedantic -Wconversion")
     endif()
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugUBSAN")
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3 -fsanitize=undefined -Wall -Wextra -Wpedantic")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3 -fsanitize=undefined -Wall -Wextra -Wpedantic -Wconversion")
     endif()
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugGDB")
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3 -Wall -Wextra -Wpedantic")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3 -Wall -Wextra -Wpedantic -Wconversion")
     endif()
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugCACHEGRIND")
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -march=native -ggdb3 -Wall -Wextra -Wpedantic")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -march=native -ggdb3 -Wall -Wextra -Wpedantic -Wconversion")
     endif()
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugLIBCPP")
