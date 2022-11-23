@@ -1,13 +1,10 @@
-#ifdef STAND_ALONE
-#    define BOOST_TEST_MODULE Main
-#endif
-
-#define BOOST_TEST_MODULE args - test
 #include <boost/test/unit_test.hpp>
 
 #include "../src/args/args.h"
 
 using namespace std;
+
+BOOST_AUTO_TEST_SUITE(args_tests)
 
 namespace
 {
@@ -103,3 +100,5 @@ BOOST_AUTO_TEST_CASE(value_check)
         BOOST_TEST((wasPresent && res.empty()));
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()
