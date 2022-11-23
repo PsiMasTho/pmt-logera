@@ -11,10 +11,10 @@ class LogLine;
 class Writer
 {
     std::ofstream d_out;
-    std::string d_delim;
+    char d_delim;
 
 public:
-    Writer(std::filesystem::path const& outfile, std::string const& delim);
+    Writer(std::filesystem::path const& outfile, char delim);
     void write(Date const& date, LogData::LogLine const& logLine);
     void write(std::vector<std::string> const& vec);
 };

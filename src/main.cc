@@ -55,7 +55,7 @@ try
     });
 
     // write header line
-    Writer writer(cfg.outputFile(), ";");
+    Writer writer(cfg.outputFile(), ';');
     writer.write(getHeaderLine(*headerData));
 
     // write all lines
@@ -68,15 +68,9 @@ try
 
     return SUCCESS;
 }
-catch(invalid_argument const& exc)
+catch(exception const& exc)
 {
-    cerr << "Invalid arguments:\n";
-    cerr << '\t' << exc.what() << '\n';
-    return FAIL;
-}
-catch(runtime_error const& exc)
-{
-    cerr << "Runtime error:\n";
+    cerr << "Exception encountered:\n";
     cerr << '\t' << exc.what() << '\n';
     return FAIL;
 }

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Writer::Writer(filesystem::path const& outfile, std::string const& delim)
+Writer::Writer(filesystem::path const& outfile, char delim)
     : d_out(outfile)
     , d_delim{delim}
 { }
@@ -25,7 +25,7 @@ void Writer::write(Date const& date, LogData::LogLine const& logLine)
 
 void Writer::write(std::vector<std::string> const& vec)
 {
-    string delim;
+    char delim;
     for(auto const& entry : vec)
         d_out << exchange(delim, d_delim) << entry;
     d_out << '\n';
