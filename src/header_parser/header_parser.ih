@@ -18,7 +18,7 @@ inline void HeaderParser::print()
 // Add here includes that are only required for the compilation
 // of HeaderParser's sources.
 
-#include "../string_util.h"
+#include "../string_util/string_util.h"
 #include <string>
 
 // UN-comment the next using-declaration if you want to use
@@ -26,3 +26,6 @@ inline void HeaderParser::print()
 // specifying std::
 
 using namespace std;
+
+// helper
+void _eraseAndReplace(string* target, string const& toErase, string const& toReplace);

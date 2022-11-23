@@ -31,9 +31,7 @@ line:
 identifier:
     IDENT
     {
-        string txt(d_scanner.matched());
-            // removing all ';'. Then removing leading and trailing spaces and '\n'
-        $$ = trim(removeCh(txt, ';'));
+        $$ = d_scanner.matched();
     }
 ;
 

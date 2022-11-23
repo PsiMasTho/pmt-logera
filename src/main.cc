@@ -14,7 +14,7 @@ Args::Opt const options[]{
     Args::Opt(Args::Opt::ValType::REQUIRED, "directory", 'd'),
     Args::Opt(Args::Opt::ValType::REQUIRED, "manual", 'm'),
     Args::Opt(Args::Opt::ValType::NONE, "verbose", 'v'),
-    Args::Opt(Args::Opt::ValType::NONE, "output", 'o'),
+    Args::Opt(Args::Opt::ValType::REQUIRED, "output", 'o'),
 };
 size_t const nOptions = size(options);
 } // namespace
@@ -71,6 +71,12 @@ try
 catch(invalid_argument const& exc)
 {
     cerr << "Invalid arguments:\n";
+    cerr << '\t' << exc.what() << '\n';
+    return FAIL;
+}
+catch(runtime_error const& exc)
+{
+    cerr << "Runtime error:\n";
     cerr << '\t' << exc.what() << '\n';
     return FAIL;
 }

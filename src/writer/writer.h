@@ -4,7 +4,6 @@
 #include "../log_data/log_data.h"
 #include <filesystem>
 #include <fstream>
-#include <functional>
 #include <string>
 
 class LogLine;

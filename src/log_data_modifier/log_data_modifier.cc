@@ -26,16 +26,11 @@ void LogDataModifier::setDate(Date const& date)
 
 void LogDataModifier::setActiveVar(string const& varName)
 {
-    if(!d_target->d_date.ok())
-        throw runtime_error("Log with bad date detected");
-
     d_activeVar = varName;
 }
 
 void LogDataModifier::addAttrToNewLine(string const& attrName, string const& attrVal)
 {
-    if(!d_target->d_date.ok())
-        throw runtime_error("Log with bad date detected");
     if(d_activeVar.empty())
         throw runtime_error("Adding new line without active variable");
 
@@ -47,9 +42,6 @@ void LogDataModifier::addAttrToNewLine(string const& attrName, string const& att
 
 void LogDataModifier::addAttrToCurrentLine(string const& attrName, string const& attrVal)
 {
-    if(!d_target->d_date.ok())
-        throw runtime_error("Log with bad date detected"s);
-
     if(!d_target->d_lines.back().exists(0))
         throw runtime_error("Attempting to add attribute with no variable"s);
 

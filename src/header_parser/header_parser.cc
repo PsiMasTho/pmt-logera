@@ -4,9 +4,8 @@
 #include <utility>
 
 HeaderParser::HeaderParser(filesystem::path path)
-    : d_stream(path)
+    : d_scanner(path)
     , d_matched(d_scanner.matched())
-    , d_scanner(path)
     , d_ret { nullptr }
 {
 }

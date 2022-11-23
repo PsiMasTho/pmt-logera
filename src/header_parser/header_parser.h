@@ -14,11 +14,10 @@
 #include <iosfwd>
 
 class HeaderParser : public HeaderParserBase {
-    std::ifstream      d_stream;
-    std::string const& d_matched;
+    
     // $insert scannerobject
     HeaderScanner d_scanner;
-
+    std::string const& d_matched;
     std::unique_ptr<HeaderData> d_ret;
 
 public:

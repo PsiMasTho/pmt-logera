@@ -14,11 +14,10 @@
 #include <filesystem>
 
 class LogParser : public LogParserBase {
-    std::string const& d_matched;
-
+    
     // $insert scannerobject
     LogScanner d_scanner;
-
+    std::string const& d_matched;
     LogDataModifier          d_logDataModifier;
     std::unique_ptr<LogData> d_ret;
 

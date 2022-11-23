@@ -5,8 +5,8 @@
 #include "../date/date.h"
 
 LogParser::LogParser(filesystem::path const& path, HeaderData const& headerData)
-    : d_matched { d_scanner.matched() }
-    , d_scanner(path)
+    : d_scanner(path)
+    , d_matched { d_scanner.matched() }
     , d_logDataModifier(nullptr, headerData)
     , d_ret { nullptr }
 {

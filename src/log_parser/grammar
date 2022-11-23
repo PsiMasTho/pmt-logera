@@ -3,7 +3,6 @@
 
 %token IDENT
        DATE
-       VAR
        NEWLINE
 
 %stype std::string
@@ -39,11 +38,9 @@ date:
 ;
 
 variable:
-    VAR
+    identifier ':'
     {
-        string txt = d_scanner.matched();
-        txt.pop_back(); // ':'
-        d_logDataModifier.setActiveVar(txt);
+        d_logDataModifier.setActiveVar($1);
     }
 ;
 
