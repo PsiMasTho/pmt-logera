@@ -65,10 +65,16 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "DebugUBSAN")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3 -fsanitize=undefined -Wall -Wextra -Wpedantic")
     endif()
 
-elseif(CMAKE_BUILD_TYPE STREQUAL "DebugGDB" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+elseif(CMAKE_BUILD_TYPE STREQUAL "DebugGDB")
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3 -Wall -Wextra -Wpedantic")
+    endif()
+
+elseif(CMAKE_BUILD_TYPE STREQUAL "DebugCACHEGRIND")
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -march=native -ggdb3 -Wall -Wextra -Wpedantic")
     endif()
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugLIBCPP")
