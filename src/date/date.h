@@ -1,22 +1,25 @@
 #ifndef INCLUDED_DATE_H
 #define INCLUDED_DATE_H
 
+#include <array>
 #include <chrono>
-#include <optional>
 #include <string>
+
+// Represents a date dd/mm/yyyy
 
 class Date
 {
-    std::optional<std::chrono::year_month_day> d_date;
+    std::chrono::year_month_day d_date;
+    std::array<char, 11> d_str;
 
 public:
     explicit Date(std::string const& dateStr);
     Date() = default;
 
-    std::string to_string() const;
-    bool ok() const;
+    char const* to_string() const;
 
-    friend auto operator<=>(Date const&, Date const&) = default;
+    friend std::strong_ordering operator<=>(Date const&, Date const&) noexcept;
+    friend bool operator==(Date const&, Date const&) noexcept;
 };
 
 #endif
