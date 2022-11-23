@@ -12,13 +12,18 @@ class SparseArray
 
 public:
     explicit SparseArray(size_t max);
-    void set(size_t idx, T value);
+    void set(size_t idx, T const& value);
+    void set(size_t idx, T&& value);
     bool exists(size_t idx) const;
     T const& get(size_t idx) const;
 
     size_t capacity() const;
+
+private:
+    template <typename U>
+    void _set(size_t idx, U&& value);
 };
 
-#include "sparse_array.hi"
+#include "sparse_array.inl"
 
 #endif

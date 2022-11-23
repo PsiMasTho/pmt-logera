@@ -7,11 +7,15 @@ SparseArray<T>::SparseArray(size_t max)
 { }
 
 template <typename T>
-void SparseArray<T>::set(size_t idx, T value)
+void SparseArray<T>::set(size_t idx, T const& value)
 {
-    size_t const countRhs = std::count(cbegin(d_specified) + idx, cend(d_specified), true);
-    d_values.insert(cend(d_values) - countRhs, std::move(value));
-    d_specified[idx] = true;
+    _set(idx, value);
+}
+
+template <typename T>
+void SparseArray<T>::set(size_t idx, T&& value)
+{
+    _set(idx, std::move(value));
 }
 
 template <typename T>
@@ -32,4 +36,13 @@ template <typename T>
 size_t SparseArray<T>::capacity() const
 {
     return d_specified.size();
+}
+
+template <typename T>
+template <typename U>
+void SparseArray<T>::_set(size_t idx, U&& value)
+{
+    size_t const countRhs = std::count(cbegin(d_specified) + idx, cend(d_specified), true);
+    d_values.insert(cend(d_values) - countRhs, std::forward<U>(value));
+    d_specified[idx] = true;
 }
