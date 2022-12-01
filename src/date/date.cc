@@ -23,7 +23,8 @@ bool operator==(Date const& lhs, Date const& rhs) noexcept
 chrono::year_month_day _strToYMD(string const& ymdStr)
 {
     char delimiter1, delimiter2;
-    int d, m, y;
+    unsigned d, m; // day, month
+    int y; // year
 
     if(istringstream iss(ymdStr);
        ymdStr.size() == 10 && iss >> d >> delimiter1 >> m >> delimiter2 >> y)
@@ -45,7 +46,7 @@ array<char, 11> _ymdToStr(chrono::year_month_day ymd)
 
     unsigned const dd = static_cast<unsigned>(ymd.day());
     unsigned const mm = static_cast<unsigned>(ymd.month());
-    unsigned const yyyy = static_cast<int>(ymd.year());
+    int const yyyy = static_cast<int>(ymd.year());
 
     // Pad leading zeros if needed
     sprintf(ret.data(), "%02d/%02d/%04d", dd, mm, yyyy);

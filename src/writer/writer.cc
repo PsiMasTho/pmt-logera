@@ -25,8 +25,8 @@ void Writer::write(Date const& date, LogData::LogLine const& logLine)
 
 void Writer::write(std::vector<std::string> const& vec)
 {
-    char delim;
+    string delim;
     for(auto const& entry : vec)
-        d_out << exchange(delim, d_delim) << entry;
+        d_out << exchange(delim, string(1, d_delim)) << entry;
     d_out << '\n';
 }

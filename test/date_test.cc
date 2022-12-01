@@ -10,7 +10,8 @@ using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(date_tests)
 
-static_assert(is_nothrow_move_constructible<Date>::value, "Date should be noexcept MoveConstructible");
+static_assert(is_nothrow_move_constructible<Date>::value,
+              "Date should be noexcept MoveConstructible");
 
 BOOST_AUTO_TEST_CASE(nonthrow_construction)
 {

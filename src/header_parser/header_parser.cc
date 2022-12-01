@@ -15,7 +15,7 @@ unique_ptr<HeaderData> HeaderParser::gen()
     d_ret.reset(new HeaderData);
 
     if (parse() == 0) // no error encountered
-        return move(exchange(d_ret, nullptr));
+        return exchange(d_ret, nullptr);
     else
         return nullptr;
 }

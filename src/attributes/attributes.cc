@@ -51,7 +51,9 @@ size_t Attributes::getIdx(std::string const& name) const
     if(itr == end(d_attrs))
         throw runtime_error("Queried unknown attribute: "s + name);
 
-    return distance(begin(d_attrs), itr);
+    // itr >= d_attrs.begin()
+    // so the distance will not be negative
+    return static_cast<size_t>(distance(begin(d_attrs), itr));
 }
 
 string const& Attributes::getName(size_t idx) const

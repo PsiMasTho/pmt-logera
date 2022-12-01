@@ -75,18 +75,15 @@ string* Args::createStringForOpt(_Opt const& opt, bool wasSpecified)
 
     // {"\0", '\0'} AKA magicOpt will be occupied by argv0, thus emplacement will fail for every other Opt that tries to
     // use one of these as keys
-    array<key_t, 2> const keys{opt.getCh(), opt.getName()};
+    tuple<char, std::string> const keys = {opt.getCh(), opt.getName()};
     bool success = false;
 
     // Emplace keys/value pairs for short and long Args. success == true means at least one emplacement succeeded
-    for(auto const& key : keys)
-    {
-        visit(
-            [&](auto&& k) {
-                success += d_optionToValueMap.emplace(k, make_pair(wasSpecified, str)).second;
-            },
-            key);
-    }
+    apply(
+        [&](auto const&... k) {
+            success += (..., d_optionToValueMap.emplace(k, make_pair(wasSpecified, str)).second);
+        },
+        keys);
 
     // if neither emplacement succeeded, then return a nullptr
     return success ? str.get() : nullptr;

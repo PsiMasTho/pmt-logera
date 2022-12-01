@@ -18,7 +18,7 @@ unique_ptr<LogData> LogParser::gen()
     d_logDataModifier.setTarget(d_ret.get());
 
     if (parse() == 0) // no error encountered
-        return move(exchange(d_ret, nullptr));
+        return exchange(d_ret, nullptr);
     else
         return nullptr;
 }

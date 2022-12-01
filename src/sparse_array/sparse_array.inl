@@ -28,7 +28,9 @@ template <typename T>
 T const& SparseArray<T>::get(size_t idx) const
 {
     auto const cItr =
-        cbegin(d_values) + std::count(cbegin(d_specified), cbegin(d_specified) + idx, true);
+        cbegin(d_values) + std::count(cbegin(d_specified),
+                                      cbegin(d_specified) + static_cast<std::ptrdiff_t>(idx),
+                                      true);
     return *cItr;
 }
 
@@ -42,7 +44,8 @@ template <typename T>
 template <typename U>
 void SparseArray<T>::_set(size_t idx, U&& value)
 {
-    size_t const countRhs = std::count(cbegin(d_specified) + idx, cend(d_specified), true);
+    auto const countRhs =
+        std::count(cbegin(d_specified) + static_cast<std::ptrdiff_t>(idx), cend(d_specified), true);
     d_values.insert(cend(d_values) - countRhs, std::forward<U>(value));
     d_specified[idx] = true;
 }

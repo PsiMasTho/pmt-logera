@@ -8,7 +8,6 @@ project(Logera VERSION 1.0.0 LANGUAGES CXX)
 file(GLOB_RECURSE PROJ_SOURCES "src/*.cc")
 list(REMOVE_ITEM PROJ_SOURCES "src/main.cc")
 
-
 add_library(Proj STATIC ${PROJ_SOURCES})
 add_executable(${PROJECT_NAME} "src/main.cc")
 target_link_libraries(${PROJECT_NAME} Proj)
@@ -83,6 +82,8 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "DebugLIBCPP")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3 -fanalyzer -D_GLIBCXX_DEBUG_PEDANTIC")
     endif()
 
+else()
+    message(FATAL_ERROR "Unknown build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
 ########################################################################
@@ -91,5 +92,5 @@ endif()
 
 message(STATUS "Build type:     ${CMAKE_BUILD_TYPE}")
 message(STATUS "Compiler flags: ${CMAKE_CXX_FLAGS}")
-message(STATUS "Tests: ${BUILD_TESTS}")
+message(STATUS "Tests:          ${BUILD_TESTS}")
 
