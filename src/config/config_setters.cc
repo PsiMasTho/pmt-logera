@@ -2,12 +2,7 @@
 
 decltype(Config::d_verbose) Config::setVerbose(Args const& args)
 {
-    auto const [specified_v, str_v] = args.option('v');
-
-    if(specified_v)
-        return true;
-    else
-        return false;
+    return args.option('v').first;
 }
 
 decltype(Config::d_headerFile) Config::setHeaderFile(Args const& args)
@@ -38,7 +33,7 @@ decltype(Config::d_headerFile) Config::setHeaderFile(Args const& args)
     {
         filesystem::directory_iterator itrBeg(cvtFunc<filesystem::path>(str_d));
 
-        auto itr = find_if(itrBeg, filesystem::directory_iterator{}, [](auto entry) {
+        auto const itr = find_if(itrBeg, filesystem::directory_iterator{}, [](auto entry) {
             return entry.path().extension() == ".lh";
         });
 
@@ -78,11 +73,12 @@ decltype(Config::d_logFiles) Config::setLogFiles(Args const& args)
     {
         ret = cvtFunc<vector<filesystem::path>>(str_m);
         ret.erase(
-            remove_if(begin(ret), end(ret), [](auto pth) { return pth.extension() != ".txt"; }));
+            remove_if(begin(ret), end(ret), [](auto pth) { return pth.extension() != ".txt"; }),
+            end(ret));
     }
     else if(specified_d)
     {
-        filesystem::directory_iterator itrBeg(cvtFunc<filesystem::path>(str_d));
+        filesystem::directory_iterator const itrBeg(cvtFunc<filesystem::path>(str_d));
 
         for(auto itr = itrBeg; itr != filesystem::directory_iterator{}; ++itr)
             if(itr->path().extension() == ".txt")

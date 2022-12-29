@@ -12,7 +12,7 @@ void Config::verbosePrint(std::ostream& out) const
     out << "Header: " << '\t' << headerFile() << "\n\n";
     out << "Output: " << '\t' << outputFile() << "\n\n";
     out << "Logs:\n";
-    for(auto& entry : logFiles())
+    for(auto const& entry : logFiles())
         out << "\t\t" << entry << '\n';
     out << '\n';
 }

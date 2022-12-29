@@ -3,7 +3,7 @@
 #include "../header_data/header_data.h"
 #include <utility>
 
-HeaderParser::HeaderParser(filesystem::path path)
+HeaderParser::HeaderParser(filesystem::path const& path)
     : d_scanner(path)
     , d_matched(d_scanner.matched())
     , d_ret { nullptr }
@@ -12,7 +12,7 @@ HeaderParser::HeaderParser(filesystem::path path)
 
 unique_ptr<HeaderData> HeaderParser::gen()
 {
-    d_ret.reset(new HeaderData);
+    d_ret = make_unique<HeaderData>();
 
     if (parse() == 0) // no error encountered
         return exchange(d_ret, nullptr);

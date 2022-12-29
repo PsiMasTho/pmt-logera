@@ -1,31 +1,7 @@
 #include "args.h"
-#include <cctype> // isalnum()
-#include <cstring> // strcmp()
+#include <algorithm>
 #include <exception>
-#include <string_view>
-#include <tuple>
+
+//#include "../string_util/string_util.h"
 
 using namespace std;
-
-enum ArgType
-{
-    SHORT_OPT,
-    LONG_OPT,
-    VALUE
-};
-
-// Helpers:
-
-// Checks whether an argument is a short option (e.g. -a), long option (e.g. --foo) or a value (e.g. 123abc)
-ArgType _argType(string_view arg);
-
-// Concats rhs to lhs with delim inbetween
-void _appendToString(string& lhs, string_view const rhs, string const& delim);
-
-// Converts argument to a string
-string _toStr(char c);
-string _toStr(string const& str);
-
-// Used to check if a Options::d_chr or Options::d_name is not empty
-bool _notNull(char c);
-bool _notNull(char const* c);

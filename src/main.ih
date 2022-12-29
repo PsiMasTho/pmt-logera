@@ -4,6 +4,7 @@
 #include "log_data/log_data.h"
 #include "log_parser/log_parser.h"
 
+#include "arg_parser/arg_parser.h"
 #include "args/args.h"
 #include "config/config.h"
 

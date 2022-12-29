@@ -11,10 +11,10 @@ vector<string> getHeaderLine(HeaderData const& header);
 namespace
 {
 Args::Opt const options[]{
-    Args::Opt(Args::Opt::ValType::REQUIRED, "directory", 'd'),
-    Args::Opt(Args::Opt::ValType::REQUIRED, "manual", 'm'),
-    Args::Opt(Args::Opt::ValType::NONE, "verbose", 'v'),
-    Args::Opt(Args::Opt::ValType::REQUIRED, "output", 'o'),
+    Args::Opt(Args::ValType::REQUIRED, "directory", 'd'),
+    Args::Opt(Args::ValType::REQUIRED, "manual", 'm'),
+    Args::Opt(Args::ValType::NONE, "verbose", 'v'),
+    Args::Opt(Args::ValType::REQUIRED, "output", 'o'),
 };
 size_t const nOptions = size(options);
 } // namespace
@@ -23,7 +23,7 @@ int main(int, char** argv)
 try
 {
     // parse options, may throw
-    Config cfg(Args(options, nOptions, argv));
+    Config cfg(Args(options, nOptions, DefaultArgParser{argv}));
 
     if(cfg.verbose())
         cfg.verbosePrint(cerr);

@@ -14,7 +14,7 @@ LogParser::LogParser(filesystem::path const& path, HeaderData const& headerData)
 
 unique_ptr<LogData> LogParser::gen()
 {
-    d_ret.reset(new LogData);
+    d_ret = make_unique<LogData>();
     d_logDataModifier.setTarget(d_ret.get());
 
     if (parse() == 0) // no error encountered

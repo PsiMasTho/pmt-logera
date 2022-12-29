@@ -8,12 +8,23 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
 #include <memory> // shared_ptr
+#include <optional>
+#include <sstream>
 #include <string>
 #include <unordered_map>
-#include <variant> // variant, visit()
+#include <utility> // pair
+#include <variant> // variant, visit
+#include <vector>
 
-class _Opt
+#include <iostream> // DEBUG
+
+// ArgParser interface
+template <typename CRTP>
+class IArgParser;
+
+class Args
 {
 public:
     enum ValType
@@ -23,58 +34,47 @@ public:
         OPTIONAL
     };
 
-    constexpr _Opt(ValType type, char const* name, char ch = '\0');
-    constexpr _Opt(ValType type, char chr);
+    class Opt
+    {
+    public:
+        using flag_t = std::variant<char, std::string, std::pair<char, std::string>>;
 
-    constexpr char const* getName() const;
-    constexpr char getCh() const;
+        Opt(ValType type, std::string const& sFlag);
+        Opt(ValType type, char cFlag);
+        Opt(ValType type, std::string const& sFlag, char cFlag);
 
-    constexpr ValType getType();
+        flag_t const& getFlags() const;
+        ValType getValType() const;
 
-    friend constexpr bool operator==(_Opt const&, _Opt const&);
-    friend constexpr bool operator!=(_Opt const&, _Opt const&);
+    private:
+        flag_t d_flags;
+        ValType d_vType;
+    };
 
-private:
-    char const* d_name;
-    char d_ch;
-    ValType d_type;
-};
-
-#include "opt.inl"
-
-class Args
-{
-    using key_t = std::variant<std::string, char>;
-    using val_t = std::pair<bool, std::shared_ptr<std::string>>;
-    std::unordered_map<key_t, val_t> d_optionToValueMap;
-
-public:
-    using Opt = _Opt;
-
-    /// \p argv must be null terminated. Throws invalid_argument if an unknown option is found
-    Args(_Opt const* options, size_t optionCount, char const* const* argv);
+    /// \p argv must be null terminated. IArgParser<DefaultArgParser> throws
+    // invalid_argument if an unknown option is found or if an option is specified twice
+    template <typename ArgParser>
+    Args(Opt const* options, size_t optionCount, IArgParser<ArgParser> parser);
 
     /// \p option short option as char or long option as string
     /// \returns {bool wasSpecified, string const& value}
     /// if the option was not specified, the string reference is to an empty static string.
     /// if the option is invalid, throws invalid_argument
-    std::pair<bool, std::string const&> option(key_t const& option) const;
+    std::pair<bool, std::string const&> option(std::variant<char, std::string> option) const;
 
-    /// \returns {bool wasSpecified, string const& value} with the value at argv0
-    std::pair<bool, std::string const&> argv0() const;
+    /// \returns value at argv0
+    char const* argv0() const;
 
 private:
-    bool addOpt(std::string const& optStr);
+    void addOption(std::variant<char, std::string> const& flag, std::string const& val);
 
-    // creates either a shared_ptr or a nullptr in the map depending on 'wasSpecified'
-    // returns that pointer. Has no effect and returns a nullptr if called
-    // with the same Opt more than once
-    std::string* createStringForOpt(_Opt const& opt, bool wasSpecified);
-
-    // same as option() except the returned string& is non-const
-    std::pair<bool, std::string&> rawOption(key_t const& option) const;
-    // both d_chr and d_name cannot be null
-    std::pair<bool, std::string&> rawOption(_Opt const& option) const;
+    std::vector<std::string> d_vals;
+    std::vector<Opt> d_unseenOpts;
+    std::unordered_map<char, size_t> d_chFlagToValIdx;
+    std::unordered_map<std::string, size_t> d_strFlagToValIdx;
+    char const* d_argv0;
 };
+
+#include "args.inl"
 
 #endif

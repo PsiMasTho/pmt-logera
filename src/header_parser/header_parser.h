@@ -21,7 +21,7 @@ class HeaderParser : public HeaderParserBase {
     std::unique_ptr<HeaderData> d_ret;
 
 public:
-    HeaderParser(std::filesystem::path path);
+    explicit HeaderParser(std::filesystem::path const &path);
     int                         parse();
     std::unique_ptr<HeaderData> gen();
 

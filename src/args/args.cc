@@ -1,155 +1,118 @@
 #include "args.ih"
 
-Args::Args(_Opt const* options, size_t optionCount, char const* const* argv)
-    : d_optionToValueMap{}
+namespace
 {
-    if(!argv[0])
-        return;
+string const emptyStr;
 
-    _Opt const magicOpt(_Opt(_Opt::ValType::REQUIRED, "\0", '\0'));
-
-    // special key for program name
-    if(auto ptr = createStringForOpt(magicOpt, true))
-        *ptr = argv[0];
-
-    _Opt target = magicOpt;
-
-    for(size_t i = 1; argv[i]; ++i)
+bool flagMatch(Args::Opt::flag_t const& optFlags, variant<char, string> const& flag)
+{
+    if(optFlags.index() == 2)
     {
-        // if argv[i] is an option
-        if(ArgType argtype = _argType(argv[i]); argtype != ArgType::VALUE)
-        {
-            size_t j = 0;
-            for(; j < optionCount; ++j)
-            {
-                string const optStr =
-                    argtype == LONG_OPT ? options[j].getName() : _toStr(options[j].getCh());
-
-                // Skip one or two dashes
-                auto const beg = argv[i] + (argtype == LONG_OPT ? 2 : 1);
-
-                if(optStr == beg)
-                {
-                    target = (createStringForOpt(options[j], true) ? options[j] : magicOpt);
-                    break;
-                }
-            }
-            // The option the user passed doesn't match any valid option
-            if(j == optionCount)
-                throw invalid_argument("Unknown option: "s + string(argv[i]));
-        }
-        else // argv[i] must be a value
-        {
-            if(target == magicOpt && i == 1)
-                throw invalid_argument("Value specified without option: "s + argv[i]);
-            else if(target == magicOpt)
-                continue;
-            else if(target.getType() == _Opt::ValType::NONE)
-                throw invalid_argument("Value specified for option taking to value");
-            else
-                _appendToString(
-                    rawOption(target).second, argv[i], rawOption(target).second.empty() ? "" : " ");
-        }
+        if(flag.index() == 0)
+            return get<0>(flag) == get<2>(optFlags).first; // compare chars
+        return get<1>(flag) == get<2>(optFlags).second; // compare str
     }
-
-    // Create an entry for every valid option that wasn't specified in argv.
-    // createStringForOpt(...) will do nothing on already inserted elements,
-    // so no checks are needed
-    for(size_t j = 0; j < optionCount; ++j)
-        createStringForOpt(options[j], false);
+    else if(optFlags.index() == 1)
+    {
+        if(flag.index() == 1)
+            return get<1>(flag) == get<1>(optFlags); // compare strings
+        return false;
+    }
+    else
+    {
+        if(flag.index() == 0)
+            return get<0>(flag) == get<0>(optFlags); // compare chars
+        return false;
+    }
 }
 
-std::pair<bool, std::string const&> Args::argv0() const
+string to_string(variant<char, string> const& flag)
 {
-    return option('\0');
-}
-
-std::pair<bool, std::string const&> Args::option(Args::key_t const& option) const
-{
-    return rawOption(option);
-}
-
-string* Args::createStringForOpt(_Opt const& opt, bool wasSpecified)
-{
-    shared_ptr<string> str = wasSpecified ? make_shared<string>() : nullptr;
-
-    // {"\0", '\0'} AKA magicOpt will be occupied by argv0, thus emplacement will fail for every other Opt that tries to
-    // use one of these as keys
-    tuple<char, std::string> const keys = {opt.getCh(), opt.getName()};
-    bool success = false;
-
-    // Emplace keys/value pairs for short and long Args. success == true means at least one emplacement succeeded
-    apply(
-        [&](auto const&... k) {
-            success += (..., d_optionToValueMap.emplace(k, make_pair(wasSpecified, str)).second);
+    return visit(
+        [](auto const& flg) -> string {
+            ostringstream ret;
+            ret << flg;
+            return ret.str();
         },
-        keys);
-
-    // if neither emplacement succeeded, then return a nullptr
-    return success ? str.get() : nullptr;
+        flag);
 }
 
-pair<bool, string&> Args::rawOption(key_t const& option) const
+} // namespace
+
+char const* Args::argv0() const
 {
-    static string emptyStr;
+    return d_argv0;
+}
 
-    auto const itr = d_optionToValueMap.find(option);
+pair<bool, string const&> Args::option(variant<char, string> option) const
+{
+    /* Option was known and seen in argv */
+    // Holds char
+    if(holds_alternative<char>(option))
+    {
+        if(auto const itr = d_chFlagToValIdx.find(get<char>(option)); itr != end(d_chFlagToValIdx))
+            return {true, d_vals[itr->second]};
+    }
+    // Holds string
+    else if(auto const itr = d_strFlagToValIdx.find(get<string>(option));
+            itr != end(d_strFlagToValIdx))
+        return {true, d_vals[itr->second]};
 
-    // throw an exception with the active field of the variant in the .what() message
-    if(itr == d_optionToValueMap.end())
-        throw invalid_argument("Nonexistant option queried: "s +
-                               visit([](auto&& k) { return _toStr(k); }, option));
+    /* Option was known but not seen in argv */
+    for(auto const& opt : d_unseenOpts)
+        if(flagMatch(opt.getFlags(), option))
+            return {false, emptyStr};
 
-    // was specified
-    if(itr->second.first)
-        return {true, *itr->second.second};
+    /* Unknown option queried */
+    throw invalid_argument("Unknown option queried: "s + to_string(option));
+}
+
+void Args::addOption(variant<char, string> const& flag, string const& val)
+{
+    auto const itr = find_if(d_unseenOpts.begin(), d_unseenOpts.end(), [flag](auto const& opt) {
+        return flagMatch(opt.getFlags(), flag);
+    });
+
+    if(itr == d_unseenOpts.end())
+        throw invalid_argument("Unknown or duplicated option: "s + to_string(flag));
+
+    if(!val.empty())
+    {
+        // Check if valtype is optional or necessary
+        if(itr->getValType() == ValType::OPTIONAL || itr->getValType() == ValType::REQUIRED)
+        {
+            if(visit([this](auto const& flg) { return !option(flg).first; }, flag))
+                d_vals.emplace_back(val);
+        }
+        else
+            throw invalid_argument(string("Value specified for option taking no value: ") + val);
+    }
     else
     {
-        emptyStr.clear();
-        return {false, emptyStr};
+        if(itr->getValType() != ValType::REQUIRED)
+        {
+            if(visit([this](auto const& flg) { return !option(flg).first; }, flag))
+                d_vals.emplace_back();
+        }
+        else
+            throw invalid_argument("No value provided for flag: "s + to_string(flag));
     }
-}
 
-pair<bool, string&> Args::rawOption(_Opt const& option) const
-{
-    if(_notNull(option.getCh()))
-        return rawOption(option.getCh());
-    else
-        return rawOption(option.getName());
-}
+    // Add the index of the value to the lookup table(s)
+    switch(itr->getFlags().index())
+    {
+    case 0: // This flag only has a char
+        d_chFlagToValIdx[get<char>(itr->getFlags())] = d_vals.size() - 1;
+        break;
+    case 1: // This flag only has a string
+        d_strFlagToValIdx[get<string>(itr->getFlags())] = d_vals.size() - 1;
+        break;
+    case 2: // This flag has a char and a string
+        d_chFlagToValIdx[get<2>(itr->getFlags()).first] = d_vals.size() - 1;
+        d_strFlagToValIdx[get<2>(itr->getFlags()).second] = d_vals.size() - 1;
+        break;
+    }
 
-ArgType _argType(string_view arg)
-{
-    if(arg.size() == 2 && arg[0] == '-' && isalnum(arg[1]))
-        return SHORT_OPT;
-    else if(arg.size() > 2 && arg[0] == '-' && arg[1] == '-')
-        return LONG_OPT;
-    else
-        return VALUE;
-}
-
-void _appendToString(string& lhs, string_view const rhs, string const& delim)
-{
-    lhs += delim;
-    lhs += rhs;
-}
-
-string _toStr(char c)
-{
-    return string(1, c);
-}
-
-string _toStr(string const& str)
-{
-    return str;
-}
-
-bool _notNull(char c)
-{
-    return c;
-}
-
-bool _notNull(char const* c)
-{
-    return c;
+    // We have now seen the option
+    d_unseenOpts.erase(itr);
 }

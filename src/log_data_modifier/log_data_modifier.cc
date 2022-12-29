@@ -46,7 +46,7 @@ void LogDataModifier::addAttrToCurrentLine(string const& attrName, string const&
         throw runtime_error("Attempting to add attribute with no variable"s);
 
     if(!d_headerData.doesVarHaveAttr(d_activeVar, attrName))
-        throw runtime_error("Variable: \""s + d_activeVar + "\" does not have attribute: \""s +
+        throw runtime_error("Variable: \""s + d_activeVar + R"(" does not have attribute: ")"s +
                             attrName + '\"');
 
     size_t const idx = d_headerData.getAttributes().getIdx(attrName);
