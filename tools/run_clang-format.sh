@@ -29,4 +29,4 @@ done < <(find . -type f -name "*.inl" "${findargs[@]}" -print0)
 #echo "${file_list[@]}"
 #echo "${findargs[@]}"
 
-clang-format-14 -i -style=file --verbose "${file_list[@]}"
+clang-format-15 -i -style=file --verbose "${file_list[@]}"
