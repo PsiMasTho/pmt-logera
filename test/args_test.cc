@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
+#include "../src/arg_parser/arg_parser.h"
 #include "../src/args/args.h"
 
 using namespace std;
@@ -9,25 +10,25 @@ BOOST_AUTO_TEST_SUITE(args_tests)
 namespace
 {
 Args::Opt const options[]{
-    Args::Opt(Args::Opt::ValType::NONE, "alpha", 'A'),
-    Args::Opt(Args::Opt::ValType::NONE, "beta", 'b'),
-    Args::Opt(Args::Opt::ValType::NONE, "CHARLIE", 'C'),
-    Args::Opt(Args::Opt::ValType::NONE, "ECHO", 'e'),
-    Args::Opt(Args::Opt::ValType::NONE, "FoX-TrOt", 'f'),
+    Args::Opt(Args::ValType::NONE, "alpha", 'A'),
+    Args::Opt(Args::ValType::NONE, "beta", 'b'),
+    Args::Opt(Args::ValType::NONE, "CHARLIE", 'C'),
+    Args::Opt(Args::ValType::NONE, "ECHO", 'e'),
+    Args::Opt(Args::ValType::NONE, "FoX-TrOt", 'f'),
 
-    Args::Opt(Args::Opt::ValType::OPTIONAL, "golf", 'G'),
-    Args::Opt(Args::Opt::ValType::OPTIONAL, "hotel", 'h'),
-    Args::Opt(Args::Opt::ValType::OPTIONAL, "INDIA", 'I'),
-    Args::Opt(Args::Opt::ValType::OPTIONAL, "JULIETT", 'j'),
-    Args::Opt(Args::Opt::ValType::OPTIONAL, "Ki-Lo", 'k'),
+    Args::Opt(Args::ValType::OPTIONAL, "golf", 'G'),
+    Args::Opt(Args::ValType::OPTIONAL, "hotel", 'h'),
+    Args::Opt(Args::ValType::OPTIONAL, "INDIA", 'I'),
+    Args::Opt(Args::ValType::OPTIONAL, "JULIETT", 'j'),
+    Args::Opt(Args::ValType::OPTIONAL, "Ki-Lo", 'k'),
 
-    Args::Opt(Args::Opt::ValType::REQUIRED, "lima", 'L'),
-    Args::Opt(Args::Opt::ValType::REQUIRED, "mike", 'm'),
-    Args::Opt(Args::Opt::ValType::REQUIRED, "NOVEMBER", 'N'),
-    Args::Opt(Args::Opt::ValType::REQUIRED, "OSCAR", 'o'),
-    Args::Opt(Args::Opt::ValType::REQUIRED, "Pa-Pa", 'P'),
+    Args::Opt(Args::ValType::REQUIRED, "lima", 'L'),
+    Args::Opt(Args::ValType::REQUIRED, "mike", 'm'),
+    Args::Opt(Args::ValType::REQUIRED, "NOVEMBER", 'N'),
+    Args::Opt(Args::ValType::REQUIRED, "OSCAR", 'o'),
+    Args::Opt(Args::ValType::REQUIRED, "Pa-Pa", 'P'),
 };
-size_t const nOptions = size(options);
+size_t const nOptions = std::size(options);
 } // namespace
 
 BOOST_AUTO_TEST_CASE(constructors_test_nothrow)
@@ -50,28 +51,47 @@ BOOST_AUTO_TEST_CASE(constructors_test_nothrow)
                              "__SoMeThing__ ;)",
                              nullptr};
 
-    BOOST_REQUIRE_NO_THROW(Args(options, nOptions, argv));
+    BOOST_REQUIRE_NO_THROW(Args(options, nOptions, DefaultArgParser{argv}));
 }
 
-BOOST_AUTO_TEST_CASE(constructors_test_throw)
+BOOST_AUTO_TEST_CASE(constructors_test_throw_because_unknown_opt)
 {
     char const* const argv[]{"./a.out", "--unknown-option-that-causes-a-throw", "foo", nullptr};
 
-    BOOST_REQUIRE_THROW(Args(options, nOptions, argv), invalid_argument);
+    BOOST_REQUIRE_THROW(Args(options, nOptions, DefaultArgParser{argv}), invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE(constructors_test_throw_because_duplicated_opt)
+{
+    char const* const argv[]{"./a.out", "-G", "garry", "--golf", "jerry", nullptr};
+
+    BOOST_REQUIRE_THROW(Args(options, nOptions, DefaultArgParser{argv}), invalid_argument);
 }
 
 // todo: test Option equality operators
 
 BOOST_AUTO_TEST_CASE(value_check)
 {
-    char const* const argv[]{"./a.out", "--golf",  "firstG",  "123",  "-G",     "secondG",
-                             "456",     "--Ki-Lo", "firstK",  "789",  "--lima", "firstL",
-                             "101",     "-L",      "secondL", "112",  "-o",     "firstO",
-                             "131",     "--alpha", "-b",      nullptr};
+    char const* const argv[]{"./a.out",
+                             "--golf",
+                             "firstG",
+                             "123",
+                             "--Ki-Lo",
+                             "firstK",
+                             "789",
+                             "--lima",
+                             "firstL",
+                             "101",
+                             "-o",
+                             "firstO",
+                             "131",
+                             "--alpha",
+                             "-b",
+                             nullptr};
 
-    Args args(options, nOptions, argv);
+    Args args(options, nOptions, DefaultArgParser{argv});
 
-    BOOST_TEST(args.argv0().second == "./a.out");
+    BOOST_TEST(args.argv0() == "./a.out");
 
     {
         auto const [wasPresent, res] = args.option("ECHO");
@@ -82,7 +102,7 @@ BOOST_AUTO_TEST_CASE(value_check)
         auto const [wasPresentShort, resShort] = args.option('G');
         auto const [wasPresentLong, resLong] = args.option("golf");
         BOOST_TEST((wasPresentShort && wasPresentLong));
-        BOOST_TEST((resShort == "firstG 123"));
+        BOOST_TEST(resShort == "firstG 123");
         BOOST_TEST((!resShort.empty() == !resLong.empty()));
     }
 
