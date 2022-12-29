@@ -6,11 +6,9 @@ project(Logera VERSION 1.0.0 LANGUAGES CXX)
 # Program binary
 ########################################################################
 file(GLOB_RECURSE PROJ_SOURCES "src/*.cc")
-list(REMOVE_ITEM PROJ_SOURCES "src/main.cc")
+list(FILTER PROJ_SOURCES EXCLUDE REGEX "^(.*src/main.cc)$")
 
-add_library(Proj STATIC ${PROJ_SOURCES})
-add_executable(${PROJECT_NAME} "src/main.cc")
-target_link_libraries(${PROJECT_NAME} Proj)
+add_executable(${PROJECT_NAME} "src/main.cc" ${PROJ_SOURCES})
 
 ########################################################################
 # Test binary
@@ -21,9 +19,9 @@ option(BUILD_TESTS "Build test program" OFF)
 if(BUILD_TESTS)
     file(GLOB_RECURSE TEST_SOURCES "test/*.cc")
     find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-    add_executable(unit_tests ${TEST_SOURCES})
+    add_executable(unit_tests ${TEST_SOURCES} ${PROJ_SOURCES})
     target_compile_definitions(unit_tests PUBLIC BOOST_TEST_DYN_LINK)
-    target_link_libraries(unit_tests Proj Boost::unit_test_framework)
+    target_link_libraries(unit_tests Boost::unit_test_framework)
 endif(BUILD_TESTS)
 
 ########################################################################
