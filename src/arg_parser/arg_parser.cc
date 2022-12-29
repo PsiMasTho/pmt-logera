@@ -1,5 +1,8 @@
 #include "arg_parser.h"
 
+#include <algorithm>
+#include <sstream>
+
 using namespace std;
 
 enum Token
