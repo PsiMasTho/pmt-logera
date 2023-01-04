@@ -62,6 +62,24 @@ For both types of files, lines starting with # are comments.
 
 For more information see examples/ folder.
 
+#### Example output
+```
+Date;Var;reps;weight;time;distance;energy;rpe;incline
+09/10/2022;bw;;71kg;;;;;
+09/10/2022;dips;2s10r;0kg;;;;8;
+09/10/2022;dips;3s8r;5kg;;;;10;
+09/10/2022;bench_press;4s2r;60kg;;;;;15deg
+09/10/2022;bench_press;5,4,4,1;100kg;;;;;15deg
+09/10/2022;btn_situps;10,10,10,10;2.5kg;;;;;
+09/10/2022;btn_situps;5s10r;5kg;;;;;
+09/10/2022;treadmill;;;10:00;;;;
+11/10/2022;bw;;78kg;;;;;
+11/10/2022;kcal;;;;;3500kcal;;
+11/10/2022;leg_extension;5s10r;100kg;;;;10;
+11/10/2022;shoulder_press;5s10r;60kg;;;;8;
+11/10/2022;leg_curl;4,4,4,5;60kg;;;;7;
+```
+
 ## Dependencies
 ### To just compile Logera:
 * *CMake*
