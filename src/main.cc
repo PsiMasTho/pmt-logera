@@ -55,16 +55,13 @@ try
     });
 
     // write header line
-    Writer writer(cfg.outputFile(), ';');
+    Writer writer(cfg.outputStream(), ';');
     writer.write(getHeaderLine(*headerData));
 
     // write all lines
     for(auto const& logDataPtr : parsedData)
         for(auto const& logLine : logDataPtr->getLines())
             writer.write(logDataPtr->getDate(), logLine);
-
-    if(cfg.verbose())
-        cout << "Done! Output written to: " << cfg.outputFile() << '\n';
 
     return SUCCESS;
 }

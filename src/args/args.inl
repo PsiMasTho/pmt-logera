@@ -10,7 +10,7 @@ protected:
 public:
     explicit IArgParser(char const* const* argv)
         : d_argv0{argv}
-        , d_argv{argv ? argv + 1 : nullptr}
+        , d_argv{argv + 1}
     { }
 
     // Returns a flag and its value

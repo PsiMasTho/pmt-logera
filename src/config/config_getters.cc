@@ -1,21 +1,21 @@
 #include "config.ih"
 
-decltype(Config::d_verbose) const& Config::verbose() const
+bool Config::verbose() const
 {
     return d_verbose;
 }
 
-decltype(Config::d_headerFile) const& Config::headerFile() const
+filesystem::path const& Config::headerFile() const
 {
     return d_headerFile;
 }
 
-decltype(Config::d_outputFile) const& Config::outputFile() const
+ostream& Config::outputStream()
 {
-    return d_outputFile;
+    return d_outputStream ? *d_outputStream : std::cout;
 }
 
-decltype(Config::d_logFiles) const& Config::logFiles() const
+vector<filesystem::path> const& Config::logFiles() const
 {
     return d_logFiles;
 }

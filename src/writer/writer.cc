@@ -4,8 +4,8 @@
 
 using namespace std;
 
-Writer::Writer(filesystem::path const& outfile, char delim)
-    : d_out(outfile)
+Writer::Writer(ostream& out, char delim)
+    : d_out(out)
     , d_delim{delim}
 { }
 

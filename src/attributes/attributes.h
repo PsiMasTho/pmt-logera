@@ -1,5 +1,5 @@
-#ifndef INCLUDED_ATTRIBUTE_H
-#define INCLUDED_ATTRIBUTE_H
+#ifndef INCLUDED_ATTRIBUTES_H
+#define INCLUDED_ATTRIBUTES_H
 
 #include <functional>
 #include <string>
@@ -7,7 +7,7 @@
 
 class Attributes
 {
-    // function to check a string against a bound regex
+    // Function to check a string against a bound regex
     using RegexMatchChecker = std::function<bool(std::string const&)>;
     using Attribute = std::pair<std::string, std::vector<RegexMatchChecker>>;
 

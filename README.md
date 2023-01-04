@@ -17,7 +17,7 @@ across time and compiles them into a csv file.
 ## Input files
 * Header:
 	Contains declarations for attributes and variables, and assigns
-	attributes to vairables. Attrubutes may contain regex expressions
+	attributes to vairables. Attrubutes may contain ECMAscript regex expressions
 	for the kind of values they accept.
 
 #### Example header for a workout programme

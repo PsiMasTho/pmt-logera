@@ -2,7 +2,9 @@
 #define INCLUDED_CONFIG_CONFIG_H
 
 #include <filesystem>
+#include <fstream>
 #include <memory>
+#include <optional>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -11,21 +13,20 @@ class Args;
 
 class Config
 {
-    bool const d_verbose;
-    std::filesystem::path const d_headerFile;
-    std::filesystem::path const d_outputFile;
-    std::vector<std::filesystem::path> const d_logFiles;
+    bool d_verbose;
+    std::filesystem::path d_headerFile;
+    std::unique_ptr<std::ofstream> d_outputStream;
+    std::string d_outputName;
+    std::vector<std::filesystem::path> d_logFiles;
 
 public:
     explicit Config(Args const& args);
 
-    bool good() const;
-
     // accessors
-    decltype(d_verbose) const& verbose() const;
-    decltype(d_headerFile) const& headerFile() const;
-    decltype(d_outputFile) const& outputFile() const;
-    decltype(d_logFiles) const& logFiles() const;
+    bool verbose() const;
+    std::filesystem::path const& headerFile() const;
+    std::ostream& outputStream();
+    std::vector<std::filesystem::path> const& logFiles() const;
 
     // print
     void verbosePrint(std::ostream& out) const;
@@ -37,10 +38,12 @@ private:
     static Type cvtFunc(std::string const& valStr);
 
     // assigning the member variables from the strings in Args
-    decltype(d_verbose) setVerbose(Args const& args);
-    decltype(d_headerFile) setHeaderFile(Args const& args);
-    decltype(d_outputFile) setOutputFile(Args const& args);
-    decltype(d_logFiles) setLogFiles(Args const& args);
+    bool setVerbose(Args const& args);
+    bool setUseStdout(Args const& args);
+    std::filesystem::path setHeaderFile(Args const& args);
+    std::unique_ptr<std::ofstream> setOutputStream(Args const& args);
+    std::string setOutputName(Args const& args);
+    std::vector<std::filesystem::path> setLogFiles(Args const& args);
 };
 
 #endif

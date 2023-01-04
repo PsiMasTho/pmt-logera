@@ -1,5 +1,7 @@
 #include "string_util.h"
 
+#include <string>
+
 using namespace std;
 
 void eraseAndReplace(string* target, string const& toErase, string const& toReplace)
@@ -10,10 +12,4 @@ void eraseAndReplace(string* target, string const& toErase, string const& toRepl
         target->erase(pos, toErase.size());
         target->insert(pos, toReplace);
     }
-}
-
-void appendToString(string& lhs, string_view const rhs, string const& delim)
-{
-    lhs += delim;
-    lhs += rhs;
 }

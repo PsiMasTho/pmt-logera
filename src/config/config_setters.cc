@@ -1,11 +1,16 @@
 #include "config.ih"
 
-decltype(Config::d_verbose) Config::setVerbose(Args const& args)
+bool Config::setVerbose(Args const& args)
 {
     return args.option('v').first;
 }
 
-decltype(Config::d_headerFile) Config::setHeaderFile(Args const& args)
+bool Config::setUseStdout(Args const& args)
+{
+    return !args.option('o').first;
+}
+
+std::filesystem::path Config::setHeaderFile(Args const& args)
 {
     auto const [specified_d, str_d] = args.option('d');
     auto const [specified_m, str_m] = args.option('m');
@@ -46,25 +51,32 @@ decltype(Config::d_headerFile) Config::setHeaderFile(Args const& args)
     return ret;
 }
 
-decltype(Config::d_outputFile) Config::setOutputFile(Args const& args)
+unique_ptr<ofstream> Config::setOutputStream(Args const& args)
 {
     auto const [specified_o, str_o] = args.option('o');
 
     if(!specified_o)
-        return filesystem::path{"out.csv"s};
+        return nullptr;
     else
-        return cvtFunc<filesystem::path>(str_o);
+        return make_unique<ofstream>(str_o);
 }
 
-decltype(Config::d_logFiles) Config::setLogFiles(Args const& args)
+string Config::setOutputName(Args const& args)
+{
+    auto const [specified_o, str_o] = args.option('o');
+
+    if(!specified_o)
+        return "stdout";
+    else
+        return str_o;
+}
+
+std::vector<std::filesystem::path> Config::setLogFiles(Args const& args)
 {
     auto const [specified_d, str_d] = args.option('d');
     auto const [specified_m, str_m] = args.option('m');
 
-    if(specified_m && specified_d)
-        throw invalid_argument("Specify either -m or -d");
-
-    if(!specified_m && !specified_d)
+    if((specified_m && specified_d) || (!specified_m && !specified_d))
         throw invalid_argument("Specify either -m or -d");
 
     vector<filesystem::path> ret;

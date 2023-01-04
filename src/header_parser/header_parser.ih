@@ -26,6 +26,3 @@ inline void HeaderParser::print()
 // specifying std::
 
 using namespace std;
-
-// helper
-//void _eraseAndReplace(string* target, string const& toErase, string const& toReplace);
