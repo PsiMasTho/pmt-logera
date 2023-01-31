@@ -20,7 +20,7 @@ across time and compiles them into a csv file.
 	attributes to vairables. Attrubutes may contain ECMAscript regex expressions
 	for the kind of values they accept.
 
-	Values may not contain: Line breaks, double-quotes or semicolons.
+	Values may not contain: Line breaks, double-quotes, '$' or ';' or '%'
 	Variable names may not contain all of the above and may not contain commas.
 	Attribue names have the same restrictions as variable names.
 
@@ -40,7 +40,7 @@ across time and compiles them into a csv file.
 # ...
 ```
 
-* Logs: Must start with the date dd/mm/yyyy, contain variables and the values of their attributes for that day. Values must not use characters '$' or ';' or '%'
+* Logs: Must start with the date yyyy-mm-dd, contain variables and the values of their attributes for that day.
 
 #### Example log
 ```
