@@ -20,6 +20,10 @@ across time and compiles them into a csv file.
 	attributes to vairables. Attrubutes may contain ECMAscript regex expressions
 	for the kind of values they accept.
 
+	Values may not contain: Line breaks, double-quotes or semicolons.
+	Variable names may not contain all of the above and may not contain commas.
+	Attribue names have the same restrictions as variable names.
+
 #### Example header for a workout programme
 ```
     # Declaring attributes
