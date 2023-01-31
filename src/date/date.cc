@@ -1,8 +1,8 @@
 #include "date.h"
 
+#include <cstdio>
 #include <exception>
 #include <sstream>
-#include <stdio.h>
 #include <utility>
 
 using namespace std;
@@ -24,8 +24,8 @@ chrono::year_month_day strToYMD(string const& ymdStr)
     int y; // year
 
     if(istringstream iss(ymdStr);
-       ymdStr.size() == DATE_REQ_LEN && iss >> d >> delimiter1 >> m >> delimiter2 >> y)
-        if(delimiter1 == delimiter2 && delimiter2 == '/')
+       ymdStr.size() == DATE_REQ_LEN && iss >> y >> delimiter1 >> m >> delimiter2 >> d)
+        if(delimiter1 == delimiter2 && delimiter2 == '-')
             if(y >= 0)
             {
                 auto const ret =
@@ -47,7 +47,7 @@ array<char, DATE_REQ_LEN + 1> ymdToStr(chrono::year_month_day ymd)
     auto const yyyy = static_cast<int>(ymd.year());
 
     // Pad leading zeros if needed
-    if(snprintf(ret.data(), ret.size(), "%02u/%02u/%04d", dd, mm, yyyy) != DATE_REQ_LEN)
+    if(snprintf(ret.data(), ret.size(), "%04d-%02u-%02u", yyyy, mm, dd) != DATE_REQ_LEN)
         throw invalid_argument("Bad date: day: "s + to_string(dd) + " month: " + to_string(mm) +
                                " year: " + to_string(yyyy));
 

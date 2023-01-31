@@ -24,6 +24,6 @@ private:
     void _set(size_t idx, U&& value);
 };
 
-#include "sparse_array.inl"
+#include "sparse_array-inl.h"
 
 #endif

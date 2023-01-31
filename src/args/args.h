@@ -1,22 +1,47 @@
 #ifndef INCLUDED_ARGS_ARGS_H
 #define INCLUDED_ARGS_ARGS_H
 
-//===---------------------------------------------------------------------===//
-///
-/// \file
-/// This file contains the Args and Opt definitions.
-///
-//===----------------------------------------------------------------------===//
-
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <utility> // pair
 #include <variant> // variant, visit
 #include <vector>
 
-// ArgParser interface
-template <typename CRTP>
-class IArgParser;
+class ArgParserCore
+{
+private:
+    char const* const* d_argv0;
+
+protected:
+    char const* const* d_argv;
+
+    explicit ArgParserCore(char const* const* argv)
+        : d_argv0{argv}
+        , d_argv{argv + 1}
+    { }
+
+public:
+    char const* argv0() const
+    {
+        return *d_argv0;
+    }
+};
+
+template <typename T>
+concept ArgParser =
+    requires(T t) {
+        // Returns a flag and its value
+        // or an empty string if no value and the flag is a boolean flag.
+        {
+            t.next()
+            } -> std::same_as<std::pair<std::variant<char, std::string>, std::string>>;
+        {
+            t.done()
+            } -> std::same_as<bool>;
+
+        std::is_base_of<ArgParserCore, T>::value;
+    };
 
 class Args
 {
@@ -45,18 +70,16 @@ public:
         ValType d_vType;
     };
 
-    /// \p argv must be null terminated. IArgParser<DefaultArgParser> throws
-    // invalid_argument if an unknown option is found or if an option is specified twice
-    template <typename ArgParser>
-    Args(Opt const* options, size_t optionCount, IArgParser<ArgParser> parser);
+    template <ArgParser Parser>
+    Args(Opt const* options, size_t optionCount, Parser parser);
 
-    /// \p option short option as char or long option as string
-    /// \returns {bool wasSpecified, string const& value}
-    /// if the option was not specified, the string reference is to an empty static string.
-    /// if the option is invalid, throws invalid_argument
+    // option short option as char or long option as string
+    // returns {bool wasSpecified, string const& value}
+    // if the option was not specified, the string reference is to an empty static string.
+    // if the option is invalid, throws invalid_argument
     std::pair<bool, std::string const&> option(std::variant<char, std::string> option) const;
 
-    /// \returns value at argv0
+    // returns value at argv0
     char const* argv0() const;
 
 private:
@@ -69,6 +92,6 @@ private:
     char const* d_argv0;
 };
 
-#include "args.inl"
+#include "args-inl.h"
 
 #endif

@@ -62,3 +62,8 @@ pair<variant<char, string>, string> DefaultArgParser::next()
 
     return ret;
 }
+
+bool DefaultArgParser::done() const
+{
+    return !*d_argv;
+}

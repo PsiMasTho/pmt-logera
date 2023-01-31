@@ -36,7 +36,7 @@ std::filesystem::path Config::setHeaderFile(Args const& args)
     }
     else if(specified_d)
     {
-        filesystem::directory_iterator itrBeg(cvtFunc<filesystem::path>(str_d));
+        filesystem::directory_iterator const itrBeg(cvtFunc<filesystem::path>(str_d));
 
         auto const itr = find_if(itrBeg, filesystem::directory_iterator{}, [](auto entry) {
             return entry.path().extension() == ".lh";

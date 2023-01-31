@@ -5,7 +5,7 @@ nl             "\r\n"|"\n"
     // ignore spaces and tabs on their own
 [ \t]+
 
-^[0-9]{1,2}'/'[0-9]{2}'/'[0-9]{4}               return LogTokens::Tokens_::DATE;
+^[0-9]{4}'-'[0-9]{2}'-'[0-9]{2}                 return LogTokens::Tokens_::DATE;
 
     // May not end with ':'
 [[:print:]]{-}[ \t\n;]*[[:print:]]{-}[ \t\n;:]+ return LogTokens::Tokens_::IDENT;

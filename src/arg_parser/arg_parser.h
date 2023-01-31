@@ -3,10 +3,14 @@
 
 #include "../args/args.h"
 
-struct DefaultArgParser : public IArgParser<DefaultArgParser>
+struct DefaultArgParser : ArgParserCore
 {
-    using IArgParser<DefaultArgParser>::IArgParser;
+    DefaultArgParser(char const* const* argv)
+        : ArgParserCore{argv}
+    { }
+
     std::pair<std::variant<char, std::string>, std::string> next();
+    bool done() const;
 };
 
 #endif

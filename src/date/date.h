@@ -5,7 +5,7 @@
 #include <chrono>
 #include <string>
 
-// Represents a date dd/mm/yyyy
+// Represents a date in the form YYYY-MM-DD
 
 class Date
 {

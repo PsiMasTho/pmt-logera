@@ -23,7 +23,7 @@ int main(int, char** argv)
 try
 {
     // parse options, may throw
-    Config cfg(Args(options, nOptions, DefaultArgParser{argv}));
+    Config cfg(Args(options, nOptions, DefaultArgParser(argv)));
 
     if(cfg.verbose())
         cfg.verbosePrint(cerr);
@@ -55,10 +55,10 @@ try
     });
 
     // write header line
-    Writer writer(cfg.outputStream(), ';');
+    Writer writer(cfg.outputStream());
     writer.write(getHeaderLine(*headerData));
 
-    // write all lines
+    // write all other lines
     for(auto const& logDataPtr : parsedData)
         for(auto const& logLine : logDataPtr->getLines())
             writer.write(logDataPtr->getDate(), logLine);
