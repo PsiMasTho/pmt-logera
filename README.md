@@ -21,7 +21,9 @@ across time and compiles them into a csv file.
 	for the kind of values they accept.
 
 	Values may not contain: Line breaks, double-quotes, '$' or ';' or '%'
+
 	Variable names may not contain all of the above and may not contain commas.
+
 	Attribue names have the same restrictions as variable names.
 
 #### Example header for a workout programme
@@ -44,7 +46,7 @@ across time and compiles them into a csv file.
 
 #### Example log
 ```
-09/10/2022
+2022-09-16
 
 bw:
     weight 71kg;
@@ -69,19 +71,19 @@ For more information see examples/ folder.
 #### Example output
 ```
 Date;Var;reps;weight;time;distance;energy;rpe;incline
-09/10/2022;bw;;71kg;;;;;
-09/10/2022;dips;2s10r;0kg;;;;8;
-09/10/2022;dips;3s8r;5kg;;;;10;
-09/10/2022;bench_press;4s2r;60kg;;;;;15deg
-09/10/2022;bench_press;5,4,4,1;100kg;;;;;15deg
-09/10/2022;btn_situps;10,10,10,10;2.5kg;;;;;
-09/10/2022;btn_situps;5s10r;5kg;;;;;
-09/10/2022;treadmill;;;10:00;;;;
-11/10/2022;bw;;78kg;;;;;
-11/10/2022;kcal;;;;;3500kcal;;
-11/10/2022;leg_extension;5s10r;100kg;;;;10;
-11/10/2022;shoulder_press;5s10r;60kg;;;;8;
-11/10/2022;leg_curl;4,4,4,5;60kg;;;;7;
+2022-09-16;bw;;71kg;;;;;
+2022-09-16;dips;2s10r;0kg;;;;8;
+2022-09-16;dips;3s8r;5kg;;;;10;
+2022-09-16;bench_press;4s2r;60kg;;;;;15deg
+2022-09-16;bench_press;5,4,4,1;100kg;;;;;15deg
+2022-09-16;btn_situps;10,10,10,10;2.5kg;;;;;
+2022-09-16;btn_situps;5s10r;5kg;;;;;
+2022-09-16;treadmill;;;10:00;;;;
+2022-10-17;bw;;78kg;;;;;
+2022-10-17;kcal;;;;;3500kcal;;
+2022-10-17;leg_extension;5s10r;100kg;;;;10;
+2022-10-17;shoulder_press;5s10r;60kg;;;;8;
+2022-10-17;leg_curl;4,4,4,5;60kg;;;;7;
 ```
 
 ## Dependencies
