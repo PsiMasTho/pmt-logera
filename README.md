@@ -70,20 +70,20 @@ For more information see examples/ folder.
 
 #### Example output
 ```
-Date;Var;reps;weight;time;distance;energy;rpe;incline
-2022-09-16;bw;;71kg;;;;;
-2022-09-16;dips;2s10r;0kg;;;;8;
-2022-09-16;dips;3s8r;5kg;;;;10;
-2022-09-16;bench_press;4s2r;60kg;;;;;15deg
-2022-09-16;bench_press;5,4,4,1;100kg;;;;;15deg
-2022-09-16;btn_situps;10,10,10,10;2.5kg;;;;;
-2022-09-16;btn_situps;5s10r;5kg;;;;;
-2022-09-16;treadmill;;;10:00;;;;
-2022-10-17;bw;;78kg;;;;;
-2022-10-17;kcal;;;;;3500kcal;;
-2022-10-17;leg_extension;5s10r;100kg;;;;10;
-2022-10-17;shoulder_press;5s10r;60kg;;;;8;
-2022-10-17;leg_curl;4,4,4,5;60kg;;;;7;
+Date,Var,reps,weight,time,distance,energy,rpe,incline
+2022-09-16,bw,,71kg,,,,,
+2022-09-16,dips,2s10r,0kg,,,,8,
+2022-09-16,dips,3s8r,5kg,,,,10,
+2022-09-16,bench_press,4s2r,60kg,,,,,15deg
+2022-09-16,bench_press,"5,4,4,1",100kg,,,,,15deg
+2022-09-16,btn_situps,"10,10,10,10",2.5kg,,,,,
+2022-09-16,btn_situps,5s10r,5kg,,,,,
+2022-09-16,treadmill,,,10:00,,,,
+2022-09-17,bw,,78kg,,,,,
+2022-09-17,kcal,,,,,3500kcal,,
+2022-09-17,leg_extension,5s10r,100kg,,,,10,
+2022-09-17,shoulder_press,5s10r,60kg,,,,8,
+2022-09-17,leg_curl,"4,4,4,5",60kg,,,,7,
 ```
 
 ## Dependencies
