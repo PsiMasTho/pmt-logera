@@ -28,7 +28,7 @@ static Token categorize(string_view arg)
 
 pair<variant<char, string>, string> DefaultArgParser::next()
 {
-    pair<variant<char, string>, string> ret;
+    pair<variant<char, string, monostate>, string> ret{monostate{}, ""s};
 
     size_t itr = 0;
 
@@ -60,7 +60,12 @@ pair<variant<char, string>, string> DefaultArgParser::next()
     } while(*d_argv && categorize(*d_argv) != Token::SHORT_OPT &&
             categorize(*d_argv) != Token::LONG_OPT);
 
-    return ret;
+    if (holds_alternative<monostate>(ret.first))
+        throw invalid_argument("Value has no flag: "s + ret.second);
+    else if (holds_alternative<char>(ret.first))
+        return pair{get<char>(ret.first), ret.second};
+    else
+        return pair{get<string>(ret.first), ret.second};
 }
 
 bool DefaultArgParser::done() const
