@@ -28,9 +28,10 @@ static Token categorize(string_view arg)
 
 pair<variant<char, string>, string> DefaultArgParser::next()
 {
-    pair<variant<char, string, monostate>, string> ret{monostate{}, ""s};
+    pair<variant<char, string>, string> ret;
 
     size_t itr = 0;
+    bool hasFlag = false;
 
     do
     {
@@ -39,14 +40,17 @@ pair<variant<char, string>, string> DefaultArgParser::next()
         case Token::SHORT_OPT: {
             // skip one dash and assign flag char
             ret.first = d_argv[0][1];
+            hasFlag = true;
             break;
         }
         case Token::LONG_OPT: {
             // skip two dashes and assign flag string
             ret.first = &d_argv[0][2];
+            hasFlag = true;
             break;
         }
         case Token::VALUE: {
+            // keep building the value
             ret.second += (itr > 1 ? " "s : ""s) + string(*d_argv);
             break;
         }
@@ -60,12 +64,10 @@ pair<variant<char, string>, string> DefaultArgParser::next()
     } while(*d_argv && categorize(*d_argv) != Token::SHORT_OPT &&
             categorize(*d_argv) != Token::LONG_OPT);
 
-    if (holds_alternative<monostate>(ret.first))
+    if(!hasFlag)
         throw invalid_argument("Value has no flag: "s + ret.second);
-    else if (holds_alternative<char>(ret.first))
-        return pair{get<char>(ret.first), ret.second};
     else
-        return pair{get<string>(ret.first), ret.second};
+        return ret;
 }
 
 bool DefaultArgParser::done() const
