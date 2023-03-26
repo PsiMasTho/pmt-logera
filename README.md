@@ -18,9 +18,9 @@ across time and compiles them into a csv file.
 * Header:
 	Contains declarations for attributes and variables, and assigns
 	attributes to vairables. Attrubutes may contain ECMAscript regex expressions
-	for the kind of values they accept.
+	for the kind of values they accept. Must have a '.lh' extension.
 
-	Values may not contain: Line breaks, double-quotes, '$' or ';' or '%'
+	Values may not contain: Line breaks, spaces, tabs, double-quotes, '$' or ';' or '%'
 
 	Variable names may not contain all of the above and may not contain commas.
 
@@ -89,14 +89,13 @@ Date,Var,reps,weight,time,distance,energy,rpe,incline
 ## Dependencies
 ### To just compile Logera:
 * *CMake*
-* *make*
 * Compiler that supports C++20
 ### If building tests:
 * *Boost.test*
 ### If modifying scanner and grammar files:
 * *bisonc++* and/or *flexc++* to (re)generate scanners and parsers
 
-## Building
+## Building (linux)
 
 	mkdir build && cd build
 	cmake -S ../ -B .
