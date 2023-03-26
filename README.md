@@ -1,6 +1,7 @@
 # Logera
 A compiler that takes custom log files that contain variables and attributes
-across time and compiles them into a csv file.
+across time and compiles them into a csv file. Intended to be used for logging
+daily training, but can be used for other kinds of logging.
 
 ## Options
 	-o = name of the output csv
@@ -26,7 +27,7 @@ across time and compiles them into a csv file.
 
 	Attribue names have the same restrictions as variable names.
 
-#### Example header for a workout programme
+#### Example header for a workout program
 ```
     # Declaring attributes
 >attr reps     ; [0-9]{1,2}s[0-9]{1,3}r  ; [0-9]+(,[0-9]+)*        ;
