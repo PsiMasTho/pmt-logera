@@ -83,7 +83,7 @@ catch(...)
 
 vector<string> getHeaderLine(HeaderData const& header)
 {
-    vector<string> ret{"Date", "Var"};
+    vector<string> ret{"date", "var"};
     for(size_t idx = 0; idx < header.getAttributes().getCount(); ++idx)
         ret.push_back(header.getAttributes().getName(idx));
 
