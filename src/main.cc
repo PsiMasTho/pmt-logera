@@ -51,7 +51,7 @@ try
         if(logData == nullptr)
             return FAIL;
 
-        parsedData.push_back(move(logData));
+        parsedData.push_back(std::move(logData));
     }
 
     // sort the output by date

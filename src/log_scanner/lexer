@@ -10,7 +10,8 @@ nl             "\r\n"|"\n"
     // May not end with ':'
 [[:print:]]{-}[ \t\n;]*[[:print:]]{-}[ \t\n;:]+ return LogTokens::Tokens_::IDENT;
 
-#.*{nl}                                         |
+#[[:print:]]*
+#[[:print:]]*{nl}                               |
 {nl}                                            return LogTokens::Tokens_::NEWLINE;
 
-.                                    	        return matched()[0];
+.                                               return matched()[0];
