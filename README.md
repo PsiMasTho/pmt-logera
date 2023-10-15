@@ -4,12 +4,12 @@ across time and compiles them into a csv file. Intended to be used for logging
 daily training, but can be used for other kinds of logging.
 
 ## Options
-  -h, --help     	shows help message and exits 
-  -d, --directory	directory containing log files 
-  -m, --manual   	manually select files (e.g. glob) [nargs: 1 or more] 
-  -v, --verbose  	verbose output 
-  -o, --output   	output file. stdout if not specified 
-  -c, --color    	colored errors (on/off) [default: "on"]
+	-h, --help     	shows help message and exits 
+	-d, --directory	directory containing log files 
+	-m, --manual   	manually select files (e.g. glob) [nargs: 1 or more] 
+	-v, --verbose  	verbose output 
+	-o, --output   	output files. stdout if not specified 
+	-c, --color    	colored errors (on/off) [default: "on"]
 
 
 ## Usage
