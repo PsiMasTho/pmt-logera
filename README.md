@@ -4,9 +4,13 @@ across time and compiles them into a csv file. Intended to be used for logging
 daily training, but can be used for other kinds of logging.
 
 ## Options
-	-o = name of the output csv
-	-d = directory containing a header and zero or more logs
-	-m = manually select files
+  -h, --help     	shows help message and exits 
+  -d, --directory	directory containing log files 
+  -m, --manual   	manually select files (e.g. glob) [nargs: 1 or more] 
+  -v, --verbose  	verbose output 
+  -o, --output   	output file. stdout if not specified 
+  -c, --color    	colored errors (on/off) [default: "on"]
+
 
 ## Usage
 	Logera -d logs/ -o data.csv # writes to data.csv

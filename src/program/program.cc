@@ -25,7 +25,7 @@ argparse::ArgumentParser get_arg_parser()
 
     ret.add_argument("-v", "--verbose").help("verbose output").implicit_value(true);
 
-    ret.add_argument("-o", "--output").nargs(1).help("output files. stdout if not specified");
+    ret.add_argument("-o", "--output").nargs(1).help("output file. stdout if not specified");
 
     ret.add_argument("-c", "--color")
         .help("colored errors (on/off)")
