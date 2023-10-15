@@ -22,8 +22,8 @@ public:
 private:
     friend class LogDataModifier;
 
-    Date d_date;
-    std::vector<LogLine> d_lines;
+    Date m_date;
+    std::vector<LogLine> m_lines;
 
 public:
     LogData() = default;

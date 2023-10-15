@@ -62,21 +62,21 @@ array<char, DATE_REQ_LEN + 1> ymdToStr(chrono::year_month_day ymd)
 } // namespace
 
 Date::Date(string const& dateStr)
-    : d_date(strToYMD(dateStr))
-    , d_str(ymdToStr(d_date))
+    : m_date(strToYMD(dateStr))
+    , m_str(ymdToStr(m_date))
 { }
 
 char const* Date::to_string() const
 {
-    return d_str.data();
+    return m_str.data();
 }
 
 std::strong_ordering operator<=>(Date const& lhs, Date const& rhs) noexcept
 {
-    return lhs.d_date <=> rhs.d_date;
+    return lhs.m_date <=> rhs.m_date;
 }
 
 bool operator==(Date const& lhs, Date const& rhs) noexcept
 {
-    return lhs.d_date == rhs.d_date;
+    return lhs.m_date == rhs.m_date;
 }

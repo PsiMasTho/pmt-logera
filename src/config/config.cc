@@ -38,6 +38,20 @@ bool setVerbose(argparse::ArgumentParser const& cmdl)
     return cmdl.present<bool>("--verbose").has_value();
 }
 
+bool setColor(argparse::ArgumentParser const& cmdl)
+{
+    auto value = cmdl.get<string>("--color");
+
+    transform(value.begin(), value.end(), value.begin(), 
+                   [](unsigned char c){return std::tolower(c);});
+
+    if (value == "true" || value == "t" || value == "yes" || value == "y" || value == "1" || value == "on")
+        return true;
+    if (value == "false" || value == "f" || value == "no" || value == "n" || value == "0" || value == "off")
+        return false;
+    throw std::runtime_error("invalid value for --color");
+}
+
 filesystem::path setHeaderFile(argparse::ArgumentParser const& cmdl)
 {
     auto const paths = path_vec_from_args(cmdl);
@@ -105,9 +119,31 @@ vector<filesystem::path> setLogFiles(argparse::ArgumentParser const& cmdl)
 
 Config::Config(argparse::ArgumentParser const& cmdl)
     : verbose{setVerbose(cmdl)}
+    , color{setColor(cmdl)}
     , headerFile{setHeaderFile(cmdl)}
     , outputStream{setOutputStream(cmdl)}
     , outputName{setOutputName(cmdl)}
     , logFiles{setLogFiles(cmdl)}
 { }
+
+Config::Config()
+    : verbose{false}
+    , color{false}
+    , headerFile{}
+    , outputStream{&cout, [](ostream*) { /* do nothing */ }}
+    , outputName{"stdout"}
+    , logFiles{}
+{ }
+
+void print_config(Config const& cfg, std::ostream& os)
+{
+    os << "Verbose output:\n";
+    os << "\tOutput: " << cfg.outputName << '\n';
+    os << "\tHeader file: " << cfg.headerFile << '\n';
+    os << "\tLog file count: " << cfg.logFiles.size() << '\n';
+    os << "\tLog files:\n";
+    for(auto const& logFile : cfg.logFiles)
+        os << "\t\t" << logFile << '\n';
+    os << '\n';
+}
 

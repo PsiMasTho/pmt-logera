@@ -15,31 +15,30 @@
 
 #include <iosfwd>
 
-#ifndef MAX_ATTRIBUTES
-#    define MAX_ATTRIBUTES 128
-#endif
-
-class HeaderData
+enum
 {
-    using VarToAttrIdxMap = std::unordered_map<std::string, std::bitset<MAX_ATTRIBUTES>>;
+    MAX_ATTRIBUTES = 128
+};
 
-    // <var name, list of associated attribute indices from d_attrs>
-    VarToAttrIdxMap d_vars;
-    Attributes d_attrs;
-    VarToAttrIdxMap::iterator d_lastVarItr;
+class header_data
+{
+    using var_to_attr_idx_map = std::unordered_map<std::string, std::bitset<MAX_ATTRIBUTES>>;
+
+    // <var name, list of associated attribute indices from m_attrs>
+    var_to_attr_idx_map m_vars;
+    attributes m_attrs;
+    var_to_attr_idx_map::iterator m_last_var_itr;
 
 public:
-    HeaderData();
-    void addVar(std::string const& varName);
-    void addAttr(std::string const& attrName);
-    void addRegexToLastAttr(std::string const& expr);
-    void addAttrToLastVar(std::string const& attrName);
+    header_data();
+    void add_var(std::string const& var_name);
+    void add_attr(std::string const& attr_name);
+    void add_regex_to_last_attr(std::string const& expr);
+    void add_attr_to_last_var(std::string const& attr_name);
 
-    bool doesVarHaveAttr(std::string const& varName, std::string const& attrName) const;
+    bool does_var_have_attr(std::string const& var_name, std::string const& attr_name) const;
 
-    Attributes const& getAttributes() const;
-
-    void debugPrint(std::ostream& out) const;
+    attributes const& get_attributes() const;
 };
 
 #endif

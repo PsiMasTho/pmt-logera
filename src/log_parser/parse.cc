@@ -301,7 +301,7 @@ SR_ *s_state[] =
 
 
 // base/base1
-LogParserBase::LogParserBase()
+log_parser_base::log_parser_base()
 :
     d_token(Reserved_::UNDETERMINED_),
     // $insert baseclasscode
@@ -310,7 +310,7 @@ LogParserBase::LogParserBase()
 }
 
 // base/clearin
-void LogParserBase::clearin_()
+void log_parser_base::clearin_()
 {
     d_nErrors_ = 0;
     d_stackIdx = -1;
@@ -326,20 +326,20 @@ void LogParserBase::clearin_()
 
 // base/debugfunctions
 
-void LogParserBase::setDebug(bool mode)
+void log_parser_base::setDebug(bool mode)
 {
     d_actionCases_ = false;
     d_debug_ = mode;
 }
 
-void LogParserBase::setDebug(DebugMode_ mode)
+void log_parser_base::setDebug(DebugMode_ mode)
 {
     d_actionCases_ = mode & ACTIONCASES;
     d_debug_ =       mode & ON;
 }
 
 // base/lex
-void LogParserBase::lex_(int token)
+void log_parser_base::lex_(int token)
 {
     d_token = token;
 
@@ -350,7 +350,7 @@ void LogParserBase::lex_(int token)
 }
 
 // base/lookup
-int LogParserBase::lookup_() const
+int log_parser_base::lookup_() const
 {
     // if the final transition is negative, then we should reduce by the rule
     // given by its positive value.
@@ -385,7 +385,7 @@ int LogParserBase::lookup_() const
 }
 
 // base/pop
-void LogParserBase::pop_(size_t count)
+void log_parser_base::pop_(size_t count)
 {
     if (d_stackIdx < static_cast<int>(count))
     {
@@ -399,7 +399,7 @@ void LogParserBase::pop_(size_t count)
 }
 
 // base/poptoken
-void LogParserBase::popToken_()
+void log_parser_base::popToken_()
 {
     d_token = d_next.first;
     d_val_ = std::move(d_next.second);
@@ -408,7 +408,7 @@ void LogParserBase::popToken_()
 }
 
 // base/push
-void LogParserBase::push_(size_t state)
+void log_parser_base::push_(size_t state)
 {
     size_t currentSize = d_stateStack.size();
     if (stackSize_() == currentSize)
@@ -432,21 +432,21 @@ void LogParserBase::push_(size_t state)
 }
 
 // base/pushtoken
-void LogParserBase::pushToken_(int token)
+void log_parser_base::pushToken_(int token)
 {
     d_next = TokenPair{ d_token, std::move(d_val_) };
     d_token = token;
 }
 
 // base/redotoken
-void LogParserBase::redoToken_()
+void log_parser_base::redoToken_()
 {
     if (d_token != Reserved_::UNDETERMINED_)
         pushToken_(d_token);
 }
 
 // base/reduce
-void LogParserBase::reduce_(int rule)
+void log_parser_base::reduce_(int rule)
 {
     PI_ const &pi = s_productionInfo[rule];
 
@@ -457,7 +457,7 @@ void LogParserBase::reduce_(int rule)
 }
 
 // base/shift
-void LogParserBase::shift_(int action)
+void log_parser_base::shift_(int action)
 {
     push_(action);
     popToken_();               // token processed
@@ -470,7 +470,7 @@ void LogParserBase::shift_(int action)
 }
 
 // base/startrecovery
-void LogParserBase::startRecovery_()
+void log_parser_base::startRecovery_()
 {
     int lastToken = d_token;                // give the unexpected token a
                                             // chance to be processed
@@ -487,13 +487,13 @@ void LogParserBase::startRecovery_()
 }
 
 // base/top
-inline size_t LogParserBase::top_() const
+inline size_t log_parser_base::top_() const
 {
     return d_stateStack[d_stackIdx].first;
 }
 
 // derived/errorrecovery
-void LogParser::errorRecovery_()
+void log_parser::errorRecovery_()
 {
     // When an error has occurred, pop elements off the stack until the top
     // state has an error-item. If none is found, the default recovery
@@ -525,7 +525,7 @@ void LogParser::errorRecovery_()
 }
 
 // derived/executeaction
-void LogParser::executeAction_(int production)
+void log_parser::executeAction_(int production)
 try
 {
     if (token_() != Reserved_::UNDETERMINED_)
@@ -608,7 +608,7 @@ catch (std::exception const &exc)
 }
 
 // derived/nextcycle
-void LogParser::nextCycle_()
+void log_parser::nextCycle_()
 try
 {
     if (s_state[state_()]->d_type & REQ_TOKEN)
@@ -654,7 +654,7 @@ catch (ErrorRecovery_)
 
 
 // derived/nexttoken
-void LogParser::nextToken_()
+void log_parser::nextToken_()
 { 
     // If d_token is Reserved_::UNDETERMINED_ then if savedToken_() is
     // Reserved_::UNDETERMINED_ another token is obtained from lex(). Then
@@ -681,13 +681,13 @@ void LogParser::nextToken_()
 }
 
 // derived/print
-void LogParser::print_()
+void log_parser::print_()
 {
 // $insert print
 }
 
 // derived/parse
-int LogParser::parse()
+int log_parser::parse()
 try 
 {
     // The parsing algorithm:

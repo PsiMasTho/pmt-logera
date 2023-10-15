@@ -38,23 +38,23 @@ identifier:
 declare_attribute:
     DECL_ATTR identifier ';'
     {
-        d_ret->addAttr($2);
+        d_ret->add_attr($2);
     }
 |
     declare_attribute identifier ';'
     {
-        d_ret->addRegexToLastAttr($2);
+        d_ret->add_regex_to_last_attr($2);
     }
 ;
 
 declare_variable:
     DECL_VAR identifier ';'
     {
-        d_ret->addVar($2);
+        d_ret->add_var($2);
     }
 |
     declare_variable identifier ';'
     {
-        d_ret->addAttrToLastVar($2);
+        d_ret->add_attr_to_last_var($2);
     }
 ;

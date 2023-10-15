@@ -3,7 +3,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "writer.h"
+#include "csv_generator.h"
 
 #include <utility>
 
@@ -21,37 +21,37 @@ bool needsQuotes(string const& str)
 }
 } // namespace
 
-Writer::Writer(ostream& out)
-    : d_out(out)
+csv_generator::csv_generator(ostream& out)
+    : m_out(out)
 { }
 
-void Writer::write(Date const& date, LogData::LogLine const& logLine)
+void csv_generator::write(Date const& date, LogData::LogLine const& log_line)
 {
-    d_out << date.to_string();
-    for(size_t idx = 0; idx < logLine.capacity(); ++idx)
+    m_out << date.to_string();
+    for(size_t idx = 0; idx < log_line.capacity(); ++idx)
     {
-        if(logLine.exists(idx))
+        if(log_line.exists(idx))
         {
-            if(needsQuotes(logLine.get(idx)))
-                d_out << ",\"" << logLine.get(idx) << '"';
+            if(needsQuotes(log_line.get(idx)))
+                m_out << ",\"" << log_line.get(idx) << '"';
             else
-                d_out << ',' << logLine.get(idx);
+                m_out << ',' << log_line.get(idx);
         }
         else
-            d_out << ',';
+            m_out << ',';
     }
 
-    d_out << '\n';
+    m_out << '\n';
 }
 
-void Writer::write(std::vector<std::string> const& vec)
+void csv_generator::write(std::vector<std::string> const& vec)
 {
     string delim;
     for(auto const& str : vec)
         if(needsQuotes(str))
-            d_out << exchange(delim, ",") << '"' << str << '"';
+            m_out << exchange(delim, ",") << '"' << str << '"';
         else
-            d_out << exchange(delim, ",") << str;
+            m_out << exchange(delim, ",") << str;
 
-    d_out << '\n';
+    m_out << '\n';
 }

@@ -474,18 +474,18 @@ try
         // $insert actions
         case 1:
         {
-            return LogTokens::Tokens_::DATE;
+            return log_tokens::Tokens_::DATE;
         }
         break;
         case 2:
         {
-            return LogTokens::Tokens_::IDENT;
+            return log_tokens::Tokens_::IDENT;
         }
         break;
         case 4:
         case 5:
         {
-            return LogTokens::Tokens_::NEWLINE;
+            return log_tokens::Tokens_::NEWLINE;
         }
         break;
         case 6:

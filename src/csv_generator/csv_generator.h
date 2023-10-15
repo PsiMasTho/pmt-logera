@@ -3,8 +3,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef INCLUDED_WRITER_H
-#define INCLUDED_WRITER_H
+#ifndef INCLUDED_CSV_GENERATOR_H
+#define INCLUDED_CSV_GENERATOR_H
 
 #include "../log_data/log_data.h"
 #include <filesystem>
@@ -15,14 +15,14 @@ class LogLine;
 
 // Writes log lines or vectors of strings to a
 // file in CSV format according to RFC 4180.
-class Writer
+class csv_generator
 {
-    std::ostream& d_out;
-    char d_delim;
+    std::ostream& m_out;
+    char m_delim;
 
 public:
-    Writer(std::ostream& out);
-    void write(Date const& date, LogData::LogLine const& logLine);
+    csv_generator(std::ostream& out);
+    void write(Date const& date, LogData::LogLine const& log_line);
     void write(std::vector<std::string> const& vec);
 };
 

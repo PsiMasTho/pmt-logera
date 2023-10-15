@@ -309,7 +309,7 @@ SR_ *s_state[] =
 
 
 // base/base1
-HeaderParserBase::HeaderParserBase()
+header_parser_base::header_parser_base()
 :
     d_token(Reserved_::UNDETERMINED_),
     // $insert baseclasscode
@@ -318,7 +318,7 @@ HeaderParserBase::HeaderParserBase()
 }
 
 // base/clearin
-void HeaderParserBase::clearin_()
+void header_parser_base::clearin_()
 {
     d_nErrors_ = 0;
     d_stackIdx = -1;
@@ -334,20 +334,20 @@ void HeaderParserBase::clearin_()
 
 // base/debugfunctions
 
-void HeaderParserBase::setDebug(bool mode)
+void header_parser_base::setDebug(bool mode)
 {
     d_actionCases_ = false;
     d_debug_ = mode;
 }
 
-void HeaderParserBase::setDebug(DebugMode_ mode)
+void header_parser_base::setDebug(DebugMode_ mode)
 {
     d_actionCases_ = mode & ACTIONCASES;
     d_debug_ =       mode & ON;
 }
 
 // base/lex
-void HeaderParserBase::lex_(int token)
+void header_parser_base::lex_(int token)
 {
     d_token = token;
 
@@ -358,7 +358,7 @@ void HeaderParserBase::lex_(int token)
 }
 
 // base/lookup
-int HeaderParserBase::lookup_() const
+int header_parser_base::lookup_() const
 {
     // if the final transition is negative, then we should reduce by the rule
     // given by its positive value.
@@ -393,7 +393,7 @@ int HeaderParserBase::lookup_() const
 }
 
 // base/pop
-void HeaderParserBase::pop_(size_t count)
+void header_parser_base::pop_(size_t count)
 {
     if (d_stackIdx < static_cast<int>(count))
     {
@@ -407,7 +407,7 @@ void HeaderParserBase::pop_(size_t count)
 }
 
 // base/poptoken
-void HeaderParserBase::popToken_()
+void header_parser_base::popToken_()
 {
     d_token = d_next.first;
     d_val_ = std::move(d_next.second);
@@ -416,7 +416,7 @@ void HeaderParserBase::popToken_()
 }
 
 // base/push
-void HeaderParserBase::push_(size_t state)
+void header_parser_base::push_(size_t state)
 {
     size_t currentSize = d_stateStack.size();
     if (stackSize_() == currentSize)
@@ -440,21 +440,21 @@ void HeaderParserBase::push_(size_t state)
 }
 
 // base/pushtoken
-void HeaderParserBase::pushToken_(int token)
+void header_parser_base::pushToken_(int token)
 {
     d_next = TokenPair{ d_token, std::move(d_val_) };
     d_token = token;
 }
 
 // base/redotoken
-void HeaderParserBase::redoToken_()
+void header_parser_base::redoToken_()
 {
     if (d_token != Reserved_::UNDETERMINED_)
         pushToken_(d_token);
 }
 
 // base/reduce
-void HeaderParserBase::reduce_(int rule)
+void header_parser_base::reduce_(int rule)
 {
     PI_ const &pi = s_productionInfo[rule];
 
@@ -465,7 +465,7 @@ void HeaderParserBase::reduce_(int rule)
 }
 
 // base/shift
-void HeaderParserBase::shift_(int action)
+void header_parser_base::shift_(int action)
 {
     push_(action);
     popToken_();               // token processed
@@ -478,7 +478,7 @@ void HeaderParserBase::shift_(int action)
 }
 
 // base/startrecovery
-void HeaderParserBase::startRecovery_()
+void header_parser_base::startRecovery_()
 {
     int lastToken = d_token;                // give the unexpected token a
                                             // chance to be processed
@@ -495,13 +495,13 @@ void HeaderParserBase::startRecovery_()
 }
 
 // base/top
-inline size_t HeaderParserBase::top_() const
+inline size_t header_parser_base::top_() const
 {
     return d_stateStack[d_stackIdx].first;
 }
 
 // derived/errorrecovery
-void HeaderParser::errorRecovery_()
+void header_parser::errorRecovery_()
 {
     // When an error has occurred, pop elements off the stack until the top
     // state has an error-item. If none is found, the default recovery
@@ -533,7 +533,7 @@ void HeaderParser::errorRecovery_()
 }
 
 // derived/executeaction
-void HeaderParser::executeAction_(int production)
+void header_parser::executeAction_(int production)
 try
 {
     if (token_() != Reserved_::UNDETERMINED_)
@@ -586,25 +586,25 @@ try
 
         case 9:
         {
-         d_ret->addAttr(vs_(-1));
+         d_ret->add_attr(vs_(-1));
          }
         break;
 
         case 10:
         {
-         d_ret->addRegexToLastAttr(vs_(-1));
+         d_ret->add_regex_to_last_attr(vs_(-1));
          }
         break;
 
         case 11:
         {
-         d_ret->addVar(vs_(-1));
+         d_ret->add_var(vs_(-1));
          }
         break;
 
         case 12:
         {
-         d_ret->addAttrToLastVar(vs_(-1));
+         d_ret->add_attr_to_last_var(vs_(-1));
          }
         break;
 
@@ -616,7 +616,7 @@ catch (std::exception const &exc)
 }
 
 // derived/nextcycle
-void HeaderParser::nextCycle_()
+void header_parser::nextCycle_()
 try
 {
     if (s_state[state_()]->d_type & REQ_TOKEN)
@@ -662,7 +662,7 @@ catch (ErrorRecovery_)
 
 
 // derived/nexttoken
-void HeaderParser::nextToken_()
+void header_parser::nextToken_()
 { 
     // If d_token is Reserved_::UNDETERMINED_ then if savedToken_() is
     // Reserved_::UNDETERMINED_ another token is obtained from lex(). Then
@@ -689,13 +689,13 @@ void HeaderParser::nextToken_()
 }
 
 // derived/print
-void HeaderParser::print_()
+void header_parser::print_()
 {
 // $insert print
 }
 
 // derived/parse
-int HeaderParser::parse()
+int header_parser::parse()
 try 
 {
     // The parsing algorithm:

@@ -5,13 +5,13 @@ nl             "\r\n"|"\n"
     // ignore spaces and tabs on their own
 [ \t]+
 
-^[0-9]{4}'-'[0-9]{2}'-'[0-9]{2}                 return LogTokens::Tokens_::DATE;
+^[0-9]{4}'-'[0-9]{2}'-'[0-9]{2}                 return log_tokens::Tokens_::DATE;
 
     // May not end with ':'
-[[:print:]]{-}[ \t\n;]*[[:print:]]{-}[ \t\n;:]+ return LogTokens::Tokens_::IDENT;
+[[:print:]]{-}[ \t\n;]*[[:print:]]{-}[ \t\n;:]+ return log_tokens::Tokens_::IDENT;
 
 #[[:print:]]*
 #[[:print:]]*{nl}                               |
-{nl}                                            return LogTokens::Tokens_::NEWLINE;
+{nl}                                            return log_tokens::Tokens_::NEWLINE;
 
 .                                               return matched()[0];

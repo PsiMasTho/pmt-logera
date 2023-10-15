@@ -13,51 +13,51 @@
 
 using namespace std;
 
-LogDataModifier::LogDataModifier(LogData* target, HeaderData const& headerData)
-    : d_target{target}
-    , d_headerData{headerData}
-    , d_activeVar{}
+LogDataModifier::LogDataModifier(LogData* target, header_data const& headerData)
+    : m_target{target}
+    , m_headerData{headerData}
+    , m_activeVar{}
 { }
 
 void LogDataModifier::setTarget(LogData* target)
 {
-    d_target = target;
+    m_target = target;
 }
 
 void LogDataModifier::setDate(Date const& date)
 {
-    d_target->d_date = date;
+    m_target->m_date = date;
 }
 
-void LogDataModifier::setActiveVar(string const& varName)
+void LogDataModifier::setActiveVar(string const& var_name)
 {
-    d_activeVar = varName;
+    m_activeVar = var_name;
 }
 
-void LogDataModifier::addAttrToNewLine(string const& attrName, string const& attrVal)
+void LogDataModifier::addAttrToNewLine(string const& attr_name, string const& attrVal)
 {
-    if(d_activeVar.empty())
+    if(m_activeVar.empty())
         throw runtime_error("Adding new line without active variable");
 
-    d_target->d_lines.emplace_back(d_headerData.getAttributes().getCount() + 1);
-    d_target->d_lines.back().set(0, d_activeVar);
+    m_target->m_lines.emplace_back(m_headerData.get_attributes().getCount() + 1);
+    m_target->m_lines.back().set(0, m_activeVar);
 
-    addAttrToCurrentLine(attrName, attrVal);
+    addAttrToCurrentLine(attr_name, attrVal);
 }
 
-void LogDataModifier::addAttrToCurrentLine(string const& attrName, string const& attrVal)
+void LogDataModifier::addAttrToCurrentLine(string const& attr_name, string const& attrVal)
 {
-    if(!d_target->d_lines.back().exists(0))
+    if(!m_target->m_lines.back().exists(0))
         throw runtime_error("Attempting to add attribute with no variable"s);
 
-    if(!d_headerData.doesVarHaveAttr(d_activeVar, attrName))
-        throw runtime_error("Variable: \""s + d_activeVar + R"(" does not have attribute: ")"s +
-                            attrName + '\"');
+    if(!m_headerData.does_var_have_attr(m_activeVar, attr_name))
+        throw runtime_error("Variable: \""s + m_activeVar + R"(" does not have attribute: ")"s +
+                            attr_name + '\"');
 
-    size_t const idx = d_headerData.getAttributes().getIdx(attrName);
-    if(!d_headerData.getAttributes().validValue(idx, attrVal))
-        throw runtime_error("Invalid value: \""s + attrVal + "\". For attribute: \"" + attrName +
+    size_t const idx = m_headerData.get_attributes().getIdx(attr_name);
+    if(!m_headerData.get_attributes().validValue(idx, attrVal))
+        throw runtime_error("Invalid value: \""s + attrVal + "\". For attribute: \"" + attr_name +
                             '\"');
 
-    d_target->d_lines.back().set(idx + 1, attrVal);
+    m_target->m_lines.back().set(idx + 1, attrVal);
 }

@@ -20,7 +20,7 @@ namespace // anonymous
 
 
 // $insert parserbase
-class LogParserBase: public LogTokens
+class log_parser_base: public log_tokens
 {
     public:
         enum DebugMode_
@@ -72,7 +72,7 @@ typedef std::string STYPE_;
         STYPE_     d_val_;
 
 
-        LogParserBase();
+        log_parser_base();
 
         void ABORT() const;
         void ACCEPT() const;
@@ -104,71 +104,71 @@ typedef std::string STYPE_;
 }; 
 
 // hdr/abort
-inline void LogParserBase::ABORT() const
+inline void log_parser_base::ABORT() const
 {
     throw PARSE_ABORT_;
 }
 
 // hdr/accept
-inline void LogParserBase::ACCEPT() const
+inline void log_parser_base::ACCEPT() const
 {
     throw PARSE_ACCEPT_;
 }
 
 
 // hdr/error
-inline void LogParserBase::ERROR() const
+inline void log_parser_base::ERROR() const
 {
     throw UNEXPECTED_TOKEN_;
 }
 
 // hdr/savedtoken
-inline int LogParserBase::savedToken_() const
+inline int log_parser_base::savedToken_() const
 {
     return d_next.first;
 }
 
 // hdr/opbitand
-inline LogParserBase::DebugMode_ operator&(LogParserBase::DebugMode_ lhs,
-                                     LogParserBase::DebugMode_ rhs)
+inline log_parser_base::DebugMode_ operator&(log_parser_base::DebugMode_ lhs,
+                                     log_parser_base::DebugMode_ rhs)
 {
-    return static_cast<LogParserBase::DebugMode_>(
+    return static_cast<log_parser_base::DebugMode_>(
             static_cast<int>(lhs) & rhs);
 }
 
 // hdr/opbitor
-inline LogParserBase::DebugMode_ operator|(LogParserBase::DebugMode_ lhs, 
-                                     LogParserBase::DebugMode_ rhs)
+inline log_parser_base::DebugMode_ operator|(log_parser_base::DebugMode_ lhs, 
+                                     log_parser_base::DebugMode_ rhs)
 {
-    return static_cast<LogParserBase::DebugMode_>(static_cast<int>(lhs) | rhs);
+    return static_cast<log_parser_base::DebugMode_>(static_cast<int>(lhs) | rhs);
 };
 
 // hdr/recovery
-inline bool LogParserBase::recovery_() const
+inline bool log_parser_base::recovery_() const
 {
     return d_recovery;
 }
 
 // hdr/stacksize
-inline size_t LogParserBase::stackSize_() const
+inline size_t log_parser_base::stackSize_() const
 {
     return d_stackIdx + 1;
 }
 
 // hdr/state
-inline size_t LogParserBase::state_() const
+inline size_t log_parser_base::state_() const
 {
     return d_state;
 }
 
 // hdr/token
-inline int LogParserBase::token_() const
+inline int log_parser_base::token_() const
 {
     return d_token;
 }
 
 // hdr/vs
-inline LogParserBase::STYPE_ &LogParserBase::vs_(int idx) 
+inline log_parser_base::STYPE_ &log_parser_base::vs_(int idx) 
 {
     return (d_vsp + idx)->second;
 }

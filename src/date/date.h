@@ -14,8 +14,8 @@
 
 class Date
 {
-    std::chrono::year_month_day d_date;
-    std::array<char, 11> d_str;
+    std::chrono::year_month_day m_date;
+    std::array<char, 11> m_str;
 
 public:
     explicit Date(std::string const& dateStr);

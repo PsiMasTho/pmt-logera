@@ -9,7 +9,7 @@
 #include "../header_data/header_data.h"
 #include "../date/date.h"
 
-LogParser::LogParser(filesystem::path const& path, HeaderData const& headerData)
+log_parser::log_parser(filesystem::path const& path, header_data const& headerData)
     : d_scanner(path)
     , d_matched { d_scanner.matched() }
     , d_logDataModifier(nullptr, headerData)
@@ -18,7 +18,7 @@ LogParser::LogParser(filesystem::path const& path, HeaderData const& headerData)
 {
 }
 
-unique_ptr<LogData> LogParser::gen()
+unique_ptr<LogData> log_parser::gen()
 {
     d_ret = make_unique<LogData>();
     d_logDataModifier.setTarget(d_ret.get());
@@ -29,25 +29,27 @@ unique_ptr<LogData> LogParser::gen()
         return nullptr;
 }
 
-LogParser::ErrorInfo const& LogParser::getErrorInfo() const
+input_error const& log_parser::getErrorInfo() const
 {
     return *d_errorInfo;
 }
 
-void LogParser::error()
+void log_parser::error()
 {
     string matchTxt = d_matched;
     eraseAndReplace(&matchTxt, "\n", "*newline*");
 
-    d_errorInfo.emplace(ErrorInfo{
-        "Unexpected input: \"" + matchTxt + "\" encountered.",
+    d_errorInfo.emplace(log_parse_error{
+        d_scanner.filename(),
+        "Unexpected input: (" + matchTxt + ") encountered.",
         d_scanner.lineNr()
     });
 }
 
-void LogParser::exceptionHandler(exception const& exc)
+void log_parser::exceptionHandler(exception const& exc)
 {
-    d_errorInfo.emplace(ErrorInfo{
+    d_errorInfo.emplace(log_parse_error{
+        d_scanner.filename(),
         exc.what(),
         d_scanner.lineNr()
     });

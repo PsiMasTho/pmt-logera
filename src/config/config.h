@@ -23,12 +23,16 @@ namespace argparse
 struct Config
 {
     explicit Config(argparse::ArgumentParser const& cmdl);
+    Config();
 
     bool verbose;
+    bool color;
     std::filesystem::path headerFile;
     std::unique_ptr<std::ostream, void (*)(std::ostream*)> outputStream; // stdout or file
     std::string outputName; // name of output file or "stdout"
     std::vector<std::filesystem::path> logFiles;
 };
+
+void print_config(Config const& cfg, std::ostream& os);
 
 #endif

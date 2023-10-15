@@ -10,59 +10,49 @@
 
 using namespace std;
 
-HeaderData::HeaderData()
-    : d_vars{}
-    , d_attrs{}
-    , d_lastVarItr{d_vars.end()}
+header_data::header_data()
+    : m_vars{}
+    , m_attrs{}
+    , m_last_var_itr{m_vars.end()}
 { }
 
-void HeaderData::addVar(string const& varName)
+void header_data::add_var(string const& var_name)
 {
-    auto const [itr, success] = d_vars.insert({varName, {}});
+    auto const [itr, success] = m_vars.insert({var_name, {}});
     if(!success)
-        throw runtime_error("Failed declaring variable: "s + varName);
+        throw runtime_error("Failed declaring variable: "s + var_name);
     else
-        d_lastVarItr = itr;
+        m_last_var_itr = itr;
 }
 
-void HeaderData::addAttr(string const& attrName)
+void header_data::add_attr(string const& attr_name)
 {
-    d_attrs.addAttr(attrName);
+    m_attrs.add_attr(attr_name);
 }
 
-void HeaderData::addRegexToLastAttr(std::string const& expr)
+void header_data::add_regex_to_last_attr(std::string const& expr)
 {
-    d_attrs.addRegexToLastAttr(expr);
+    m_attrs.add_regex_to_last_attr(expr);
 }
 
-void HeaderData::addAttrToLastVar(std::string const& attrName)
+void header_data::add_attr_to_last_var(std::string const& attr_name)
 {
-    if(d_lastVarItr == d_vars.end())
-        throw runtime_error("Attemtpting to add attribute without a variable: "s + attrName);
+    if(m_last_var_itr == m_vars.end())
+        throw runtime_error("Attemtpting to add attribute without a variable: "s + attr_name);
 
-    d_lastVarItr->second[d_attrs.getIdx(attrName)] = true;
+    m_last_var_itr->second[m_attrs.getIdx(attr_name)] = true;
 }
 
-bool HeaderData::doesVarHaveAttr(std::string const& varName, std::string const& attrName) const
+bool header_data::does_var_have_attr(std::string const& var_name, std::string const& attr_name) const
 {
-    auto const itr = d_vars.find(varName);
-    if(itr == d_vars.end())
-        throw runtime_error("Unknown variable queried: "s + varName);
+    auto const itr = m_vars.find(var_name);
+    if(itr == m_vars.end())
+        throw runtime_error("Unknown variable queried: "s + var_name);
     else
-        return itr->second[d_attrs.getIdx(attrName)];
+        return itr->second[m_attrs.getIdx(attr_name)];
 }
 
-Attributes const& HeaderData::getAttributes() const
+attributes const& header_data::get_attributes() const
 {
-    return d_attrs;
-}
-
-#include <ostream>
-void HeaderData::debugPrint(ostream& out) const
-{
-    for(auto [varName, idxBits] : d_vars)
-    {
-        out << "VAR: " << varName << '\n';
-        out << "\tATTRS: " << idxBits.to_string() << '\n';
-    }
+    return m_attrs;
 }

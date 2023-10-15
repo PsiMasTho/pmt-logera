@@ -8,27 +8,27 @@
 
 #include <string>
 
-class HeaderData;
+class header_data;
 class LogData;
 class Date;
 
 class LogDataModifier
 {
-    LogData* d_target;
-    HeaderData const& d_headerData;
+    LogData* m_target;
+    header_data const& m_headerData;
 
-    std::string d_activeVar;
+    std::string m_activeVar;
 
 public:
-    LogDataModifier(LogData* target, HeaderData const& headerData);
+    LogDataModifier(LogData* target, header_data const& headerData);
 
     void setTarget(LogData* target);
 
     void setDate(Date const& date);
 
-    void setActiveVar(std::string const& varName);
-    void addAttrToNewLine(std::string const& attrName, std::string const& attrVal);
-    void addAttrToCurrentLine(std::string const& attrName, std::string const& attrVal);
+    void setActiveVar(std::string const& var_name);
+    void addAttrToNewLine(std::string const& attr_name, std::string const& attrVal);
+    void addAttrToCurrentLine(std::string const& attr_name, std::string const& attrVal);
 };
 
 #endif

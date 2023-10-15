@@ -10,18 +10,18 @@
 #include <string>
 #include <utility>
 
-class Attributes
+class attributes
 {
     // Function to check a string against a bound regex
     using RegexMatchChecker = std::function<bool(std::string const&)>;
     using Attribute = std::pair<std::string, std::vector<RegexMatchChecker>>;
 
-    std::vector<Attribute> d_attrs;
+    std::vector<Attribute> m_attrs;
 
 public:
-    Attributes();
-    void addAttr(std::string const& name);
-    void addRegexToLastAttr(std::string const& expr);
+    attributes();
+    void add_attr(std::string const& name);
+    void add_regex_to_last_attr(std::string const& expr);
 
     bool validValue(size_t idx, std::string const& value) const;
 

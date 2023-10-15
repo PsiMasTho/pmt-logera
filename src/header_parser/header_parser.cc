@@ -8,16 +8,17 @@
 #include "../header_data/header_data.h"
 #include <utility>
 
-HeaderParser::HeaderParser(filesystem::path const& path)
+header_parser::header_parser(filesystem::path const& path)
     : d_scanner(path)
     , d_matched(d_scanner.matched())
-    , d_ret { nullptr }
+    , d_ret {nullptr}
+    , d_errorInfo {nullopt}
 {
 }
 
-unique_ptr<HeaderData> HeaderParser::gen()
+unique_ptr<header_data> header_parser::gen()
 {
-    d_ret = make_unique<HeaderData>();
+    d_ret = make_unique<header_data>();
 
     if (parse() == 0) // no error encountered
         return exchange(d_ret, nullptr);
@@ -25,22 +26,29 @@ unique_ptr<HeaderData> HeaderParser::gen()
         return nullptr;
 }
 
-void HeaderParser::error()
+input_error const& header_parser::getErrorInfo() const
 {
-    cerr << "Syntax error in header file: " << d_scanner.filename() << '\n';
-
-    string matchTxt = d_matched;
-
-    eraseAndReplace(&matchTxt, "\n", "*newline*");
-
-    cerr << "Unexpected input: (" << matchTxt << ") encountered.\n";
-    cerr << "At line: " << d_scanner.lineNr() << '\n';
+    return *d_errorInfo;
 }
 
-void HeaderParser::exceptionHandler(exception const& exc)
+void header_parser::error()
 {
-    cerr << "Error in header file: " << d_scanner.filename() << '\n';
-    cerr << '\t' << exc.what() << '\n';
-    cerr << "At line: " << d_scanner.lineNr() << '\n';
+    string matchTxt = d_matched;
+    eraseAndReplace(&matchTxt, "\n", "*newline*");
+
+    d_errorInfo.emplace(header_parse_error{
+        d_scanner.filename(),
+        "Unexpected input: (" + matchTxt + ") encountered.",
+        d_scanner.lineNr()
+    });
+}
+
+void header_parser::exceptionHandler(exception const& exc)
+{
+    d_errorInfo.emplace(header_parse_error{
+        d_scanner.filename(),
+        exc.what(),
+        d_scanner.lineNr()
+    });
     ABORT();
 }

@@ -20,7 +20,7 @@ namespace // anonymous
 
 
 // $insert parserbase
-class HeaderParserBase: public HeaderTokens
+class header_parser_base: public header_tokens
 {
     public:
         enum DebugMode_
@@ -72,7 +72,7 @@ typedef std::string STYPE_;
         STYPE_     d_val_;
 
 
-        HeaderParserBase();
+        header_parser_base();
 
         void ABORT() const;
         void ACCEPT() const;
@@ -104,71 +104,71 @@ typedef std::string STYPE_;
 }; 
 
 // hdr/abort
-inline void HeaderParserBase::ABORT() const
+inline void header_parser_base::ABORT() const
 {
     throw PARSE_ABORT_;
 }
 
 // hdr/accept
-inline void HeaderParserBase::ACCEPT() const
+inline void header_parser_base::ACCEPT() const
 {
     throw PARSE_ACCEPT_;
 }
 
 
 // hdr/error
-inline void HeaderParserBase::ERROR() const
+inline void header_parser_base::ERROR() const
 {
     throw UNEXPECTED_TOKEN_;
 }
 
 // hdr/savedtoken
-inline int HeaderParserBase::savedToken_() const
+inline int header_parser_base::savedToken_() const
 {
     return d_next.first;
 }
 
 // hdr/opbitand
-inline HeaderParserBase::DebugMode_ operator&(HeaderParserBase::DebugMode_ lhs,
-                                     HeaderParserBase::DebugMode_ rhs)
+inline header_parser_base::DebugMode_ operator&(header_parser_base::DebugMode_ lhs,
+                                     header_parser_base::DebugMode_ rhs)
 {
-    return static_cast<HeaderParserBase::DebugMode_>(
+    return static_cast<header_parser_base::DebugMode_>(
             static_cast<int>(lhs) & rhs);
 }
 
 // hdr/opbitor
-inline HeaderParserBase::DebugMode_ operator|(HeaderParserBase::DebugMode_ lhs, 
-                                     HeaderParserBase::DebugMode_ rhs)
+inline header_parser_base::DebugMode_ operator|(header_parser_base::DebugMode_ lhs, 
+                                     header_parser_base::DebugMode_ rhs)
 {
-    return static_cast<HeaderParserBase::DebugMode_>(static_cast<int>(lhs) | rhs);
+    return static_cast<header_parser_base::DebugMode_>(static_cast<int>(lhs) | rhs);
 };
 
 // hdr/recovery
-inline bool HeaderParserBase::recovery_() const
+inline bool header_parser_base::recovery_() const
 {
     return d_recovery;
 }
 
 // hdr/stacksize
-inline size_t HeaderParserBase::stackSize_() const
+inline size_t header_parser_base::stackSize_() const
 {
     return d_stackIdx + 1;
 }
 
 // hdr/state
-inline size_t HeaderParserBase::state_() const
+inline size_t header_parser_base::state_() const
 {
     return d_state;
 }
 
 // hdr/token
-inline int HeaderParserBase::token_() const
+inline int header_parser_base::token_() const
 {
     return d_token;
 }
 
 // hdr/vs
-inline HeaderParserBase::STYPE_ &HeaderParserBase::vs_(int idx) 
+inline header_parser_base::STYPE_ &header_parser_base::vs_(int idx) 
 {
     return (d_vsp + idx)->second;
 }

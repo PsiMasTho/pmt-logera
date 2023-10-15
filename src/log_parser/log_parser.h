@@ -10,30 +10,25 @@
 
 #include "../log_data_modifier/log_data_modifier.h"
 #include "../log_scanner/log_scanner.h"
+#include "../input_error/input_error.h"
 #include <fstream>
 #include <filesystem>
 #include <optional>
 
-class LogParser : public LogParserBase {
+class log_parser : public log_parser_base {
 
-    struct ErrorInfo
-    {
-        std::string msg;
-        size_t      lineNr;
-    };
-    
     // $insert scannerobject
     LogScanner d_scanner;
     std::string const& d_matched;
     LogDataModifier          d_logDataModifier;
     std::unique_ptr<LogData> d_ret;
-    std::optional<ErrorInfo> d_errorInfo;
+    std::optional<input_error> d_errorInfo;
 
 public:
-    LogParser(std::filesystem::path const& path, HeaderData const& headerData);
-    int                      parse();
+    log_parser(std::filesystem::path const& path, header_data const& headerData);
+    int parse();
     std::unique_ptr<LogData> gen();
-    ErrorInfo const&         getErrorInfo() const;
+    input_error const& getErrorInfo() const;
 
 private:
     void error(); // called on (syntax) errors

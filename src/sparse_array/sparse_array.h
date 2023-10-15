@@ -12,8 +12,8 @@
 template <typename T>
 class SparseArray
 {
-    std::vector<T> d_values;
-    std::vector<bool> d_specified;
+    std::vector<T> m_values;
+    std::vector<bool> m_specified;
 
 public:
     explicit SparseArray(size_t max);

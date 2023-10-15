@@ -5,13 +5,13 @@ nl             "\r\n"|"\n"
     // ignore spaces and tabs on their own
 [ \t]+
 
-">attr"					                return HeaderTokens::Tokens_::DECL_ATTR;
+">attr"					                return header_tokens::Tokens_::DECL_ATTR;
 
-">var"                                  return HeaderTokens::Tokens_::DECL_VAR;
+">var"                                  return header_tokens::Tokens_::DECL_VAR;
 
-[[:print:]]{-}[ \t\n;]+					return HeaderTokens::Tokens_::IDENT;
+[[:print:]]{-}[ \t\n;]+					return header_tokens::Tokens_::IDENT;
 
 #.*{nl}                                 |
-{nl}                                    return HeaderTokens::Tokens_::NEWLINE;
+{nl}                                    return header_tokens::Tokens_::NEWLINE;
 
 .                                    	return matched()[0];

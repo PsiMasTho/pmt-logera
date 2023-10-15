@@ -6,7 +6,7 @@
 #ifndef INCLUDED_HEADER_TOKEN_ENUMS_
 #define INCLUDED_HEADER_TOKEN_ENUMS_
 
-struct HeaderTokens
+struct header_tokens
 {
     // Symbolic tokens:
     enum Tokens_

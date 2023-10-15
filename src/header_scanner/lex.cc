@@ -487,23 +487,23 @@ try
         // $insert actions
         case 1:
         {
-            return HeaderTokens::Tokens_::DECL_ATTR;
+            return header_tokens::Tokens_::DECL_ATTR;
         }
         break;
         case 2:
         {
-            return HeaderTokens::Tokens_::DECL_VAR;
+            return header_tokens::Tokens_::DECL_VAR;
         }
         break;
         case 3:
         {
-            return HeaderTokens::Tokens_::IDENT;
+            return header_tokens::Tokens_::IDENT;
         }
         break;
         case 4:
         case 5:
         {
-            return HeaderTokens::Tokens_::NEWLINE;
+            return header_tokens::Tokens_::NEWLINE;
         }
         break;
         case 6:

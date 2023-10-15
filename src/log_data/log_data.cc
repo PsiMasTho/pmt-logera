@@ -13,10 +13,10 @@ using namespace std;
 
 Date const& LogData::getDate() const
 {
-    return d_date;
+    return m_date;
 }
 
 std::vector<LogData::LogLine> const& LogData::getLines() const
 {
-    return d_lines;
+    return m_lines;
 }
