@@ -13,7 +13,8 @@ LogParser::LogParser(filesystem::path const& path, HeaderData const& headerData)
     : d_scanner(path)
     , d_matched { d_scanner.matched() }
     , d_logDataModifier(nullptr, headerData)
-    , d_ret { nullptr }
+    , d_ret {nullptr}
+    , d_errorInfo {nullopt}
 {
 }
 
@@ -28,22 +29,27 @@ unique_ptr<LogData> LogParser::gen()
         return nullptr;
 }
 
+LogParser::ErrorInfo const& LogParser::getErrorInfo() const
+{
+    return *d_errorInfo;
+}
+
 void LogParser::error()
 {
-    cerr << "Syntax error in log file: " << d_scanner.filename() << '\n';
-
     string matchTxt = d_matched;
-
     eraseAndReplace(&matchTxt, "\n", "*newline*");
 
-    cerr << "Unexpected input: \"" << matchTxt << "\" encountered.\n";
-    cerr << "At line: " << d_scanner.lineNr() << '\n';
+    d_errorInfo.emplace(ErrorInfo{
+        "Unexpected input: \"" + matchTxt + "\" encountered.",
+        d_scanner.lineNr()
+    });
 }
 
 void LogParser::exceptionHandler(exception const& exc)
 {
-    cerr << "Error in log file: " << d_scanner.filename() << '\n';
-    cerr << '\t' << exc.what() << '\n';
-    cerr << "Parsing stopped at line: " << d_scanner.lineNr() << '\n';
+    d_errorInfo.emplace(ErrorInfo{
+        exc.what(),
+        d_scanner.lineNr()
+    });
     ABORT();
 }

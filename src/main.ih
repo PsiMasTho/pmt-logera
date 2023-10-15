@@ -9,8 +9,7 @@
 #include "log_data/log_data.h"
 #include "log_parser/log_parser.h"
 
-#include "arg_parser/arg_parser.h"
-#include "args/args.h"
+#include "argparse/argparse.hpp" // Third party library (https://github.com/p-ranav/argparse/releases/tag/v2.9)
 #include "config/config.h"
 
 #include "writer/writer.h"

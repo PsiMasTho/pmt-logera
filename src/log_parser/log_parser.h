@@ -12,19 +12,28 @@
 #include "../log_scanner/log_scanner.h"
 #include <fstream>
 #include <filesystem>
+#include <optional>
 
 class LogParser : public LogParserBase {
+
+    struct ErrorInfo
+    {
+        std::string msg;
+        size_t      lineNr;
+    };
     
     // $insert scannerobject
     LogScanner d_scanner;
     std::string const& d_matched;
     LogDataModifier          d_logDataModifier;
     std::unique_ptr<LogData> d_ret;
+    std::optional<ErrorInfo> d_errorInfo;
 
 public:
     LogParser(std::filesystem::path const& path, HeaderData const& headerData);
     int                      parse();
     std::unique_ptr<LogData> gen();
+    ErrorInfo const&         getErrorInfo() const;
 
 private:
     void error(); // called on (syntax) errors

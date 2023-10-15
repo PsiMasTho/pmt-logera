@@ -2,7 +2,7 @@
 
 cd ..
 
-excluded_dir_list=('src/header_scanner' 'src/header_parser' 'src/log_parser' 'src/log_scanner')
+excluded_dir_list=('src/header_scanner' 'src/header_parser' 'src/log_parser' 'src/log_scanner' 'src/argparse)
 findargs=()
 
 for i in "${excluded_dir_list[@]}"; do
