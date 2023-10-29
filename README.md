@@ -75,7 +75,7 @@ For more information see examples/ folder.
 
 #### Example output
 ```
-Date,Var,reps,weight,time,distance,energy,rpe,incline
+date,Var,reps,weight,time,distance,energy,rpe,incline
 2022-09-16,bw,,71kg,,,,,
 2022-09-16,dips,2s10r,0kg,,,,8,
 2022-09-16,dips,3s8r,5kg,,,,10,
@@ -96,7 +96,7 @@ Date,Var,reps,weight,time,distance,energy,rpe,incline
 * *CMake*
 * Compiler that supports C++20
 ### If building tests:
-* *Boost.test*
+* *Catch2*
 ### If modifying scanner and grammar files:
 * *bisonc++* and/or *flexc++* to (re)generate scanners and parsers
 
@@ -113,4 +113,4 @@ Builds the binaries with different flags to either improve performance or to hel
 debugging. The type is Release by default.
 
 * -DBUILD_TESTS=[ON|OFF]
-Whether to compile the unit tests which requires Boost.test. OFF by default.
+Whether to compile the unit tests which requires Catch2. OFF by default.

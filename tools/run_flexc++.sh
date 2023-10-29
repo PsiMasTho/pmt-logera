@@ -1,8 +1,6 @@
 #!/bin/bash
 
-LOG_SCANNER_DIR=../src/log_scanner
-HEADER_SCANNER_DIR=../src/header_scanner
-
-flexc++ "${LOG_SCANNER_DIR}"/lexer    --target-directory="${LOG_SCANNER_DIR}"/    --filenames=log_scanner    --no-lines --class-name LogScanner &&\
-flexc++ "${HEADER_SCANNER_DIR}"/lexer --target-directory="${HEADER_SCANNER_DIR}"/ --filenames=header_scanner --no-lines --class-name HeaderScanner &&\
+cd "../src/" &&\
+flexc++ log_scanner_lexer    --lex-source=log_scanner_lex.cc    --filenames=log_scanner    --no-lines --class-name log_scanner &&\
+flexc++ header_scanner_lexer --lex-source=header_scanner_lex.cc --filenames=header_scanner --no-lines --class-name header_scanner &&\
 echo SUCCESS
