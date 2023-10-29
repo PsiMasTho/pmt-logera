@@ -1,28 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 set(CMAKE_CXX_STANDARD 20)
-project(Logera VERSION 1.0.0 LANGUAGES CXX)
-
-########################################################################
-# Program binary
-########################################################################
-file(GLOB_RECURSE PROJ_SOURCES "src/*.cc")
-list(FILTER PROJ_SOURCES EXCLUDE REGEX "^(.*src/main.cc)$")
-
-add_executable(${PROJECT_NAME} "src/main.cc" ${PROJ_SOURCES})
-
-########################################################################
-# Test binary
-########################################################################
-
-option(BUILD_TESTS "Build test program" OFF)
-
-if(BUILD_TESTS)
-    file(GLOB_RECURSE TEST_SOURCES "test/*.cc")
-    find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-    add_executable(unit_tests ${TEST_SOURCES} ${PROJ_SOURCES})
-    target_compile_definitions(unit_tests PUBLIC BOOST_TEST_DYN_LINK)
-    target_link_libraries(unit_tests Boost::unit_test_framework)
-endif(BUILD_TESTS)
+project(logera VERSION 1.0.0 LANGUAGES CXX)
 
 ########################################################################
 # Compiler flags
@@ -46,7 +24,6 @@ set_property(CACHE SANITIZER PROPERTY STRINGS "none" "thread" "address" "undefin
 
 option(WITH_DEBUG_SYMBOLS "Include debug symbols in the binary" OFF)
 option(NATIVE_BUILD "Optimize binary for the current machine" OFF)
-option(LINK_TIME_OPTIMIZATION "Enable link time optimization" OFF)
 option(DEBUG_STL "Enable debug STL version" OFF)
 
     # Optimization level
@@ -87,18 +64,21 @@ endif()
 if (SANITIZER STREQUAL "thread")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options("-fsanitize=thread")
+        add_link_options("-fsanitize=thread")
     else()
         message(WARNING "Thread sanitizer not supported for this compiler.")
     endif()
 elseif (SANITIZER STREQUAL "address")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options("-fsanitize=address")
+        add_link_options("-fsanitize=address")
     else()
         message(WARNING "Address sanitizer not supported for this compiler.")
     endif()
 elseif (SANITIZER STREQUAL "undefined")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options("-fsanitize=undefined")
+        add_link_options("-fsanitize=undefined")
     else()
         message(WARNING "Undefined behavior sanitizer not supported for this compiler.")
     endif()
@@ -126,18 +106,6 @@ if (NATIVE_BUILD)
     endif()
 endif()
 
-    # LTO
-if (LINK_TIME_OPTIMIZATION)
-    include(CheckIPOSupported)
-    check_ipo_supported(RESULT isIpoSupported OUTPUT ipoError)
-    if (isIpoSupported)
-        set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-        message(STATUS "Link time optimization supported and enabled.")
-    else()
-        message(WARNING "Link time optimization not supported. <${error}>.")
-    endif()
-endif()
-
     # Debug STL
 if (DEBUG_STL)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -146,6 +114,22 @@ if (DEBUG_STL)
         add_compile_options("-D_LIBCPP_DEBUG=1")
     endif()
 endif()
+
+########################################################################
+# Library and executable
+########################################################################
+
+add_subdirectory(src)
+
+########################################################################
+# Tests
+########################################################################
+
+option(BUILD_TESTS "Build test program" OFF)
+
+if(BUILD_TESTS)
+    add_subdirectory(test)
+endif(BUILD_TESTS)
 
 ########################################################################
 # Messages

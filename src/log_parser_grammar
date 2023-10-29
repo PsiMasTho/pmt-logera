@@ -1,0 +1,65 @@
+%scanner ../log_scanner/log_scanner.h
+%scanner-class-name log_scanner
+%parsefun-source log_parser_parse.cc
+
+%token IDENT
+       DATE
+       NEWLINE
+
+%stype std::string
+
+%%
+
+input:
+    // empty
+|
+    input line
+;
+
+line:
+    date NEWLINE
+    {
+       d_logDataModifier.set_date(date($1));
+    }
+|
+    variable NEWLINE
+|
+    assign_vals_to_attrs NEWLINE
+|
+    assign_vals_to_attrs EOF
+|
+    NEWLINE
+;
+
+date:
+    DATE
+    {
+        $$ = d_scanner.matched();
+    }
+;
+
+variable:
+    identifier ':'
+    {
+        d_logDataModifier.set_active_var($1);
+    }
+;
+
+identifier:
+    IDENT
+    {
+        $$ = d_scanner.matched();
+    }
+;
+
+assign_vals_to_attrs:
+    identifier identifier ';'
+    {
+        d_logDataModifier.add_attr_to_new_line($1, $2);
+    }
+|
+    assign_vals_to_attrs identifier identifier ';'
+    {
+        d_logDataModifier.add_attr_to_current_line($2, $3);
+    }
+;

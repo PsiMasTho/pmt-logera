@@ -1,0 +1,61 @@
+%scanner ../header_scanner/header_scanner.h
+%scanner-class-name header_scanner
+%parsefun-source header_parser_parse.cc
+
+%token DECL_VAR
+       IDENT
+       DECL_ATTR
+       NEWLINE
+
+%stype std::string
+
+%%
+
+input:
+    // empty
+|
+    input line
+;
+
+line:
+    declare_attribute NEWLINE
+|
+    declare_attribute EOF
+|
+    declare_variable NEWLINE
+|
+    declare_variable EOF
+|
+    NEWLINE
+;
+
+identifier:
+    IDENT
+    {
+        $$ = d_scanner.matched();
+    }
+;
+
+declare_attribute:
+    DECL_ATTR identifier ';'
+    {
+        d_ret->add_attr($2);
+    }
+|
+    declare_attribute identifier ';'
+    {
+        d_ret->add_regex_to_last_attr($2);
+    }
+;
+
+declare_variable:
+    DECL_VAR identifier ';'
+    {
+        d_ret->add_var($2);
+    }
+|
+    declare_variable identifier ';'
+    {
+        d_ret->add_attr_to_last_var($2);
+    }
+;

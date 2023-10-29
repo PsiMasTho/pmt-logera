@@ -1,0 +1,24 @@
+# Tests
+include(FetchContent)
+
+FetchContent_Declare(
+  Catch2
+  GIT_SHALLOW    TRUE
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v3.4.0)
+
+FetchContent_MakeAvailable(Catch2)
+
+list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/contrib)
+
+
+# All tests sources
+file(GLOB_RECURSE TEST_SOURCES "*.cc")
+add_executable(${PROJECT_NAME}-tests ${TEST_SOURCES})
+
+# Using c++20
+target_compile_features(${PROJECT_NAME}-tests PRIVATE cxx_std_20)
+
+# Should be linked to the main library, as well as the Catch2 testing library
+target_link_libraries(${PROJECT_NAME}-tests PRIVATE logera Catch2::Catch2WithMain)
+target_compile_definitions(${PROJECT_NAME}-tests PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")
