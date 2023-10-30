@@ -18,7 +18,6 @@ enum
 
 class date
 {
-    std::chrono::year_month_day m_date;
     std::array<char, DATE_STR_LEN + 1> m_str;
 
 public:
