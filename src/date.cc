@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <cstdio>
 #include <exception>
-#include <sstream>
 #include <utility>
 #include <regex>
 #include <tuple>
@@ -49,15 +48,15 @@ tuple<int, unsigned, unsigned> split_ymd(chrono::year_month_day const& ymd)
 [[noreturn]] void throw_bad_ymd(chrono::year_month_day const& ymd)
 {
     auto const [yyyy, mm, dd] = split_ymd(ymd);
-    throw invalid_argument("Bad date: day: "s + to_string(dd) + " month: " + to_string(mm) +
-                           " year: " + to_string(yyyy));
+    throw invalid_argument("Bad date: year: "s + to_string(yyyy) + " month: " + to_string(mm) +
+                            " day: " + to_string(dd));
 }
 
 auto ymd_to_str(chrono::year_month_day ymd)
 {
-    auto const [yyyy, mm, dd] = split_ymd(ymd);
-
     array<char, DATE_STR_LEN + 1> ret;
+
+    auto const [yyyy, mm, dd] = split_ymd(ymd);
     if (snprintf(ret.data(), ret.size(), "%04d-%02u-%02u", yyyy, mm, dd) != DATE_STR_LEN)
         throw_bad_ymd(ymd);
 
