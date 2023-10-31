@@ -479,7 +479,7 @@ void HeaderScannerBase::reset_()
     d_more = false;
 }
 
-int HeaderScanner::executeAction_(size_t ruleIdx)
+int header_scanner::executeAction_(size_t ruleIdx)
 try
 {
     switch (ruleIdx)
@@ -520,7 +520,7 @@ catch (Leave_ value)
     return static_cast<int>(value);
 }
 
-int HeaderScanner::lex_()
+int header_scanner::lex_()
 {
     reset_();
     preCode();

@@ -22,10 +22,12 @@ private:
     friend class log_data_modifier;
 
     date m_date;
+    std::string m_filename;
     std::vector<log_line> m_lines;
 
 public:
     log_data() = default;
     date const& get_date() const;
+    std::string const& get_filename() const;
     std::vector<log_line> const& get_lines() const;
 };

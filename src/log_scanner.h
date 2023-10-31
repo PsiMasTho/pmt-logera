@@ -10,9 +10,9 @@
 #include "log_token_enums.h"
 
 // $insert classHead
-class LogScanner : public LogScannerBase {
+class log_scanner : public LogScannerBase {
 public:
-    explicit LogScanner(std::filesystem::path const& infile);
+    explicit log_scanner(std::filesystem::path const& infile);
 
     // $insert lexFunctionDecl
     int lex();
@@ -30,28 +30,28 @@ private:
     // be exec'ed after the rules's actions.
 };
 
-inline LogScanner::LogScanner(std::filesystem::path const& infile)
+inline log_scanner::log_scanner(std::filesystem::path const& infile)
     : LogScannerBase(infile, "-")
 {
 }
 
 // $insert inlineLexFunction
-inline int LogScanner::lex()
+inline int log_scanner::lex()
 {
     return lex_();
 }
 
-inline void LogScanner::preCode()
+inline void log_scanner::preCode()
 {
     // optionally replace by your own code
 }
 
-inline void LogScanner::postCode([[maybe_unused]] PostEnum_ type)
+inline void log_scanner::postCode([[maybe_unused]] PostEnum_ type)
 {
     // optionally replace by your own code
 }
 
-inline void LogScanner::print()
+inline void log_scanner::print()
 {
     print_();
 }

@@ -24,6 +24,7 @@ public:
     void set_target(log_data* target);
 
     void set_date(date const& date);
+    void set_filename(std::string const& filename);
 
     void set_active_var(std::string const& var_name);
     void add_attr_to_new_line(std::string const& attr_name, std::string const& attr_val);

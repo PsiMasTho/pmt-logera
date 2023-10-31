@@ -10,9 +10,9 @@
 #include "header_token_enums.h"
 
 // $insert classHead
-class HeaderScanner : public HeaderScannerBase {
+class header_scanner : public HeaderScannerBase {
 public:
-    HeaderScanner(std::filesystem::path const& infile);
+    header_scanner(std::filesystem::path const& infile);
 
     // $insert lexFunctionDecl
     int lex();
@@ -30,28 +30,28 @@ private:
     // be exec'ed after the rules's actions.
 };
 
-inline HeaderScanner::HeaderScanner(std::filesystem::path const& infile)
+inline header_scanner::header_scanner(std::filesystem::path const& infile)
     : HeaderScannerBase(infile, "-")
 {
 }
 
 // $insert inlineLexFunction
-inline int HeaderScanner::lex()
+inline int header_scanner::lex()
 {
     return lex_();
 }
 
-inline void HeaderScanner::preCode()
+inline void header_scanner::preCode()
 {
     // optionally replace by your own code
 }
 
-inline void HeaderScanner::postCode([[maybe_unused]] PostEnum_ type)
+inline void header_scanner::postCode([[maybe_unused]] PostEnum_ type)
 {
     // optionally replace by your own code
 }
 
-inline void HeaderScanner::print()
+inline void header_scanner::print()
 {
     print_();
 }

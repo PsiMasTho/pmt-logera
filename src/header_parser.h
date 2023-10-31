@@ -9,7 +9,7 @@
 #include "header_scanner.h"
 
 #include "header_data.h"
-#include "input_error.h"
+#include "parse_error.h"
 #include <filesystem>
 #include <fstream>
 #include <iosfwd>
@@ -18,16 +18,16 @@
 class header_parser : public header_parser_base {
 
     // $insert scannerobject
-    HeaderScanner d_scanner;
+    header_scanner d_scanner;
     std::string const& d_matched;
     std::unique_ptr<header_data> d_ret;
-    std::optional<input_error> d_errorInfo;
+    std::optional<parse_error> d_errorInfo;
 
 public:
     explicit header_parser(std::filesystem::path const &path);
     int parse();
     std::unique_ptr<header_data> gen();
-    input_error const& getErrorInfo() const;
+    parse_error const& get_error_info() const;
 
 private:
     void error(); // called on (syntax) errors

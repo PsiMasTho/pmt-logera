@@ -6,7 +6,6 @@
 #pragma once
 
 #include <array>
-#include <chrono>
 #include <string>
 
 // Represents a date in the form YYYY-MM-DD

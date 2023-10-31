@@ -10,7 +10,7 @@
 
 #include "log_data_modifier.h"
 #include "log_scanner.h"
-#include "input_error.h"
+#include "parse_error.h"
 
 #include <fstream>
 #include <filesystem>
@@ -19,17 +19,17 @@
 class log_parser : public log_parser_base {
 
     // $insert scannerobject
-    LogScanner d_scanner;
+    log_scanner d_scanner;
     std::string const& d_matched;
     log_data_modifier d_logDataModifier;
     std::unique_ptr<log_data> d_ret;
-    std::optional<input_error> d_errorInfo;
+    std::optional<parse_error> d_errorInfo;
 
 public:
     log_parser(std::filesystem::path const& path, header_data const& hd);
     int parse();
     std::unique_ptr<log_data> gen();
-    input_error const& getErrorInfo() const;
+    parse_error const& get_error_info() const;
 
 private:
     void error(); // called on (syntax) errors

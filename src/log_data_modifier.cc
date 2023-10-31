@@ -8,7 +8,7 @@
 #include "header_data.h"
 #include "log_data.h"
 
-#include <exception>
+#include <stdexcept>
 #include <string>
 
 using namespace std;
@@ -27,6 +27,11 @@ void log_data_modifier::set_target(log_data* target)
 void log_data_modifier::set_date(date const& date)
 {
     m_target->m_date = date;
+}
+
+void log_data_modifier::set_filename(string const& filename)
+{
+    m_target->m_filename = filename;
 }
 
 void log_data_modifier::set_active_var(string const& var_name)

@@ -22,6 +22,7 @@ unique_ptr<log_data> log_parser::gen()
 {
     d_ret = make_unique<log_data>();
     d_logDataModifier.set_target(d_ret.get());
+    d_logDataModifier.set_filename(d_scanner.filename());
 
     if (parse() == 0) // no error encountered
         return exchange(d_ret, nullptr);
@@ -29,7 +30,7 @@ unique_ptr<log_data> log_parser::gen()
         return nullptr;
 }
 
-input_error const& log_parser::getErrorInfo() const
+parse_error const& log_parser::get_error_info() const
 {
     return *d_errorInfo;
 }
@@ -39,7 +40,7 @@ void log_parser::error()
     string matchTxt = d_matched;
     erase_and_replace(&matchTxt, "\n", "*newline*");
 
-    d_errorInfo.emplace(log_parse_error{
+    d_errorInfo.emplace(parse_error{
         d_scanner.filename(),
         "Unexpected input: (" + matchTxt + ") encountered.",
         d_scanner.lineNr()
@@ -48,7 +49,7 @@ void log_parser::error()
 
 void log_parser::exceptionHandler(exception const& exc)
 {
-    d_errorInfo.emplace(log_parse_error{
+    d_errorInfo.emplace(parse_error{
         d_scanner.filename(),
         exc.what(),
         d_scanner.lineNr()

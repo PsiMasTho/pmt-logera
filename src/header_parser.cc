@@ -26,7 +26,7 @@ unique_ptr<header_data> header_parser::gen()
         return nullptr;
 }
 
-input_error const& header_parser::getErrorInfo() const
+parse_error const& header_parser::get_error_info() const
 {
     return *d_errorInfo;
 }
@@ -36,7 +36,7 @@ void header_parser::error()
     string matchTxt = d_matched;
     erase_and_replace(&matchTxt, "\n", "*newline*");
 
-    d_errorInfo.emplace(header_parse_error{
+    d_errorInfo.emplace(parse_error{
         d_scanner.filename(),
         "Unexpected input: (" + matchTxt + ") encountered.",
         d_scanner.lineNr()
@@ -45,7 +45,7 @@ void header_parser::error()
 
 void header_parser::exceptionHandler(exception const& exc)
 {
-    d_errorInfo.emplace(header_parse_error{
+    d_errorInfo.emplace(parse_error{
         d_scanner.filename(),
         exc.what(),
         d_scanner.lineNr()

@@ -6,45 +6,12 @@
 #include "date.h"
 
 #include <algorithm>
-#include <cstdio>
+#include <cctype>
+#include <chrono>
 #include <cstring>
-#include <exception>
-#include <utility>
-#include <regex>
-#include <tuple>
+#include <stdexcept>
 
 using namespace std;
-
-namespace
-{
-
-[[noreturn]] void throw_bad_ymd(string const& ymd_str);
-[[noreturn]] void throw_bad_ymd(chrono::year_month_day const& ymd);
-tuple<int, unsigned, unsigned> split_ymd(string const& ymd_str);
-tuple<int, unsigned, unsigned> split_ymd(chrono::year_month_day const& ymd);
-array<char, DATE_STR_LEN + 1> ymd_to_str(chrono::year_month_day ymd);
-chrono::year_month_day str_to_ymd(string const& ymd_str);
-
-} // namespace
-
-date::date(string const& date_str)
-    : m_str{ymd_to_str(str_to_ymd(date_str))} // the nested functions perform the validation
-{ }
-
-char const* date::to_string() const
-{
-    return m_str.data();
-}
-
-strong_ordering operator<=>(date const& lhs, date const& rhs) noexcept
-{
-    return str_to_ymd(lhs.to_string()) <=> str_to_ymd(rhs.to_string());
-}
-
-bool operator==(date const& lhs, date const& rhs) noexcept
-{
-    return strncmp(lhs.to_string(), rhs.to_string(), DATE_STR_LEN) == 0;
-}
 
 namespace
 {
@@ -54,55 +21,66 @@ namespace
     throw invalid_argument("Bad date string: "s + ymd_str);
 }
 
-[[noreturn]] void throw_bad_ymd(chrono::year_month_day const& ymd)
+bool validate_ymd_str(string const& ymd_str)
 {
-    auto const [yyyy, mm, dd] = split_ymd(ymd);
-    throw invalid_argument("Bad date: year: "s + to_string(yyyy) + " month: " + to_string(mm) +
-                            " day: " + to_string(dd));
+    auto const is_delim_idx = [](size_t idx) { return idx == 4 || idx == 7; };
+
+    if (ymd_str.size() != DATE_STR_LEN)
+        return false;
+    
+    for (size_t idx = 0; idx < ymd_str.size(); ++idx)
+    {
+        if (is_delim_idx(idx))
+        {
+            if (ymd_str[idx] != '-')
+                return false;
+        }
+        else
+        {
+            if (!isdigit(ymd_str[idx]))
+                return false;
+        }
+    }
+    
+    return true;
 }
 
-tuple<int, unsigned, unsigned> split_ymd(string const& ymd_str)
+bool validate_ymd_date(string const& ymd_str)
 {
-    static regex const ymd_regex(R"((\d{4})-(\d{2})-(\d{2}))", regex::optimize);
-    smatch match;
+    int const yyyy = stoi(ymd_str.substr(0, 4));
+    unsigned const mm = stoul(ymd_str.substr(5, 2));
+    unsigned const dd = stoul(ymd_str.substr(8, 2));
 
-    if (!regex_match(ymd_str, match, ymd_regex))
+    auto const ymd = chrono::year_month_day(chrono::year(yyyy), chrono::month(mm), chrono::day(dd));
+    return ymd.ok();
+}
+
+bool validate_ymd(string const& ymd_str)
+{
+    return validate_ymd_str(ymd_str) && validate_ymd_date(ymd_str);
+}
+
+} // namespace
+
+date::date(string const& ymd_str)
+    : m_str{}
+{
+    if (!validate_ymd(ymd_str))
         throw_bad_ymd(ymd_str);
-    
-    return {stoi(match[1]), stoul(match[2]), stoul(match[3])};
-    
+    copy_n(ymd_str.data(), DATE_STR_LEN + 1, m_str.data());
 }
 
-tuple<int, unsigned, unsigned> split_ymd(chrono::year_month_day const& ymd)
+char const* date::to_string() const
 {
-    auto const yyyy = static_cast<int>(ymd.year());
-    auto const mm = static_cast<unsigned>(ymd.month());
-    auto const dd = static_cast<unsigned>(ymd.day());
-
-    return {yyyy, mm, dd};
+    return m_str.data();
 }
 
-array<char, DATE_STR_LEN + 1> ymd_to_str(chrono::year_month_day ymd)
+strong_ordering operator<=>(date const& lhs, date const& rhs) noexcept
 {
-    array<char, DATE_STR_LEN + 1> ret;
-
-    auto const [yyyy, mm, dd] = split_ymd(ymd);
-    if (snprintf(ret.data(), ret.size(), "%04d-%02u-%02u", yyyy, mm, dd) != DATE_STR_LEN)
-        throw_bad_ymd(ymd);
-
-    return ret;
+    return strncmp(lhs.to_string(), rhs.to_string(), DATE_STR_LEN) <=> 0;
 }
 
-chrono::year_month_day str_to_ymd(string const& ymd_str)
+bool operator==(date const& lhs, date const& rhs) noexcept
 {
-    auto const [yyyy, mm, dd] = split_ymd(ymd_str);
-
-    auto const ret = chrono::year_month_day(chrono::year(yyyy), chrono::month(mm), chrono::day(dd));
-    if (!ret.ok())
-        throw_bad_ymd(ret);
-    
-    return ret;
-
-}
-
+    return (lhs <=> rhs) == 0;
 }

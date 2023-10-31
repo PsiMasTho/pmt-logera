@@ -15,6 +15,11 @@ date const& log_data::get_date() const
     return m_date;
 }
 
+std::string const& log_data::get_filename() const
+{
+    return m_filename;
+}
+
 std::vector<log_data::log_line> const& log_data::get_lines() const
 {
     return m_lines;

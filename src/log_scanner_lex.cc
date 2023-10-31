@@ -466,7 +466,7 @@ void LogScannerBase::reset_()
     d_more = false;
 }
 
-int LogScanner::executeAction_(size_t ruleIdx)
+int log_scanner::executeAction_(size_t ruleIdx)
 try
 {
     switch (ruleIdx)
@@ -502,7 +502,7 @@ catch (Leave_ value)
     return static_cast<int>(value);
 }
 
-int LogScanner::lex_()
+int log_scanner::lex_()
 {
     reset_();
     preCode();
