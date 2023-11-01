@@ -12,7 +12,6 @@
 #include "header_data.h"
 #include "date.h"                               
 
-#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <string>
