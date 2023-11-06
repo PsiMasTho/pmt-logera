@@ -11,7 +11,7 @@
 #include <bitset>
 #include <vector>
 #include <string>
-#include <unordered_map>
+#include <optional>
 
 struct attribute_data
 {
@@ -19,26 +19,28 @@ struct attribute_data
     std::vector<std::string> m_reg_exprs;
 };
 
+struct variable_data
+{
+    std::string m_name;
+    std::vector<bool> m_attr_indices;
+};
+
 struct header_data
 {
-    enum
-    {
-        MAX_ATTRIBUTES = 128
-    };
-
-    using var_to_attr_idx = std::unordered_map<std::string, std::bitset<MAX_ATTRIBUTES>>;
-
-    // <var name, list of associated attribute indices from m_attrs>
-    var_to_attr_idx m_vars;
     std::vector<attribute_data> m_attrs;
+    std::vector<variable_data> m_vars;
+
+    // assuming sorted data
+    bool does_var_have_attr(std::string const& var_name, std::string const& attr_name) const;
+    size_t get_attr_idx(std::string const& attr_name) const;
 };
 
 // class representing data of a single file
 struct log_data
 {
-    using log_line = sparse_array<std::string>;
+    using entry = sparse_array<std::string>;
 
     date m_date;
     std::string m_filename;
-    std::vector<log_line> m_lines;
+    std::vector<entry> m_entries;
 };

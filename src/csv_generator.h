@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include "log_data.h"
+#include "archive_data.h"
 #include <filesystem>
 #include <iosfwd>
 #include <string>
 
-class log_line;
+class entry;
 
 // Writes log lines or vectors of strings to a
 // file in CSV format according to RFC 4180.
@@ -21,6 +21,6 @@ class csv_generator
 
 public:
     csv_generator(std::ostream& out);
-    void write(date const& date, log_data::log_line const& log_line);
+    void write(date const& date, log_data::entry const& entry);
     void write(std::vector<std::string> const& vec);
 };

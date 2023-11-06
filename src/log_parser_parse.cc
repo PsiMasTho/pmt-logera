@@ -542,7 +542,7 @@ try
 
         case 3:
         {
-         d_logDataModifier.set_date(date(vs_(-1)));
+         m_ctx.set_date(date(vs_(-1)));
          }
         break;
 
@@ -578,7 +578,7 @@ try
 
         case 9:
         {
-         d_logDataModifier.set_active_var(vs_(-1));
+         m_ctx.set_active_var(vs_(-1));
          }
         break;
 
@@ -590,13 +590,13 @@ try
 
         case 11:
         {
-         d_logDataModifier.add_attr_to_new_line(vs_(-2), vs_(-1));
+         m_ctx.add_attr_to_new_line(vs_(-2), vs_(-1));
          }
         break;
 
         case 12:
         {
-         d_logDataModifier.add_attr_to_current_line(vs_(-2), vs_(-1));
+         m_ctx.add_attr_to_current_line(vs_(-2), vs_(-1));
          }
         break;
 

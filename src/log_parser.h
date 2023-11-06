@@ -8,7 +8,6 @@
 // $insert scanner.h
 #include "log_scanner.h"
 
-#include "log_parser_actions.h"
 #include "log_scanner.h"
 #include "parse_error.h"
 
@@ -16,17 +15,20 @@
 #include <filesystem>
 #include <optional>
 
+struct log_data;
+class log_parser_context;
+
 class log_parser : public log_parser_base {
 
     // $insert scannerobject
     log_scanner d_scanner;
     std::string const& d_matched;
-    log_parser_actions d_logDataModifier;
-    std::unique_ptr<log_data> d_ret;
-    std::optional<parse_error> d_errorInfo;
+    
+    log_parser_context& m_ctx;
+    std::optional<parse_error> m_error_info;
 
 public:
-    log_parser(std::filesystem::path const& path, header_data const& hd);
+    log_parser(std::filesystem::path const& path, log_parser_context& ctx);
     int parse();
     std::unique_ptr<log_data> gen();
     parse_error const& get_error_info() const;

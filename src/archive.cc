@@ -1,9 +1,11 @@
 #include "archive.h"
 
 #include "date.h"
+#include "archive_data.h"
 #include "header_parser.h"
-#include "log_data.h"
 #include "log_parser.h"
+#include "header_parser_context.h"
+#include "log_parser_context.h"
 
 #include <algorithm>
 
@@ -41,11 +43,11 @@ void archive::reorder(ordering order)
         return;
 
     static auto const by_filename = [](auto& lhs, auto& rhs) {
-        return lhs->get_date() < rhs->get_date();
+        return lhs->m_filename < rhs->m_filename;
     };
 
     static auto const by_date = [](auto& lhs, auto& rhs) {
-        return lhs->get_filename() < rhs->get_filename();
+        return lhs->m_date < rhs->m_date;
     };
 
     if (order == BY_DATE)
@@ -73,7 +75,8 @@ auto archive::get_log_data() const -> std::span<std::unique_ptr<log_data> const>
 
 void archive::parse_header(std::filesystem::path const& header_path)
 {
-    header_parser parser(header_path);
+    header_parser_context ctx;
+    header_parser parser(header_path, ctx);
     m_header_data = parser.gen();
     if (m_header_data == nullptr)
         m_errors.push_back(parser.get_error_info());
@@ -81,9 +84,10 @@ void archive::parse_header(std::filesystem::path const& header_path)
 
 void archive::parse_log_files(std::vector<std::filesystem::path> const& log_paths)
 {
+    log_parser_context ctx(m_header_data.get());
     for (auto const& pth : log_paths)
     {
-        log_parser parser(pth, *m_header_data);
+        log_parser parser(pth, ctx);
         unique_ptr<log_data> log_data = parser.gen();
 
         // error encountered

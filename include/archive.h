@@ -8,8 +8,8 @@
 #include <filesystem>
 #include <string>
 
-class header_data;
-class log_data;
+struct header_data;
+struct log_data;
 class date;
 
 class archive

@@ -19,6 +19,7 @@ inline void header_parser::print()
 // of header_parser's sources.
 
 #include "string_util.h"
+#include "header_parser_context.h"
 #include <string>
 
 // UN-comment the next using-declaration if you want to use

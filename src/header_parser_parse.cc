@@ -586,25 +586,25 @@ try
 
         case 9:
         {
-         d_ret->add_attr(vs_(-1));
+         m_ctx.add_attr(vs_(-1));
          }
         break;
 
         case 10:
         {
-         d_ret->add_regex_to_last_attr(vs_(-1));
+         m_ctx.add_regex_to_last_attr(vs_(-1));
          }
         break;
 
         case 11:
         {
-         d_ret->add_var(vs_(-1));
+         m_ctx.add_var(vs_(-1));
          }
         break;
 
         case 12:
         {
-         d_ret->add_attr_to_last_var(vs_(-1));
+         m_ctx.add_attr_to_last_var(vs_(-1));
          }
         break;
 

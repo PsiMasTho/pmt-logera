@@ -26,17 +26,17 @@ csv_generator::csv_generator(ostream& out)
     : m_out(out)
 { }
 
-void csv_generator::write(date const& date, log_data::log_line const& log_line)
+void csv_generator::write(date const& date, log_data::entry const& entry)
 {
     m_out << date.to_string();
-    for(size_t idx = 0; idx < log_line.capacity(); ++idx)
+    for(size_t idx = 0; idx < entry.capacity(); ++idx)
     {
-        if(log_line.exists(idx))
+        if(entry.exists(idx))
         {
-            if(needs_quotes(log_line.get(idx)))
-                m_out << ",\"" << log_line.get(idx) << '"';
+            if(needs_quotes(entry.get(idx)))
+                m_out << ",\"" << entry.get(idx) << '"';
             else
-                m_out << ',' << log_line.get(idx);
+                m_out << ',' << entry.get(idx);
         }
         else
             m_out << ',';

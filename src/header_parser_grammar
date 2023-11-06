@@ -1,4 +1,4 @@
-%scanner ../header_scanner/header_scanner.h
+%scanner header_scanner.h
 %scanner-class-name header_scanner
 %parsefun-source header_parser_parse.cc
 
@@ -39,23 +39,23 @@ identifier:
 declare_attribute:
     DECL_ATTR identifier ';'
     {
-        d_ret->add_attr($2);
+        m_ctx.add_attr($2);
     }
 |
     declare_attribute identifier ';'
     {
-        d_ret->add_regex_to_last_attr($2);
+        m_ctx.add_regex_to_last_attr($2);
     }
 ;
 
 declare_variable:
     DECL_VAR identifier ';'
     {
-        d_ret->add_var($2);
+        m_ctx.add_var($2);
     }
 |
     declare_variable identifier ';'
     {
-        d_ret->add_attr_to_last_var($2);
+        m_ctx.add_attr_to_last_var($2);
     }
 ;

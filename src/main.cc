@@ -9,7 +9,7 @@
 #include "config.h"
 #include "archive.h"
 #include "csv_generator.h"
-#include "header_data.h"
+#include "archive_data.h"
 #include "date.h"                               
 
 #include <exception>
@@ -50,8 +50,8 @@ argparse::ArgumentParser get_arg_parser()
 vector<string> get_header_line(header_data const& header)
 {
     vector<string> ret{"date", "var"};
-    for(size_t idx = 0; idx < header.get_attributes().get_count(); ++idx)
-        ret.push_back(header.get_attributes().get_name(idx));
+    for(size_t idx = 0; idx < header.m_attrs.size(); ++idx)
+        ret.push_back(header.m_attrs[idx].m_name);
 
     return ret;
 }
@@ -92,8 +92,8 @@ void generate_csv(archive const& ar, config const& cfg)
 
     // write all other lines
     for (auto const& log_data_ptr : ar.get_log_data())
-        for (auto const& log_line : log_data_ptr->get_lines())
-            gen.write(log_data_ptr->get_date(), log_line);
+        for (auto const& entry : log_data_ptr->m_entries)
+            gen.write(log_data_ptr->m_date, entry);
 }
 
 

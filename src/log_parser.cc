@@ -5,34 +5,32 @@
 
 #include "log_parser.ih"
 
-#include "log_data.h"
-#include "header_data.h"
-#include "date.h"
-
-log_parser::log_parser(filesystem::path const& path, header_data const& hd)
+log_parser::log_parser(std::filesystem::path const& path, log_parser_context& ctx)
     : d_scanner(path)
     , d_matched { d_scanner.matched() }
-    , d_logDataModifier(nullptr, hd)
-    , d_ret {nullptr}
-    , d_errorInfo {nullopt}
+    , m_ctx {ctx}
+    , m_error_info {nullopt}
 {
 }
 
 unique_ptr<log_data> log_parser::gen()
 {
-    d_ret = make_unique<log_data>();
-    d_logDataModifier.set_target(d_ret.get());
-    d_logDataModifier.set_filename(d_scanner.filename());
+    m_ctx.set_filename(d_scanner.filename());
 
     if (parse() == 0) // no error encountered
-        return exchange(d_ret, nullptr);
+        return m_ctx.release_log_data();
     else
+    {
+        // if error encountered, then release the log_data
+        // so that the context can be reused.
+        m_ctx.release_log_data();
         return nullptr;
+    }
 }
 
 parse_error const& log_parser::get_error_info() const
 {
-    return *d_errorInfo;
+    return *m_error_info;
 }
 
 void log_parser::error()
@@ -40,7 +38,7 @@ void log_parser::error()
     string matchTxt = d_matched;
     erase_and_replace(&matchTxt, "\n", "*newline*");
 
-    d_errorInfo.emplace(parse_error{
+    m_error_info.emplace(parse_error{
         d_scanner.filename(),
         "Unexpected input: (" + matchTxt + ") encountered.",
         d_scanner.lineNr()
@@ -49,7 +47,7 @@ void log_parser::error()
 
 void log_parser::exceptionHandler(exception const& exc)
 {
-    d_errorInfo.emplace(parse_error{
+    m_error_info.emplace(parse_error{
         d_scanner.filename(),
         exc.what(),
         d_scanner.lineNr()

@@ -8,23 +8,26 @@
 // $insert scanner.h
 #include "header_scanner.h"
 
-#include "header_data.h"
 #include "parse_error.h"
 #include <filesystem>
 #include <fstream>
 #include <iosfwd>
 #include <optional>
 
+struct header_data;
+class header_parser_context;
+
 class header_parser : public header_parser_base {
 
     // $insert scannerobject
     header_scanner d_scanner;
     std::string const& d_matched;
-    std::unique_ptr<header_data> d_ret;
-    std::optional<parse_error> d_errorInfo;
+
+    header_parser_context& m_ctx;
+    std::optional<parse_error> m_error_info;
 
 public:
-    explicit header_parser(std::filesystem::path const &path);
+    explicit header_parser(std::filesystem::path const& path, header_parser_context& ctx);
     int parse();
     std::unique_ptr<header_data> gen();
     parse_error const& get_error_info() const;
