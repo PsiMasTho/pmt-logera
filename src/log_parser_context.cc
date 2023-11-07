@@ -37,6 +37,8 @@ log_parser_context::log_parser_context(header_data * hd)
     : m_target{make_unique<log_data>()}
     , m_header_data{hd}
     , m_matchers{}
+    , m_active_variable_idx{}
+    , m_entries_created_for_active_variable{0}
 {
     construct_regexes();
 }
@@ -51,26 +53,37 @@ void log_parser_context::set_filename(string const& filename)
     m_target->filename = filename;
 }
 
-void log_parser_context::add_entry(entry_data const& entry)
-{
-    m_target->entries.push_back(entry);
-}
-
-auto log_parser_context::make_entry_or_throw(std::string const& var_name, sparse_array<std::string> const& attr_values) -> entry_data
+void log_parser_context::set_active_variable_or_throw(std::string const& var_name)
 {
     if (!does_var_exist_bin(var_name, *m_header_data))
         throw runtime_error("Variable: \""s + var_name + "\" does not exist"s);
 
-    // check if variable has all attributes
-    size_t const var_idx = get_var_idx_bin(var_name, *m_header_data);
+    m_active_variable_idx = get_var_idx_bin(var_name, *m_header_data);
+    m_entries_created_for_active_variable = 0;
+
+}
+
+// 1. checks if active variable is set
+// 2. checks if the set attributes belong to the active variable
+void log_parser_context::create_entry_or_throw(sparse_array<std::string> const& attr_values)
+{
+    if (!m_active_variable_idx.has_value())
+        throw runtime_error("No active variable"s);
+
+    size_t const var_idx = m_active_variable_idx.value();
     for (size_t idx = 0; idx < m_header_data->attrs.size(); ++idx)
     {
+            // skip if attribute is not set
+        if (!attr_values.exists(idx))
+            continue;
+
         if (!does_var_have_attr_idx(var_idx, idx, *m_header_data))
-            throw runtime_error("Variable: \""s + var_name + R"(" does not have attribute: ")"s +
+            throw runtime_error("Variable: \""s + m_header_data->vars[var_idx].name + R"(" does not have attribute: ")"s +
                                 m_header_data->attrs[idx].name + '\"');
     }
 
-    return entry_data{var_name, attr_values};
+    m_target->entries.emplace_back(m_header_data->vars[var_idx].name, attr_values);
+    ++m_entries_created_for_active_variable;
 }
 
 auto log_parser_context::make_attr_value_arr_or_throw(std::pair<std::string, std::string> const& attr_value_pair) -> sparse_array<std::string>
@@ -99,8 +112,17 @@ void log_parser_context::update_attr_value_arr_or_throw(sparse_array<std::string
     attr_value_arr.set(attr_idx, attr_value_pair.second);
 }
 
+// if there is an active variable pending but no entries then this is an error
+void log_parser_context::at_eof()
+{
+    if (m_active_variable_idx.has_value() && m_entries_created_for_active_variable == 0)
+        throw runtime_error("No entries created for active variable: \""s + m_header_data->vars[m_active_variable_idx.value()].name + '\"');
+}
+
 unique_ptr<log_data> log_parser_context::release_log_data()
 {
+    m_active_variable_idx.reset();
+    m_entries_created_for_active_variable = 0;
     return exchange(m_target, make_unique<log_data>());
 }
 
@@ -118,7 +140,8 @@ void log_parser_context::construct_regexes()
 
 auto log_parser_context::validate_attr_val_regex(std::size_t attr_idx, std::string const& attr_val) const -> bool
 {
-    if (!m_matchers[attr_idx](attr_val))
-        throw runtime_error("Invalid value: \""s + attr_val + "\". For attribute: \"" +
-                            m_header_data->attrs[attr_idx].name + '\"');
+    return m_matchers[attr_idx](attr_val);
+
+    //         throw runtime_error("Invalid value: \""s + attr_val + "\". For attribute: \"" +
+    //                      m_header_data->attrs[attr_idx].name + '\"');
 }

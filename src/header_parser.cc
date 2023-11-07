@@ -28,12 +28,12 @@ parse_error const& header_parser::get_error_info() const
 
 void header_parser::error()
 {
-    string matchTxt = d_matched;
-    erase_and_replace(&matchTxt, "\n", "*newline*");
+    string match_txt = d_matched;
+    erase_and_replace(&match_txt, "\n", "*newline*");
 
     m_error_info.emplace(parse_error{
         d_scanner.filename(),
-        "Unexpected input: (" + matchTxt + ") encountered.",
+        fmt::format("Unexpected input: ({}) encountered.", match_txt),
         d_scanner.lineNr()
     });
 }

@@ -20,23 +20,26 @@ bool needs_quotes(string const& str)
 {
     return str.find(',') != string::npos;
 }
+
 } // namespace
 
 csv_generator::csv_generator(ostream& out)
     : m_out(out)
 { }
 
-void csv_generator::write(log_date const& log_date, log_data::entry const& entry)
+void csv_generator::write(log_date const& log_date, entry_data const& entry)
 {
-    m_out << log_date.to_string();
-    for(size_t idx = 0; idx < entry.capacity(); ++idx)
+    m_out << log_date.to_string() << ',';
+    m_out << entry.var_name;
+    
+    for(size_t idx = 0; idx < entry.attr_values.capacity(); ++idx)
     {
-        if(entry.exists(idx))
+        if (entry.attr_values.exists(idx))
         {
-            if(needs_quotes(entry.get(idx)))
-                m_out << ",\"" << entry.get(idx) << '"';
+            if (needs_quotes(entry.attr_values.get(idx)))
+                m_out << ",\"" << entry.attr_values.get(idx) << '"';
             else
-                m_out << ',' << entry.get(idx);
+                m_out << ',' << entry.attr_values.get(idx);
         }
         else
             m_out << ',';

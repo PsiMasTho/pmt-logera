@@ -30,9 +30,11 @@ install(EXPORT ${PROJECT_NAME}-config
         FILE ${PROJECT_NAME}-config.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
+find_package(fmt REQUIRED)
+target_link_libraries(${PROJECT_NAME} fmt::fmt)
 option(BUILD_LOGERA_TO_CSV "Build logera to csv program" OFF)
 
 if (BUILD_LOGERA_TO_CSV)
     add_executable(${PROJECT_NAME}-to-csv main.cc)
-    target_link_libraries(${PROJECT_NAME}-to-csv ${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME}-to-csv ${PROJECT_NAME} fmt::fmt)
 endif ()

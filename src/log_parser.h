@@ -18,7 +18,7 @@
 struct log_data;
 class log_parser_context;
 
-class log_parser : public log_parser_base {
+class log_parser : public log_parserBase {
 
     // $insert scannerobject
     log_scanner d_scanner;

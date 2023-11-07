@@ -35,12 +35,16 @@ parse_error const& log_parser::get_error_info() const
 
 void log_parser::error()
 {
-    string matchTxt = d_matched;
-    erase_and_replace(&matchTxt, "\n", "*newline*");
+    string match_txt = d_matched;
+
+    if (match_txt.empty())
+        match_txt = "<EOF>";
+    else
+        erase_and_replace(&match_txt, "\n", "*newline*");
 
     m_error_info.emplace(parse_error{
         d_scanner.filename(),
-        "Unexpected input: (" + matchTxt + ") encountered.",
+        fmt::format("Unexpected input: {} encountered.", match_txt),
         d_scanner.lineNr()
     });
 }

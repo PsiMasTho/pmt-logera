@@ -2,10 +2,7 @@
 %scanner-class-name log_scanner
 %parsefun-source log_parser_parse.cc
 
-%baseclass-preinclude <string>
-%baseclass-preinclude <utility>
-%baseclass-preinclude "detail/sparse_array.h"
-%baseclass-preinclude "archive_data.h"
+%baseclass-preinclude log_parser_base_preinclude.h
 
 %token IDENT
        DATE
@@ -14,16 +11,12 @@
 %polymorphic STRING:              std::string;
              STRING_PAIR:         std::pair<std::string, std::string>;
              LOG_DATE:            log_date;
-             ENTRY_DATA:          entry_data;
-             SPARSE_ARRAY_STRING: sparse_array<std::string>;
+             SPARSE_ARRAY_STRING: std::optional<sparse_array<std::string>>;
 
 %type <STRING>              identifier;
 %type <STRING>              variable;
 %type <STRING_PAIR>         attr_value_pair;
 %type <LOG_DATE>            date;
-%type <ENTRY_DATA>          entry;
-%type <ENTRY_DATA>          single_line_entry;
-%type <ENTRY_DATA>          multi_line_entry
 %type <SPARSE_ARRAY_STRING> attr_value_arr;
 
 %%
@@ -31,43 +24,53 @@
 input:
     // empty
 |
-    input line
+    input statement
 ;
 
-line:
+// todo: the extra production rules for EOF are hacky but work for now
+statement:
     date NEWLINE
     {
-       m_ctx.set_date($1);
+        m_ctx.set_date($1);
     }
 |
-    entry
+    date EOF
     {
-        m_ctx.add_entry($1);
+        m_ctx.set_date($1);
+        m_ctx.at_eof();
+        ACCEPT();
+    }
+|
+    variable NEWLINE
+    {
+        m_ctx.set_active_variable_or_throw($1);
+    }
+|
+    variable EOF
+    {
+        m_ctx.set_active_variable_or_throw($1);
+        m_ctx.at_eof();
+        ACCEPT();
+    }
+|
+    attr_value_arr NEWLINE
+    {
+        m_ctx.create_entry_or_throw($1.value());
+    }
+|
+    attr_value_arr EOF
+    {
+        m_ctx.create_entry_or_throw($1.value());
+        m_ctx.at_eof();
+        ACCEPT();
     }
 |
     NEWLINE
 |
     EOF
-;
-
-date:
-    DATE
     {
-        $$ = log_date{d_scanner.matched()};
-    }
-;
-
-identifier:
-    IDENT
-    {
-        $$ = d_scanner.matched();
-    }
-;
-
-variable:
-    identifier ':'
-    {
-        m_ctx.set_active_var($1);
+        m_ctx.at_eof();
+        ACCEPT();
     }
 ;
 
@@ -86,32 +89,28 @@ attr_value_arr:
 |
     attr_value_arr attr_value_pair
     {
-        m_ctx.update_attr_value_arr_or_throw($$, $2);
+        m_ctx.update_attr_value_arr_or_throw($1.value(), $2);
+        $$ = $1;
     }
 ;
 
-entry:
-    single_line_entry
-    {
-        $$ = $1;
-    }
-|
-    multi_line_entry
+variable:
+    identifier ':'
     {
         $$ = $1;
     }
 ;
 
-single_line_entry:
-    variable attr_value_arr
+identifier:
+    IDENT
     {
-        $$ = m_ctx.make_entry_or_throw($1, $2);
+        $$ = d_scanner.matched();
     }
 ;
 
-multi_line_entry:
-    entry NEWLINE attr_value_arr
+date:
+    DATE
     {
-        $$ = m_ctx.make_entry_or_throw($1.var_name, $3);
+        $$ = log_date{d_scanner.matched()};
     }
 ;

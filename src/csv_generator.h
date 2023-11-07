@@ -21,6 +21,6 @@ class csv_generator
 
 public:
     csv_generator(std::ostream& out);
-    void write(log_date const& log_date, log_data::entry const& entry);
+    void write(log_date const& log_date, entry_data const& entry);
     void write(std::vector<std::string> const& vec);
 };
