@@ -2,3 +2,5 @@
 
 // $insert class_h
 #include "log_scanner.h"
+
+#include "log_token_enums.h"

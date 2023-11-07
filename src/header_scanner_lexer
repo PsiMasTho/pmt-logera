@@ -1,3 +1,9 @@
+%baseclass-header =      "header_scanner_base.h"
+%class-header =          "header_scanner.h"
+%implementation-header = "header_scanner.ih"
+%lex-source =            "header_scanner_lex.cc"
+%class-name =            "header_scanner"
+
 nl             "\r\n"|"\n"
 
 %%

@@ -2,3 +2,5 @@
 
 // $insert class_h
 #include "header_scanner.h"
+
+#include "header_token_enums.h"

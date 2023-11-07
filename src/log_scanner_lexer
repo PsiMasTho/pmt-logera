@@ -1,3 +1,9 @@
+%baseclass-header =      "log_scanner_base.h"
+%class-header =          "log_scanner.h"
+%implementation-header = "log_scanner.ih"
+%lex-source =            "log_scanner_lex.cc"
+%class-name =            "log_scanner"
+
 nl             "\r\n"|"\n"
 
 %%
@@ -8,9 +14,9 @@ nl             "\r\n"|"\n"
 ^[0-9]{4}'-'[0-9]{2}'-'[0-9]{2}                 return log_tokens::Tokens_::DATE;
 
     // May not end with ':'
-[[:print:]]{-}[ \t\n;]*[[:print:]]{-}[ \t\n;:]+ return log_tokens::Tokens_::IDENT;
+[[:print:]]{-}[ \t\n#;]*[[:print:]]{-}[ \t\n;:]+ return log_tokens::Tokens_::IDENT;
 
-#[[:print:]]*
+#[[:print:]]*                                   |
 #[[:print:]]*{nl}                               |
 {nl}                                            return log_tokens::Tokens_::NEWLINE;
 
