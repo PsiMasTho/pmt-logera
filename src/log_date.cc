@@ -3,7 +3,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "date.h"
+#include "log_date.h"
 
 #include <algorithm>
 #include <cctype>
@@ -18,7 +18,7 @@ namespace
 
 [[noreturn]] void throw_bad_ymd(string const& ymd_str)
 {
-    throw invalid_argument("Bad date string: "s + ymd_str);
+    throw invalid_argument("Bad log_date string: "s + ymd_str);
 }
 
 bool validate_ymd_str(string const& ymd_str)
@@ -62,7 +62,7 @@ bool validate_ymd(string const& ymd_str)
 
 } // namespace
 
-date::date(string const& ymd_str)
+log_date::log_date(string const& ymd_str)
     : m_str{}
 {
     if (!validate_ymd(ymd_str))
@@ -70,17 +70,17 @@ date::date(string const& ymd_str)
     copy_n(ymd_str.data(), DATE_STR_LEN + 1, m_str.data());
 }
 
-char const* date::to_string() const
+char const* log_date::to_string() const
 {
     return m_str.data();
 }
 
-strong_ordering operator<=>(date const& lhs, date const& rhs) noexcept
+strong_ordering operator<=>(log_date const& lhs, log_date const& rhs) noexcept
 {
     return strncmp(lhs.to_string(), rhs.to_string(), DATE_STR_LEN) <=> 0;
 }
 
-bool operator==(date const& lhs, date const& rhs) noexcept
+bool operator==(log_date const& lhs, log_date const& rhs) noexcept
 {
     return (lhs <=> rhs) == 0;
 }

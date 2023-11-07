@@ -19,7 +19,7 @@ inline void log_parser::print()
 // of log_parser's sources.
 
 #include "archive_data.h"
-#include "date.h"
+#include "log_date.h"
 #include "log_parser_context.h"
 #include "string_util.h"
 

@@ -26,9 +26,9 @@ csv_generator::csv_generator(ostream& out)
     : m_out(out)
 { }
 
-void csv_generator::write(date const& date, log_data::entry const& entry)
+void csv_generator::write(log_date const& log_date, log_data::entry const& entry)
 {
-    m_out << date.to_string();
+    m_out << log_date.to_string();
     for(size_t idx = 0; idx < entry.capacity(); ++idx)
     {
         if(entry.exists(idx))

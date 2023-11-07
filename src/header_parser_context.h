@@ -30,5 +30,4 @@ private:
     std::vector<attribute_data>::iterator get_last_attr_itr();
 
     void sort_target_by_name();
-    std::size_t get_attr_idx(std::string const& attr_name) const;
 };

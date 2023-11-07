@@ -10,7 +10,7 @@
 
 struct header_data;
 struct log_data;
-class date;
+class log_date;
 
 class archive
 {

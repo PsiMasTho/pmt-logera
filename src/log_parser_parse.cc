@@ -121,12 +121,12 @@ PI_ const s_productionInfo[] =
      {0, 0}, // not used: reduction values are negative
      {260, 0}, // 1: input ->  <empty>
      {260, 2}, // 2: input ->  input line
-     {261, 2}, // 3: line (NEWLINE) ->  date NEWLINE
+     {261, 2}, // 3: line (NEWLINE) ->  log_date NEWLINE
      {261, 2}, // 4: line (NEWLINE) ->  variable NEWLINE
      {261, 2}, // 5: line (NEWLINE) ->  assign_vals_to_attrs NEWLINE
      {261, 2}, // 6: line (EOF_) ->  assign_vals_to_attrs EOF_
      {261, 1}, // 7: line (NEWLINE) ->  NEWLINE
-     {262, 1}, // 8: date (DATE) ->  DATE
+     {262, 1}, // 8: log_date (DATE) ->  DATE
      {263, 2}, // 9: variable (':') ->  identifier ':'
      {265, 1}, // 10: identifier (IDENT) ->  IDENT
      {264, 3}, // 11: assign_vals_to_attrs (';') ->  identifier identifier ';'
@@ -148,7 +148,7 @@ SR_ s_1[] =
 {
     { { REQ_TOKEN}, {      10} },                        
     { {       261}, {       2} }, // line                
-    { {       262}, {       3} }, // date                
+    { {       262}, {       3} }, // log_date                
     { {       263}, {       4} }, // variable            
     { {       264}, {       5} }, // assign_vals_to_attrs
     { {       259}, {       6} }, // NEWLINE             
@@ -542,7 +542,7 @@ try
 
         case 3:
         {
-         m_ctx.set_date(date(vs_(-1)));
+         m_ctx.set_date(log_date(vs_(-1)));
          }
         break;
 

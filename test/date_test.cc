@@ -1,26 +1,26 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "../src/date.h"
+#include "../include/log_date.h"
 
 #include <string>
 #include <type_traits>
 
 using namespace std;
 
-static_assert(is_nothrow_move_constructible<date>::value,
-              "date should be noexcept move_constructible");
+static_assert(is_nothrow_move_constructible<log_date>::value,
+              "log_date should be nothrow_move_constructible");
 
 TEST_CASE("nonthrow_construction")
 {
-    date a("1000-01-02");
-    date b("1992-12-23");
-    date c("2024-08-02");
-    [[maybe_unused]] date d = b;
+    log_date a("1000-01-02");
+    log_date b("1992-12-23");
+    log_date c("2024-08-02");
+    [[maybe_unused]] log_date d = b;
 }
 
 TEST_CASE("throw_construction")
 {
-    auto const f = [](string const& str) { return date(str); };
+    auto const f = [](string const& str) { return log_date(str); };
 
     REQUIRE_THROWS_AS(f(""), invalid_argument);
     REQUIRE_THROWS_AS(f("12345678x"), invalid_argument);
@@ -38,11 +38,11 @@ TEST_CASE("throw_construction")
 
 TEST_CASE("equality_comparisons")
 {
-    date a("1998-02-02");
-    date b("1999-02-02");
-    date c("2022-04-05");
-    date d("1000-01-02");
-    date e = a;
+    log_date a("1998-02-02");
+    log_date b("1999-02-02");
+    log_date c("2022-04-05");
+    log_date d("1000-01-02");
+    log_date e = a;
     REQUIRE((a < b));
     REQUIRE((b > a));
     REQUIRE((d < a));
@@ -52,21 +52,21 @@ TEST_CASE("equality_comparisons")
 
 TEST_CASE("to_string_conversion")
 {
-    string const aStr = "1998-09-01";
-    string const bStr = "2045-04-25";
-    string const cStr = "1111-12-30";
-    string const dStr = "2101-09-11";
+    string const a_str = "1998-09-01";
+    string const b_str = "2045-04-25";
+    string const c_str = "1111-12-30";
+    string const d_str = "2101-09-11";
 
-    date const aDate(aStr);
-    date const bDate(bStr);
-    date const cDate(cStr);
-    date const dDate(dStr);
+    log_date const a_date(a_str);
+    log_date const b_date(b_str);
+    log_date const c_date(c_str);
+    log_date const d_date(d_str);
 
-    REQUIRE(aDate.to_string() == aStr);
-    REQUIRE(bDate.to_string() == bStr);
-    REQUIRE(cDate.to_string() == cStr);
-    REQUIRE(dDate.to_string() == dStr);
+    REQUIRE(a_date.to_string() == a_str);
+    REQUIRE(b_date.to_string() == b_str);
+    REQUIRE(c_date.to_string() == c_str);
+    REQUIRE(d_date.to_string() == d_str);
 
-    date const eDate = dDate;
-    REQUIRE(eDate.to_string() == dStr);
+    log_date const e_date = d_date;
+    REQUIRE(e_date.to_string() == d_str);
 }

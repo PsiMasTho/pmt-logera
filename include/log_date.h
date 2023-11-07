@@ -15,16 +15,16 @@ enum
     DATE_STR_LEN = 10 // not including null terminator
 };
 
-class date
+class log_date
 {
     std::array<char, DATE_STR_LEN + 1> m_str;
 
 public:
-    explicit date(std::string const& date_str);
-    date() = default;
+    explicit log_date(std::string const& date_str);
+    log_date() = default;
 
     char const* to_string() const;
 
-    friend std::strong_ordering operator<=>(date const&, date const&) noexcept;
-    friend bool operator==(date const&, date const&) noexcept;
+    friend std::strong_ordering operator<=>(log_date const&, log_date const&) noexcept;
+    friend bool operator==(log_date const&, log_date const&) noexcept;
 };

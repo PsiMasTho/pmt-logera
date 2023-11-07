@@ -5,13 +5,12 @@
 
 #pragma once
 
+#include "detail/sparse_array.h"
+#include "archive_data.h"
+
 #include <string>
 #include <regex>
 #include <vector>
-
-struct header_data;
-struct log_data;
-class date;
 
 class regex_matcher
 {
@@ -28,22 +27,23 @@ class log_parser_context
     std::unique_ptr<log_data> m_target;
     header_data* m_header_data;
     std::vector<regex_matcher> m_matchers; // access attribute by index
-    std::string m_active_var;
 
 public:
     log_parser_context(header_data* hd);
 
-    void set_date(date const& date);
+    void set_date(log_date const& date);
     void set_filename(std::string const& filename);
+    void add_entry(entry_data const& entry);
 
-    void set_active_var(std::string const& var_name);
-    void add_attr_to_new_line(std::string const& attr_name, std::string const& attr_val);
-    void add_attr_to_current_line(std::string const& attr_name, std::string const& attr_val);
+    auto make_entry_or_throw(std::string const& var_name, sparse_array<std::string> const& attr_values) -> entry_data;
+    auto make_attr_value_arr_or_throw(std::pair<std::string, std::string> const& attr_value_pair) -> sparse_array<std::string>;
+    void update_attr_value_arr_or_throw(sparse_array<std::string>& attr_value_arr, std::pair<std::string, std::string> const& attr_value_pair);
 
         // clears state and is ready to parse another log immediately
     std::unique_ptr<log_data> release_log_data();
 
 private:
     void construct_regexes();
+    auto validate_attr_val_regex(std::size_t attr_idx, std::string const& attr_val) const -> bool;
 };
 

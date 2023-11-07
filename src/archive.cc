@@ -1,6 +1,6 @@
 #include "archive.h"
 
-#include "date.h"
+#include "log_date.h"
 #include "archive_data.h"
 #include "header_parser.h"
 #include "log_parser.h"
@@ -43,11 +43,11 @@ void archive::reorder(ordering order)
         return;
 
     static auto const by_filename = [](auto& lhs, auto& rhs) {
-        return lhs->m_filename < rhs->m_filename;
+        return lhs->filename < rhs->filename;
     };
 
     static auto const by_date = [](auto& lhs, auto& rhs) {
-        return lhs->m_date < rhs->m_date;
+        return lhs->date < rhs->date;
     };
 
     if (order == BY_DATE)

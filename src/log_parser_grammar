@@ -2,11 +2,29 @@
 %scanner-class-name log_scanner
 %parsefun-source log_parser_parse.cc
 
+%baseclass-preinclude <string>
+%baseclass-preinclude <utility>
+%baseclass-preinclude "detail/sparse_array.h"
+%baseclass-preinclude "archive_data.h"
+
 %token IDENT
        DATE
        NEWLINE
 
-%stype std::string
+%polymorphic STRING:              std::string;
+             STRING_PAIR:         std::pair<std::string, std::string>;
+             LOG_DATE:            log_date;
+             ENTRY_DATA:          entry_data;
+             SPARSE_ARRAY_STRING: sparse_array<std::string>;
+
+%type <STRING>              identifier;
+%type <STRING>              variable;
+%type <STRING_PAIR>         attr_value_pair;
+%type <LOG_DATE>            date;
+%type <ENTRY_DATA>          entry;
+%type <ENTRY_DATA>          single_line_entry;
+%type <ENTRY_DATA>          multi_line_entry
+%type <SPARSE_ARRAY_STRING> attr_value_arr;
 
 %%
 
@@ -19,20 +37,28 @@ input:
 line:
     date NEWLINE
     {
-       m_ctx.set_date(date($1));
+       m_ctx.set_date($1);
     }
 |
-    variable NEWLINE
-|
-    assign_vals_to_attrs NEWLINE
-|
-    assign_vals_to_attrs EOF
+    entry
+    {
+        m_ctx.add_entry($1);
+    }
 |
     NEWLINE
+|
+    EOF
 ;
 
 date:
     DATE
+    {
+        $$ = log_date{d_scanner.matched()};
+    }
+;
+
+identifier:
+    IDENT
     {
         $$ = d_scanner.matched();
     }
@@ -45,21 +71,47 @@ variable:
     }
 ;
 
-identifier:
-    IDENT
+attr_value_pair:
+    identifier identifier ';'
     {
-        $$ = d_scanner.matched();
+        $$ = make_pair($1, $2);
     }
 ;
 
-assign_vals_to_attrs:
-    identifier identifier ';'
+attr_value_arr:
+    attr_value_pair
     {
-        m_ctx.add_attr_to_new_line($1, $2);
+        $$ = m_ctx.make_attr_value_arr_or_throw($1);
     }
 |
-    assign_vals_to_attrs identifier identifier ';'
+    attr_value_arr attr_value_pair
     {
-        m_ctx.add_attr_to_current_line($2, $3);
+        m_ctx.update_attr_value_arr_or_throw($$, $2);
+    }
+;
+
+entry:
+    single_line_entry
+    {
+        $$ = $1;
+    }
+|
+    multi_line_entry
+    {
+        $$ = $1;
+    }
+;
+
+single_line_entry:
+    variable attr_value_arr
+    {
+        $$ = m_ctx.make_entry_or_throw($1, $2);
+    }
+;
+
+multi_line_entry:
+    entry NEWLINE attr_value_arr
+    {
+        $$ = m_ctx.make_entry_or_throw($1.var_name, $3);
     }
 ;

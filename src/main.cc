@@ -8,9 +8,10 @@
 
 #include "config.h"
 #include "archive.h"
+#include "cmdl_exception.h"
 #include "csv_generator.h"
 #include "archive_data.h"
-#include "date.h"                               
+#include "log_date.h"                               
 
 #include <exception>
 #include <iostream>
@@ -47,11 +48,26 @@ argparse::ArgumentParser get_arg_parser()
     return ret;
 }
 
+auto parse_args(int argc, char** argv) -> config
+{
+    argparse::ArgumentParser cmdl = get_arg_parser();
+    try
+    {
+        cmdl.parse_args(argc, argv); // may throw
+    }
+    catch (std::exception const& e)
+    {
+        throw cmdl_exception(e.what());
+    }
+
+    return config(cmdl);
+}
+
 vector<string> get_header_line(header_data const& header)
 {
     vector<string> ret{"date", "var"};
-    for(size_t idx = 0; idx < header.m_attrs.size(); ++idx)
-        ret.push_back(header.m_attrs[idx].m_name);
+    for(size_t idx = 0; idx < header.attrs.size(); ++idx)
+        ret.push_back(header.attrs[idx].name);
 
     return ret;
 }
@@ -92,33 +108,20 @@ void generate_csv(archive const& ar, config const& cfg)
 
     // write all other lines
     for (auto const& log_data_ptr : ar.get_log_data())
-        for (auto const& entry : log_data_ptr->m_entries)
-            gen.write(log_data_ptr->m_date, entry);
+        for (auto const& entry : log_data_ptr->entries)
+            gen.write(log_data_ptr->date, entry);
 }
 
 
 int main(int argc, char** argv)
 try
 {
-    argparse::ArgumentParser cmdl = get_arg_parser();
-    try
-    {
-        cmdl.parse_args(argc, argv); // may throw
-    }
-    catch(std::exception const& e)
-    {
-        cerr << "\tError parsing command line arguments\n";
-        cerr << "\t\tError message: " << e.what() << "\n\n";
-        return EXIT_FAILURE;
-    }
-
-    config cfg(cmdl);
-
+    config const cfg = parse_args(argc, argv);
 
     if(cfg.verbose)
         print_config(cfg, cout);
     
-    auto ar = parse(cfg.header_file, cfg.log_files, archive::ordering::BY_DATE);
+    archive const ar = parse(cfg.header_file, cfg.log_files, archive::ordering::BY_DATE);
 
     if (ar.has_errors())
     {
@@ -127,6 +130,12 @@ try
     }
    
     generate_csv(ar, cfg);
+}
+catch (cmdl_exception const& exc)
+{
+    std::cerr << "Command line error encountered:\n";
+    std::cerr << '\t' << exc.what() << '\n';
+    return EXIT_FAILURE;
 }
 catch(std::exception const& exc)
 {

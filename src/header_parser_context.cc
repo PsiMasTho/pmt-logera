@@ -1,10 +1,32 @@
 #include "header_parser_context.h"
 
+#include "parser_context_common.h"
+
 #include <algorithm>
 #include <stdexcept>
 #include <numeric>
+#include <type_traits>
 
 using namespace std;
+
+namespace
+{
+    template <typename T, typename U>
+    void indirect_sort(T data_begin, T data_end, U indices_begin)
+    {
+        size_t const size = distance(data_begin, data_end);
+
+        vector<typename T::value_type> tmp(size);
+        transform(indices_begin, next(indices_begin, size), tmp.begin(),
+            [&data_begin](size_t idx)
+            {
+                return *next(data_begin, idx);
+            });
+
+        // write back
+        move(tmp.begin(), tmp.end(), data_begin);
+    }
+}
 
 header_parser_context::header_parser_context()
     : m_target{make_unique<header_data>()}
@@ -21,7 +43,7 @@ void header_parser_context::add_var(string const& var_name)
     else
     {
         m_var_name_hashes.insert(var_name_hash);
-        m_target->m_vars.emplace_back(variable_data{var_name, vector<bool>(m_target->m_attrs.size(), false)});
+        m_target->vars.emplace_back(variable_data{var_name, vector<bool>(m_target->attrs.size(), false)});
     }
 }
 
@@ -34,107 +56,85 @@ void header_parser_context::add_attr(string const& attr_name)
     else
     {
         m_attr_name_hashes.insert(attr_name_hash);
-        m_target->m_attrs.emplace_back(attribute_data{attr_name, {}});
+        m_target->attrs.emplace_back(attribute_data{attr_name, {}});
     } 
 }
 
 void header_parser_context::add_regex_to_last_attr(string const& expr)
 {
-    if(m_target->m_attrs.empty())
+    if(m_target->attrs.empty())
         throw runtime_error("Trying to add regex without an attribute: "s + expr);
     
     // check if the regex is unique
-    auto const& last_attr = m_target->m_attrs.back();
-    if (any_of(last_attr.m_reg_exprs.begin(), last_attr.m_reg_exprs.end(),
+    auto const& last_attr = m_target->attrs.back();
+    if (any_of(last_attr.reg_exprs.begin(), last_attr.reg_exprs.end(),
         [&expr](string const& reg_expr)
         {
             return reg_expr == expr;
         }))
         throw runtime_error("Regex is not unique to attribute: "s + expr);
 
-    m_target->m_attrs.back().m_reg_exprs.emplace_back(expr);
+    m_target->attrs.back().reg_exprs.emplace_back(expr);
 }
 
 void header_parser_context::add_attr_to_last_var(string const& attr_name)
 {
     auto const last_var_itr = get_last_var_itr();
-    if (last_var_itr == m_target->m_vars.end())
+    if (last_var_itr == m_target->vars.end())
         throw runtime_error("Attemtpting to add attribute without a variable: "s + attr_name);
 
-    auto const attr_idx = get_attr_idx(attr_name);
+    auto const attr_idx = get_attr_idx_lin(attr_name, *m_target);
 
-    if (last_var_itr->m_attr_indices[attr_idx])
+    if (last_var_itr->attr_indices[attr_idx])
         throw runtime_error("Attempting to add attribute twice: "s + attr_name);
 
-    last_var_itr->m_attr_indices[attr_idx] = true;
+    last_var_itr->attr_indices[attr_idx] = true;
 }
 
 unique_ptr<header_data> header_parser_context::release_header_data()
 {
-    //sort_target_by_name();
+    sort_target_by_name();
     return move(m_target);
 }
 
 vector<variable_data>::iterator header_parser_context::get_last_var_itr()
 {
-    if (m_target->m_vars.empty())
-        return m_target->m_vars.end();
+    if (m_target->vars.empty())
+        return m_target->vars.end();
     
-    return prev(m_target->m_vars.end());
+    return prev(m_target->vars.end());
 }
 
 vector<attribute_data>::iterator header_parser_context::get_last_attr_itr()
 {
-    if (m_target->m_attrs.empty())
-        return m_target->m_attrs.end();
+    if (m_target->attrs.empty())
+        return m_target->attrs.end();
     
-    return prev(m_target->m_attrs.end());
+    return prev(m_target->attrs.end());
 }
 
 void header_parser_context::sort_target_by_name()
 {
     // sort variables
-    sort(m_target->m_vars.begin(), m_target->m_vars.end(),
+    sort(m_target->vars.begin(), m_target->vars.end(),
         [](variable_data const& lhs, variable_data const& rhs)
         {
-            return lhs.m_name < rhs.m_name;
+            return lhs.name < rhs.name;
         });
     
     // get sorted indices of attributes
-    vector<size_t> sorted_attr_indices(m_target->m_attrs.size());
+    vector<size_t> sorted_attr_indices(m_target->attrs.size());
     iota(sorted_attr_indices.begin(), sorted_attr_indices.end(), 0);
     sort(sorted_attr_indices.begin(), sorted_attr_indices.end(),
         [this](size_t lhs, size_t rhs)
         {
-            return m_target->m_attrs[lhs].m_name < m_target->m_attrs[rhs].m_name;
+            return m_target->attrs[lhs].name < m_target->attrs[rhs].name;
         });
     
     // indirectly sort all variables' attribute indices
-    for (auto& var : m_target->m_vars)
-    {
-        vector<bool> sorted_attr_indices(var.m_attr_indices.size());
-        for (size_t i = 0; i < m_target->m_attrs.size(); ++i)
-            sorted_attr_indices[i] = var.m_attr_indices[sorted_attr_indices[i]];
-        var.m_attr_indices = move(sorted_attr_indices);
-    }
+    for (auto& var : m_target->vars)
+        indirect_sort(begin(var.attr_indices), end(var.attr_indices), begin(sorted_attr_indices));
 
     // sort attributes
-    vector<attribute_data> sorted_attrs(m_target->m_attrs.size());
-    for (size_t i = 0; i < m_target->m_attrs.size(); ++i)
-        sorted_attrs[i] = move(m_target->m_attrs[sorted_attr_indices[i]]);
-    m_target->m_attrs = move(sorted_attrs);
-}
-
-size_t header_parser_context::get_attr_idx(string const& attr_name) const
-{
-    auto const itr = find_if(m_target->m_attrs.begin(), m_target->m_attrs.end(),
-        [&attr_name](attribute_data const& attr)
-        {
-            return attr.m_name == attr_name;
-        });
-    
-    if (itr == m_target->m_attrs.end())
-        throw runtime_error("Attribute not found: "s + attr_name);
-    
-    return distance(m_target->m_attrs.begin(), itr);
+    indirect_sort(begin(m_target->attrs), end(m_target->attrs), begin(sorted_attr_indices));
 }

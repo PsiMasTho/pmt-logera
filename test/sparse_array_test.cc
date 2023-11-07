@@ -1,7 +1,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "../src/sparse_array.h"
+#include "../include/detail/sparse_array.h"
 
 #include <string>
 #include <type_traits>
@@ -9,7 +9,7 @@
 using namespace std;
 
 static_assert(is_nothrow_move_constructible<sparse_array<string>>::value,
-              "sparse_array should be noexcept MoveConstructible");
+              "sparse_array should be nothrow_move_constructible");
 
 TEST_CASE("capacity")
 {

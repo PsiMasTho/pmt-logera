@@ -6,11 +6,9 @@
 #pragma once
 
 #include <filesystem>
-#include <fstream>
+#include <iosfwd>
 #include <memory>
-#include <optional>
 #include <string>
-#include <type_traits>
 #include <vector>
 
 // fwd declaration
