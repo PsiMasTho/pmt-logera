@@ -27,9 +27,10 @@ csv_generator::csv_generator(ostream& out)
     : m_out(out)
 { }
 
-void csv_generator::write(log_date const& log_date, entry_data const& entry)
+void csv_generator::write(log_date const& log_date, std::string const& filename, entry_data const& entry)
 {
     m_out << log_date.to_string() << ',';
+    m_out << filename << ',';
     m_out << entry.var_name;
     
     for(size_t idx = 0; idx < entry.attr_values.capacity(); ++idx)

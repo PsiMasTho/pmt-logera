@@ -15,7 +15,8 @@ log_parser::log_parser(std::filesystem::path const& path, log_parser_context& ct
 
 unique_ptr<log_data> log_parser::gen()
 {
-    m_ctx.set_filename(d_scanner.filename());
+    std::filesystem::path const filename_path(d_scanner.filename());
+    m_ctx.set_filename(filename_path.filename().string());
 
     if (parse() == 0) // no error encountered
         return m_ctx.release_log_data();

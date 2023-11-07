@@ -50,6 +50,6 @@ public:
 
 private:
     void construct_regexes();
-    auto validate_attr_val_regex(std::size_t attr_idx, std::string const& attr_val) const -> bool;
+    void validate_attr_val_regex_or_throw(std::size_t attr_idx, std::string const& attr_val) const;
 };
 

@@ -4,7 +4,9 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include "../external/argparse/argparse.hpp"
-#include "../external/termcolor/termcolor.hpp"
+
+#include <fmt/format.h>
+#include <fmt/color.h>
 
 #include "config.h"
 #include "archive.h"
@@ -14,7 +16,6 @@
 #include "log_date.h"                               
 
 #include <exception>
-#include <iostream>
 #include <string>
 
 using namespace std;
@@ -65,7 +66,7 @@ auto parse_args(int argc, char** argv) -> config
 
 vector<string> get_header_line(header_data const& header)
 {
-    vector<string> ret{"date", "var"};
+    vector<string> ret{"date", "var", "filename"};
     for(size_t idx = 0; idx < header.attrs.size(); ++idx)
         ret.push_back(header.attrs[idx].name);
 
@@ -75,15 +76,19 @@ vector<string> get_header_line(header_data const& header)
 void print_error(parse_error const& error, bool color)
 {
     if (color)
-        cerr << termcolor::red;
-    cerr << "\tError parsing file\n";
-    if (color)
-        cerr << termcolor::bright_yellow;
-    cerr << "\t\tFilename:      " << error.filename << '\n';
-    cerr << "\t\tError message: " << error.msg << '\n';
-    cerr << "\t\tLine:          " << error.line_nr << "\n\n";
-    if (color)
-        cerr << termcolor::reset;
+    {
+        fmt::print(stderr, fg(fmt::color::red),    "  Error parsing file\n");
+        fmt::print(stderr, fg(fmt::color::yellow), "    Filename:      {}\n", error.filename);
+        fmt::print(stderr, fg(fmt::color::yellow), "    Error message: {}\n", error.msg);
+        fmt::print(stderr, fg(fmt::color::yellow), "    Line:          {}\n\n", error.line_nr);
+    }
+    else
+    {
+        fmt::print(stderr, "  Error parsing file\n");
+        fmt::print(stderr, "    Filename:      {}\n", error.filename);      
+        fmt::print(stderr, "    Error message: {}\n", error.msg);
+        fmt::print(stderr, "    Line:          {}\n\n", error.line_nr);
+    }
 }
 
 } // namespace
@@ -92,10 +97,9 @@ void print_errors(config const& cfg, span<parse_error const> errors)
 {
     bool const color = cfg.color;
     if (color)
-        cerr << termcolor::red;
-    cerr << errors.size() << " errors encountered:\n";
-    if (color)
-        cerr << termcolor::reset;
+        fmt::print(stderr, fg(fmt::color::red), "{} errors encountered:\n", errors.size());
+    else
+        fmt::print(stderr, "{} errors encountered:\n", errors.size());
     for (auto const& error : errors)
         print_error(error, color);
 }
@@ -109,7 +113,7 @@ void generate_csv(archive const& ar, config const& cfg)
     // write all other lines
     for (auto const& log_data_ptr : ar.get_log_data())
         for (auto const& entry : log_data_ptr->entries)
-            gen.write(log_data_ptr->date, entry);
+            gen.write(log_data_ptr->date, log_data_ptr->filename, entry);
 }
 
 
@@ -133,18 +137,16 @@ try
 }
 catch (cmdl_exception const& exc)
 {
-    std::cerr << "Command line error encountered:\n";
-    std::cerr << '\t' << exc.what() << '\n';
+    fmt::print(stderr, "Command line error encountered:\n  {}\n", exc.what());
     return EXIT_FAILURE;
 }
 catch(std::exception const& exc)
 {
-    std::cerr << "Unhandled std::exception encountered:\n";
-    std::cerr << '\t' << exc.what() << '\n';
+    fmt::print(stderr, "Unhandled std::exception encountered:\n  {}\n", exc.what());
     return EXIT_FAILURE;
 }
 catch(...)
 {
-    std::cerr << "Terminating due to unknown exception." << '\n';
+    fmt::print(stderr, "Terminating due to unknown exception.\n");
     return EXIT_FAILURE;
 }

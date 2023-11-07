@@ -9,12 +9,50 @@
 #include "log_date.h"
 #include "parser_context_common.h"
 
+#include <fmt/format.h>
+
 #include <algorithm>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
 using namespace std;
+using fmt::format;
+
+namespace
+{
+
+[[noreturn]] void throw_var_doesnt_exist(std::string const& var_name)
+{
+    throw runtime_error(format("Variable: \"{}\" does not exist", var_name));
+}
+
+[[noreturn]] void throw_no_active_var()
+{
+    throw runtime_error("No active variable");
+}
+
+[[noreturn]] void throw_var_doesnt_have_attr(std::string const& var_name, std::string const& attr_name)
+{
+    throw runtime_error(format("Variable: \"{}\" does not have attribute: \"{}\"", var_name, attr_name));
+}
+
+[[noreturn]] void throw_attr_already_added(std::string const& attr_name)
+{
+    throw runtime_error(format("Attribute: \"{}\" already added", attr_name));
+}
+
+[[noreturn]] void throw_active_var_has_no_entries_at_eof(std::string const& var_name)
+{
+    throw runtime_error(format("End of file reached without any entries for: \"{}\"", var_name));
+}
+
+[[noreturn]] void throw_attr_val_regex_mismatch(std::string const& attr_name, std::string const& attr_val)
+{
+    throw runtime_error(format("Invalid value: \"{}\". For attribute: \"{}\"", attr_val, attr_name));
+}
+
+} // namespace
 
 void regex_matcher::add_regex(std::string const& expr)
 {
@@ -56,7 +94,7 @@ void log_parser_context::set_filename(string const& filename)
 void log_parser_context::set_active_variable_or_throw(std::string const& var_name)
 {
     if (!does_var_exist_bin(var_name, *m_header_data))
-        throw runtime_error("Variable: \""s + var_name + "\" does not exist"s);
+        throw_var_doesnt_exist(var_name);
 
     m_active_variable_idx = get_var_idx_bin(var_name, *m_header_data);
     m_entries_created_for_active_variable = 0;
@@ -68,7 +106,7 @@ void log_parser_context::set_active_variable_or_throw(std::string const& var_nam
 void log_parser_context::create_entry_or_throw(sparse_array<std::string> const& attr_values)
 {
     if (!m_active_variable_idx.has_value())
-        throw runtime_error("No active variable"s);
+        throw_no_active_var();
 
     size_t const var_idx = m_active_variable_idx.value();
     for (size_t idx = 0; idx < m_header_data->attrs.size(); ++idx)
@@ -78,8 +116,7 @@ void log_parser_context::create_entry_or_throw(sparse_array<std::string> const& 
             continue;
 
         if (!does_var_have_attr_idx(var_idx, idx, *m_header_data))
-            throw runtime_error("Variable: \""s + m_header_data->vars[var_idx].name + R"(" does not have attribute: ")"s +
-                                m_header_data->attrs[idx].name + '\"');
+            throw_var_doesnt_have_attr(m_header_data->vars[var_idx].name, m_header_data->attrs[idx].name);
     }
 
     m_target->entries.emplace_back(m_header_data->vars[var_idx].name, attr_values);
@@ -90,7 +127,7 @@ auto log_parser_context::make_attr_value_arr_or_throw(std::pair<std::string, std
 {
     // validate regex
     size_t const attr_idx = get_attr_idx_bin(attr_value_pair.first, *m_header_data);
-    validate_attr_val_regex(attr_idx, attr_value_pair.second);
+    validate_attr_val_regex_or_throw(attr_idx, attr_value_pair.second);
 
     // create sparse array
     sparse_array<std::string> ret(m_header_data->attrs.size());
@@ -102,11 +139,11 @@ void log_parser_context::update_attr_value_arr_or_throw(sparse_array<std::string
 {
     // validate regex
     size_t const attr_idx = get_attr_idx_bin(attr_value_pair.first, *m_header_data);
-    validate_attr_val_regex(attr_idx, attr_value_pair.second);
+    validate_attr_val_regex_or_throw(attr_idx, attr_value_pair.second);
 
-    // check if attribute already exists
+    // check if attribute already added before
     if (attr_value_arr.exists(attr_idx))
-        throw runtime_error("Attribute: \""s + attr_value_pair.first + "\" already exists"s);
+        throw_attr_already_added(attr_value_pair.first);
     
     // add to sparse array
     attr_value_arr.set(attr_idx, attr_value_pair.second);
@@ -116,7 +153,7 @@ void log_parser_context::update_attr_value_arr_or_throw(sparse_array<std::string
 void log_parser_context::at_eof()
 {
     if (m_active_variable_idx.has_value() && m_entries_created_for_active_variable == 0)
-        throw runtime_error("No entries created for active variable: \""s + m_header_data->vars[m_active_variable_idx.value()].name + '\"');
+        throw_active_var_has_no_entries_at_eof(m_header_data->vars[m_active_variable_idx.value()].name);
 }
 
 unique_ptr<log_data> log_parser_context::release_log_data()
@@ -138,10 +175,8 @@ void log_parser_context::construct_regexes()
     }
 }
 
-auto log_parser_context::validate_attr_val_regex(std::size_t attr_idx, std::string const& attr_val) const -> bool
+void log_parser_context::validate_attr_val_regex_or_throw(std::size_t attr_idx, std::string const& attr_val) const
 {
-    return m_matchers[attr_idx](attr_val);
-
-    //         throw runtime_error("Invalid value: \""s + attr_val + "\". For attribute: \"" +
-    //                      m_header_data->attrs[attr_idx].name + '\"');
+    if(!m_matchers[attr_idx](attr_val))
+        throw_attr_val_regex_mismatch(m_header_data->attrs[attr_idx].name, attr_val);
 }
