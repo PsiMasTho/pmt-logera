@@ -25,23 +25,23 @@ bool validate_ymd_str(string const& ymd_str)
 {
     auto const is_delim_idx = [](size_t idx) { return idx == 4 || idx == 7; };
 
-    if (ymd_str.size() != DATE_STR_LEN)
+    if(ymd_str.size() != DATE_STR_LEN)
         return false;
-    
-    for (size_t idx = 0; idx < ymd_str.size(); ++idx)
+
+    for(size_t idx = 0; idx < ymd_str.size(); ++idx)
     {
-        if (is_delim_idx(idx))
+        if(is_delim_idx(idx))
         {
-            if (ymd_str[idx] != '-')
+            if(ymd_str[idx] != '-')
                 return false;
         }
         else
         {
-            if (!isdigit(ymd_str[idx]))
+            if(!isdigit(ymd_str[idx]))
                 return false;
         }
     }
-    
+
     return true;
 }
 
@@ -65,7 +65,7 @@ bool validate_ymd(string const& ymd_str)
 log_date::log_date(string const& ymd_str)
     : m_str{}
 {
-    if (!validate_ymd(ymd_str))
+    if(!validate_ymd(ymd_str))
         throw_bad_ymd(ymd_str);
     copy_n(ymd_str.data(), DATE_STR_LEN + 1, m_str.data());
 }
@@ -77,10 +77,10 @@ char const* log_date::to_string() const
 
 strong_ordering operator<=>(log_date const& lhs, log_date const& rhs) noexcept
 {
-    return strncmp(lhs.to_string(), rhs.to_string(), DATE_STR_LEN) <=> 0;
+    return strncmp(lhs.to_string(), rhs.to_string(), DATE_STR_LEN) <= > 0;
 }
 
 bool operator==(log_date const& lhs, log_date const& rhs) noexcept
 {
-    return (lhs <=> rhs) == 0;
+    return (lhs <= > rhs) == 0;
 }

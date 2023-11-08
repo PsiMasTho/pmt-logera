@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "log_date.h"
 #include "detail/sparse_array.h"
+#include "log_date.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
 struct attribute_data
 {

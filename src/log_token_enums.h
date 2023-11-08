@@ -14,5 +14,4 @@ struct log_tokens
         DATE,
         NEWLINE,
     };
-
 };

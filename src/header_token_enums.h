@@ -15,5 +15,4 @@ struct header_tokens
         DECL_ATTR,
         NEWLINE,
     };
-
 };

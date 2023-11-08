@@ -9,13 +9,12 @@ header_parser::header_parser(std::filesystem::path const& path, header_parser_co
     : d_scanner(path)
     , d_matched(d_scanner.matched())
     , m_ctx(ctx)
-    , m_error_info {nullopt}
-{
-}
+    , m_error_info{nullopt}
+{ }
 
 unique_ptr<header_data> header_parser::gen()
 {
-    if (parse() == 0) // no error encountered
+    if(parse() == 0) // no error encountered
         return m_ctx.release_header_data();
     else
         return nullptr;
@@ -30,24 +29,17 @@ void header_parser::error()
 {
     string match_txt = d_matched;
 
-    if (match_txt.empty())
+    if(match_txt.empty())
         match_txt = "<EOF>";
     else
         erase_and_replace(&match_txt, "\n", "*newline*");
 
-    m_error_info.emplace(parse_error{
-        d_scanner.filename(),
-        fmt::format("Unexpected input: {} encountered.", match_txt),
-        d_scanner.lineNr()
-    });
+    m_error_info.emplace(
+        parse_error{d_scanner.filename(), fmt::format("Unexpected input: {} encountered.", match_txt), d_scanner.lineNr()});
 }
 
 void header_parser::exceptionHandler(exception const& exc)
 {
-    m_error_info.emplace(parse_error{
-        d_scanner.filename(),
-        exc.what(),
-        d_scanner.lineNr()
-    });
+    m_error_info.emplace(parse_error{d_scanner.filename(), exc.what(), d_scanner.lineNr()});
     ABORT();
 }

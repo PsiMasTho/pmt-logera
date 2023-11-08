@@ -7,11 +7,11 @@
 
 #include "parse_error.h"
 
-#include <memory>
-#include <vector>
-#include <span>
 #include <filesystem>
+#include <memory>
+#include <span>
 #include <string>
+#include <vector>
 
 struct header_data;
 struct log_data;
@@ -20,7 +20,6 @@ class log_date;
 class archive
 {
 public:
-
     enum ordering
     {
         UNORDERED,
@@ -41,7 +40,8 @@ private:
     void parse_header(std::filesystem::path const& header_path);
     void parse_log_files(std::vector<std::filesystem::path> const& log_paths);
 
-    friend auto parse(std::filesystem::path const& header_path, std::vector<std::filesystem::path> const& log_paths, ordering order) -> archive;
+    friend auto parse(std::filesystem::path const& header_path, std::vector<std::filesystem::path> const& log_paths, ordering order)
+        -> archive;
 
     ordering m_ordering = UNORDERED;
     std::vector<parse_error> m_errors;

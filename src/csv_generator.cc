@@ -5,8 +5,8 @@
 
 #include "csv_generator.h"
 
-#include <utility>
 #include <ostream>
+#include <utility>
 
 using namespace std;
 
@@ -32,12 +32,12 @@ void csv_generator::write(log_date const& log_date, std::string const& filename,
     m_out << log_date.to_string() << ',';
     m_out << filename << ',';
     m_out << entry.var_name;
-    
+
     for(size_t idx = 0; idx < entry.attr_values.capacity(); ++idx)
     {
-        if (entry.attr_values.exists(idx))
+        if(entry.attr_values.exists(idx))
         {
-            if (needs_quotes(entry.attr_values.get(idx)))
+            if(needs_quotes(entry.attr_values.get(idx)))
                 m_out << ",\"" << entry.attr_values.get(idx) << '"';
             else
                 m_out << ',' << entry.attr_values.get(idx);

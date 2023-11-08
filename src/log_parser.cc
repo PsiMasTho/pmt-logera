@@ -7,18 +7,17 @@
 
 log_parser::log_parser(std::filesystem::path const& path, log_parser_context& ctx)
     : d_scanner(path)
-    , d_matched { d_scanner.matched() }
-    , m_ctx {ctx}
-    , m_error_info {nullopt}
-{
-}
+    , d_matched{d_scanner.matched()}
+    , m_ctx{ctx}
+    , m_error_info{nullopt}
+{ }
 
 unique_ptr<log_data> log_parser::gen()
 {
     std::filesystem::path const filename_path(d_scanner.filename());
     m_ctx.set_filename(filename_path.filename().string());
 
-    if (parse() == 0) // no error encountered
+    if(parse() == 0) // no error encountered
         return m_ctx.release_log_data();
     else
     {
@@ -38,24 +37,17 @@ void log_parser::error()
 {
     string match_txt = d_matched;
 
-    if (match_txt.empty())
+    if(match_txt.empty())
         match_txt = "<EOF>";
     else
         erase_and_replace(&match_txt, "\n", "*newline*");
 
-    m_error_info.emplace(parse_error{
-        d_scanner.filename(),
-        fmt::format("Unexpected input: {} encountered.", match_txt),
-        d_scanner.lineNr()
-    });
+    m_error_info.emplace(
+        parse_error{d_scanner.filename(), fmt::format("Unexpected input: {} encountered.", match_txt), d_scanner.lineNr()});
 }
 
 void log_parser::exceptionHandler(exception const& exc)
 {
-    m_error_info.emplace(parse_error{
-        d_scanner.filename(),
-        exc.what(),
-        d_scanner.lineNr()
-    });
+    m_error_info.emplace(parse_error{d_scanner.filename(), exc.what(), d_scanner.lineNr()});
     ABORT();
 }

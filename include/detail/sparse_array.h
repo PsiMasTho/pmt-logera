@@ -5,9 +5,9 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <vector>
-#include <algorithm>
 
 template <typename T>
 class sparse_array
@@ -56,10 +56,7 @@ bool sparse_array<T>::exists(std::size_t idx) const
 template <typename T>
 T const& sparse_array<T>::get(std::size_t idx) const
 {
-    auto const cItr =
-        cbegin(m_values) + std::count(cbegin(m_specified),
-                                      cbegin(m_specified) + static_cast<std::ptrdiff_t>(idx),
-                                      true);
+    auto const cItr = cbegin(m_values) + std::count(cbegin(m_specified), cbegin(m_specified) + static_cast<std::ptrdiff_t>(idx), true);
     return *cItr;
 }
 
@@ -73,8 +70,7 @@ template <typename T>
 template <typename U>
 void sparse_array<T>::_set(std::size_t idx, U&& value)
 {
-    auto const countRhs =
-        std::count(cbegin(m_specified) + static_cast<std::ptrdiff_t>(idx), cend(m_specified), true);
+    auto const countRhs = std::count(cbegin(m_specified) + static_cast<std::ptrdiff_t>(idx), cend(m_specified), true);
     m_values.insert(cend(m_values) - countRhs, std::forward<U>(value));
     m_specified[idx] = true;
 }

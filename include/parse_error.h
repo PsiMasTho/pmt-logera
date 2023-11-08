@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <string>
 #include <cstddef>
+#include <string>
 
 struct parse_error
 {

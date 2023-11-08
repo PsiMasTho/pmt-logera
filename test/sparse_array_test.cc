@@ -12,8 +12,7 @@
 
 using namespace std;
 
-static_assert(is_nothrow_move_constructible<sparse_array<string>>::value,
-              "sparse_array should be nothrow_move_constructible");
+static_assert(is_nothrow_move_constructible<sparse_array<string>>::value, "sparse_array should be nothrow_move_constructible");
 
 TEST_CASE("capacity")
 {

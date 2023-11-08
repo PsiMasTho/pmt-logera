@@ -62,16 +62,14 @@ void regex_matcher::add_regex(std::string const& expr)
 bool regex_matcher::operator()(std::string const& str) const
 {
     // if no regex is defined, then assume it's a match
-    if (m_regexes.empty())
+    if(m_regexes.empty())
         return true;
-    
+
     // does any regex match?
-    return any_of(begin(m_regexes), end(m_regexes), [&str](auto const& rexpr) {
-        return regex_match(str, rexpr);
-    });
+    return any_of(begin(m_regexes), end(m_regexes), [&str](auto const& rexpr) { return regex_match(str, rexpr); });
 }
 
-log_parser_context::log_parser_context(header_data * hd)
+log_parser_context::log_parser_context(header_data* hd)
     : m_target{make_unique<log_data>()}
     , m_header_data{hd}
     , m_matchers{}
@@ -93,29 +91,28 @@ void log_parser_context::set_filename(string const& filename)
 
 void log_parser_context::set_active_variable_or_throw(std::string const& var_name)
 {
-    if (!does_var_exist_bin(var_name, *m_header_data))
+    if(!does_var_exist_bin(var_name, *m_header_data))
         throw_var_doesnt_exist(var_name);
 
     m_active_variable_idx = get_var_idx_bin(var_name, *m_header_data);
     m_entries_created_for_active_variable = 0;
-
 }
 
 // 1. checks if active variable is set
 // 2. checks if the set attributes belong to the active variable
 void log_parser_context::create_entry_or_throw(sparse_array<std::string> const& attr_values)
 {
-    if (!m_active_variable_idx.has_value())
+    if(!m_active_variable_idx.has_value())
         throw_no_active_var();
 
     size_t const var_idx = m_active_variable_idx.value();
-    for (size_t idx = 0; idx < m_header_data->attrs.size(); ++idx)
+    for(size_t idx = 0; idx < m_header_data->attrs.size(); ++idx)
     {
-            // skip if attribute is not set
-        if (!attr_values.exists(idx))
+        // skip if attribute is not set
+        if(!attr_values.exists(idx))
             continue;
 
-        if (!does_var_have_attr_idx(var_idx, idx, *m_header_data))
+        if(!does_var_have_attr_idx(var_idx, idx, *m_header_data))
             throw_var_doesnt_have_attr(m_header_data->vars[var_idx].name, m_header_data->attrs[idx].name);
     }
 
@@ -123,7 +120,8 @@ void log_parser_context::create_entry_or_throw(sparse_array<std::string> const& 
     ++m_entries_created_for_active_variable;
 }
 
-auto log_parser_context::make_attr_value_arr_or_throw(std::pair<std::string, std::string> const& attr_value_pair) -> sparse_array<std::string>
+auto log_parser_context::make_attr_value_arr_or_throw(std::pair<std::string, std::string> const& attr_value_pair)
+    -> sparse_array<std::string>
 {
     // validate regex
     size_t const attr_idx = get_attr_idx_bin(attr_value_pair.first, *m_header_data);
@@ -135,16 +133,17 @@ auto log_parser_context::make_attr_value_arr_or_throw(std::pair<std::string, std
     return ret;
 }
 
-void log_parser_context::update_attr_value_arr_or_throw(sparse_array<std::string>& attr_value_arr, std::pair<std::string, std::string> const& attr_value_pair)
+void log_parser_context::update_attr_value_arr_or_throw(sparse_array<std::string>& attr_value_arr,
+                                                        std::pair<std::string, std::string> const& attr_value_pair)
 {
     // validate regex
     size_t const attr_idx = get_attr_idx_bin(attr_value_pair.first, *m_header_data);
     validate_attr_val_regex_or_throw(attr_idx, attr_value_pair.second);
 
     // check if attribute already added before
-    if (attr_value_arr.exists(attr_idx))
+    if(attr_value_arr.exists(attr_idx))
         throw_attr_already_added(attr_value_pair.first);
-    
+
     // add to sparse array
     attr_value_arr.set(attr_idx, attr_value_pair.second);
 }
@@ -152,7 +151,7 @@ void log_parser_context::update_attr_value_arr_or_throw(sparse_array<std::string
 // if there is an active variable pending but no entries then this is an error
 void log_parser_context::at_eof()
 {
-    if (m_active_variable_idx.has_value() && m_entries_created_for_active_variable == 0)
+    if(m_active_variable_idx.has_value() && m_entries_created_for_active_variable == 0)
         throw_active_var_has_no_entries_at_eof(m_header_data->vars[m_active_variable_idx.value()].name);
 }
 
@@ -167,10 +166,10 @@ void log_parser_context::construct_regexes()
 {
     m_matchers.reserve(m_header_data->attrs.size());
 
-    for (auto const& attr : m_header_data->attrs)
+    for(auto const& attr : m_header_data->attrs)
     {
         m_matchers.emplace_back();
-        for (auto const& expr : attr.reg_exprs)
+        for(auto const& expr : attr.reg_exprs)
             m_matchers.back().add_regex(expr);
     }
 }

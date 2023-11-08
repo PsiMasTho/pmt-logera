@@ -7,10 +7,10 @@
 
 #include "archive_data.h"
 
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <unordered_set>
+#include <vector>
 
 struct header_data;
 
@@ -27,7 +27,7 @@ public:
     void add_regex_to_last_attr(std::string const& expr);
     void add_attr_to_last_var(std::string const& attr_name);
 
-        // leaves class in a destructible but otherwise unusable state
+    // leaves class in a destructible but otherwise unusable state
     std::unique_ptr<header_data> release_header_data();
 
 private:

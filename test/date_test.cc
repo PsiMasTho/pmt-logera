@@ -12,8 +12,7 @@
 
 using namespace std;
 
-static_assert(is_nothrow_move_constructible<log_date>::value,
-              "log_date should be nothrow_move_constructible");
+static_assert(is_nothrow_move_constructible<log_date>::value, "log_date should be nothrow_move_constructible");
 
 TEST_CASE("nonthrow_construction")
 {

@@ -6,7 +6,6 @@ Checks: "*,
         -fuchsia-*,
         -google-*,
         -llvm*,
-        -modernize-use-trailing-return-type,
         -zircon-*,
         -readability-else-after-return,
         -readability-avoid-const-params-in-decls,
@@ -21,3 +20,4 @@ Checks: "*,
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle:     none
+

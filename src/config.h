@@ -14,7 +14,7 @@
 // fwd declaration
 namespace argparse
 {
-    class ArgumentParser;
+class ArgumentParser;
 }
 
 struct config

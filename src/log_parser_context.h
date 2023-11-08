@@ -5,18 +5,18 @@
 
 #pragma once
 
-#include "detail/sparse_array.h"
 #include "archive_data.h"
+#include "detail/sparse_array.h"
 
 #include <optional>
-#include <string>
 #include <regex>
+#include <string>
 #include <vector>
 
 class regex_matcher
 {
     std::vector<std::regex> m_regexes;
-    
+
 public:
     regex_matcher() = default;
     void add_regex(std::string const& expr);
@@ -41,15 +41,15 @@ public:
     void create_entry_or_throw(sparse_array<std::string> const& attr_values);
 
     auto make_attr_value_arr_or_throw(std::pair<std::string, std::string> const& attr_value_pair) -> sparse_array<std::string>;
-    void update_attr_value_arr_or_throw(sparse_array<std::string>& attr_value_arr, std::pair<std::string, std::string> const& attr_value_pair);
+    void update_attr_value_arr_or_throw(sparse_array<std::string>& attr_value_arr,
+                                        std::pair<std::string, std::string> const& attr_value_pair);
 
     void at_eof();
 
-        // clears state and is ready to parse another log immediately
+    // clears state and is ready to parse another log immediately
     std::unique_ptr<log_data> release_log_data();
 
 private:
     void construct_regexes();
     void validate_attr_val_regex_or_throw(std::size_t attr_idx, std::string const& attr_val) const;
 };
-
