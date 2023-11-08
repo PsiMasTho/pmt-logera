@@ -59,7 +59,7 @@ auto parse_args(int argc, char** argv) -> config
 
 vector<string> get_header_line(header_data const& header)
 {
-    vector<string> ret{"date", "var", "filename"};
+    vector<string> ret{"date", "filename", "var"};
     for(size_t idx = 0; idx < header.attrs.size(); ++idx)
         ret.push_back(header.attrs[idx].name);
 

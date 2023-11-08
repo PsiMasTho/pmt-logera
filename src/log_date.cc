@@ -77,10 +77,10 @@ char const* log_date::to_string() const
 
 strong_ordering operator<=>(log_date const& lhs, log_date const& rhs) noexcept
 {
-    return strncmp(lhs.to_string(), rhs.to_string(), DATE_STR_LEN) <= > 0;
+    return strncmp(lhs.to_string(), rhs.to_string(), DATE_STR_LEN) <=> 0;
 }
 
 bool operator==(log_date const& lhs, log_date const& rhs) noexcept
 {
-    return (lhs <= > rhs) == 0;
+    return (lhs <=> rhs) == 0;
 }
