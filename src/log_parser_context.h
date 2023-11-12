@@ -9,11 +9,11 @@
 #include "detail/sparse_array.h"
 #include "parser_context_common.h"
 
+#include <memory>
 #include <optional>
 #include <regex>
 #include <string>
 #include <vector>
-#include <memory>
 
 class log_scanner;
 
@@ -49,7 +49,7 @@ public:
 
     auto make_attr_value_arr_or_err(std::pair<std::string, std::string> const& attr_value_pair) -> sparse_array<std::string>;
     void update_attr_value_arr_or_err(sparse_array<std::string>& attr_value_arr,
-                                        std::pair<std::string, std::string> const& attr_value_pair);
+                                      std::pair<std::string, std::string> const& attr_value_pair);
 
     void at_eof();
 

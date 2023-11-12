@@ -10,10 +10,10 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <filesystem>
 #include <numeric>
 #include <stdexcept>
 #include <type_traits>
-#include <filesystem>
 
 using namespace std;
 using fmt::format;
@@ -63,7 +63,8 @@ void header_parser_context::add_attr(string const& attr_name)
     auto const attr_name_hash = hash<string>{}(attr_name);
 
     if(m_attr_name_hashes.contains(attr_name_hash))
-        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Attribute name is not unique: {}", attr_name), m_scanner->lineNr());
+        push_error(
+            parse_error::SEMANTIC, m_scanner->filename(), format("Attribute name is not unique: {}", attr_name), m_scanner->lineNr());
     else
     {
         m_attr_name_hashes.insert(attr_name_hash);
@@ -74,7 +75,10 @@ void header_parser_context::add_attr(string const& attr_name)
 void header_parser_context::add_regex_to_last_attr(string const& expr)
 {
     if(m_target->attrs.empty())
-        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Trying to add regex without an attribute: {}", expr), m_scanner->lineNr());
+        push_error(parse_error::SEMANTIC,
+                   m_scanner->filename(),
+                   format("Trying to add regex without an attribute: {}", expr),
+                   m_scanner->lineNr());
 
     // check if the regex is unique
     auto const& last_attr = m_target->attrs.back();
@@ -88,12 +92,16 @@ void header_parser_context::add_attr_to_last_var(string const& attr_name)
 {
     auto const last_var_itr = get_last_var_itr();
     if(last_var_itr == m_target->vars.end())
-        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Trying to add attribute without a variable: {}", attr_name), m_scanner->lineNr());
+        push_error(parse_error::SEMANTIC,
+                   m_scanner->filename(),
+                   format("Trying to add attribute without a variable: {}", attr_name),
+                   m_scanner->lineNr());
 
     auto const attr_idx = get_attr_idx_lin(attr_name, *m_target);
 
     if(last_var_itr->attr_indices[attr_idx])
-        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Attepmting to add attribute twice: {}", attr_name), m_scanner->lineNr());
+        push_error(
+            parse_error::SEMANTIC, m_scanner->filename(), format("Attepmting to add attribute twice: {}", attr_name), m_scanner->lineNr());
 
     last_var_itr->attr_indices[attr_idx] = true;
 }
@@ -127,7 +135,8 @@ void header_parser_context::set_filename_from_scanner()
         return;
 
     filesystem::path const filename_path(m_scanner->filename());
-    m_target->filename = filename_path.filename().string();;
+    m_target->filename = filename_path.filename().string();
+    ;
 }
 
 void header_parser_context::sort_target_by_name()

@@ -1,5 +1,8 @@
 #!/bin/python3
 
+# Note: for now this needs to be run from the root of the project as:
+# python3 tools/run_clang-format.py
+
 import os
 
 directories = ["test/", "include/", "src/"]

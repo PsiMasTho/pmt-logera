@@ -29,7 +29,8 @@ void header_parser::error()
     else
         erase_and_replace(&match_txt, "\n", "*newline*");
 
-    m_ctx.push_error(parse_error::SYNTAX, d_scanner.filename(), fmt::format("Unexpected input: {} encountered.", match_txt), d_scanner.lineNr());
+    m_ctx.push_error(
+        parse_error::SYNTAX, d_scanner.filename(), fmt::format("Unexpected input: {} encountered.", match_txt), d_scanner.lineNr());
     header_parser_base::ABORT();
 }
 

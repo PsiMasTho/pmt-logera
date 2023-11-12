@@ -12,9 +12,9 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <filesystem>
 #include <stdexcept>
 #include <string>
-#include <filesystem>
 #include <utility>
 
 using namespace std;
@@ -80,15 +80,19 @@ void log_parser_context::create_entry_or_err(sparse_array<string> const& attr_va
             continue;
 
         if(!does_var_have_attr_idx(var_idx, idx, *m_header_data))
-            push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Variable: \"{}\" does not have attribute: \"{}\"", m_header_data->vars[var_idx].name, m_header_data->attrs[idx].name), m_scanner->lineNr());
+            push_error(parse_error::SEMANTIC,
+                       m_scanner->filename(),
+                       format("Variable: \"{}\" does not have attribute: \"{}\"",
+                              m_header_data->vars[var_idx].name,
+                              m_header_data->attrs[idx].name),
+                       m_scanner->lineNr());
     }
 
     m_target->entries.emplace_back(m_header_data->vars[var_idx].name, attr_values);
     ++m_entries_created_for_active_variable;
 }
 
-auto log_parser_context::make_attr_value_arr_or_err(pair<string, string> const& attr_value_pair)
-    -> sparse_array<string>
+auto log_parser_context::make_attr_value_arr_or_err(pair<string, string> const& attr_value_pair) -> sparse_array<string>
 {
     // validate regex
     size_t const attr_idx = get_attr_idx_bin(attr_value_pair.first, *m_header_data);
@@ -100,8 +104,7 @@ auto log_parser_context::make_attr_value_arr_or_err(pair<string, string> const& 
     return ret;
 }
 
-void log_parser_context::update_attr_value_arr_or_err(sparse_array<string>& attr_value_arr,
-                                                        pair<string, string> const& attr_value_pair)
+void log_parser_context::update_attr_value_arr_or_err(sparse_array<string>& attr_value_arr, pair<string, string> const& attr_value_pair)
 {
     // validate regex
     size_t const attr_idx = get_attr_idx_bin(attr_value_pair.first, *m_header_data);
@@ -109,7 +112,10 @@ void log_parser_context::update_attr_value_arr_or_err(sparse_array<string>& attr
 
     // check if attribute already added before
     if(attr_value_arr.exists(attr_idx))
-        push_error(parse_error::SEMANTIC, m_scanner->filename(), format( "Attribute: \"{}\" already added", attr_value_pair.first), m_scanner->lineNr());
+        push_error(parse_error::SEMANTIC,
+                   m_scanner->filename(),
+                   format("Attribute: \"{}\" already added", attr_value_pair.first),
+                   m_scanner->lineNr());
 
     // add to sparse array
     attr_value_arr.set(attr_idx, attr_value_pair.second);
@@ -119,7 +125,10 @@ void log_parser_context::update_attr_value_arr_or_err(sparse_array<string>& attr
 void log_parser_context::at_eof()
 {
     if(m_active_variable_idx.has_value() && m_entries_created_for_active_variable == 0)
-        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("End of file reached without any entries for: \"{}\"", m_header_data->vars[m_active_variable_idx.value()].name), m_scanner->lineNr());
+        push_error(parse_error::SEMANTIC,
+                   m_scanner->filename(),
+                   format("End of file reached without any entries for: \"{}\"", m_header_data->vars[m_active_variable_idx.value()].name),
+                   m_scanner->lineNr());
 }
 
 unique_ptr<log_data> log_parser_context::release_log_data()
@@ -145,7 +154,7 @@ void log_parser_context::construct_regexes()
 
 void log_parser_context::set_filename_from_scanner()
 {
-    if (!m_scanner)
+    if(!m_scanner)
         return;
 
     filesystem::path const filename_path(m_scanner->filename());
@@ -155,5 +164,8 @@ void log_parser_context::set_filename_from_scanner()
 void log_parser_context::validate_attr_val_regex_or_err(size_t attr_idx, string const& attr_val)
 {
     if(!m_matchers[attr_idx](attr_val))
-        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Invalid value: \"{}\". For attribute: \"{}\"", attr_val, m_header_data->attrs[attr_idx].name), m_scanner->lineNr());
+        push_error(parse_error::SEMANTIC,
+                   m_scanner->filename(),
+                   format("Invalid value: \"{}\". For attribute: \"{}\"", attr_val, m_header_data->attrs[attr_idx].name),
+                   m_scanner->lineNr());
 }
