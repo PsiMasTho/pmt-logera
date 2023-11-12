@@ -80,8 +80,7 @@ void archive::parse_header(std::filesystem::path const& header_path)
     header_parser_context ctx;
     header_parser parser(header_path, ctx);
     m_header_data = parser.gen();
-    if(m_header_data == nullptr)
-        m_errors.push_back(parser.get_error_info());
+    move(ctx.get_errors().begin(), ctx.get_errors().end(), back_inserter(m_errors));
 }
 
 void archive::parse_log_files(std::vector<std::filesystem::path> const& log_paths)
@@ -90,16 +89,8 @@ void archive::parse_log_files(std::vector<std::filesystem::path> const& log_path
     for(auto const& pth : log_paths)
     {
         log_parser parser(pth, ctx);
-        unique_ptr<log_data> log_data = parser.gen();
-
-        // error encountered
-        if(log_data == nullptr)
-        {
-            m_errors.push_back(parser.get_error_info());
-            continue;
-        }
-
-        if(!has_errors())
-            m_log_data.push_back(move(log_data));
+        m_log_data.push_back(parser.gen());
     }
+
+    move(ctx.get_errors().begin(), ctx.get_errors().end(), back_inserter(m_errors));
 }

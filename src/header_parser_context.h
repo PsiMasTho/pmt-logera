@@ -6,6 +6,7 @@
 #pragma once
 
 #include "archive_data.h"
+#include "parser_context_common.h"
 
 #include <memory>
 #include <string>
@@ -13,15 +14,21 @@
 #include <vector>
 
 struct header_data;
+class header_scanner;
 
-class header_parser_context
+class header_parser_context : public error_context
 {
     std::unique_ptr<header_data> m_target;
     std::unordered_set<std::size_t> m_attr_name_hashes;
     std::unordered_set<std::size_t> m_var_name_hashes;
 
+    header_scanner const* m_scanner;
+
 public:
     header_parser_context();
+
+    void set_scanner(header_scanner const& scanner);
+
     void add_var(std::string const& var_name);
     void add_attr(std::string const& attr_name);
     void add_regex_to_last_attr(std::string const& expr);
@@ -33,6 +40,8 @@ public:
 private:
     std::vector<variable_data>::iterator get_last_var_itr();
     std::vector<attribute_data>::iterator get_last_attr_itr();
+
+    void set_filename_from_scanner();
 
     void sort_target_by_name();
 };

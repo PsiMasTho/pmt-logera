@@ -11,32 +11,30 @@
 #include "log_scanner.h"
 #include "parse_error.h"
 
-#include <fstream>
 #include <filesystem>
-#include <optional>
+#include <memory>
+#include <string>
+
 
 struct log_data;
 class log_parser_context;
 
-class log_parser : public log_parserBase {
+class log_parser : public log_parser_base {
 
     // $insert scannerobject
     log_scanner d_scanner;
     std::string const& d_matched;
     
     log_parser_context& m_ctx;
-    std::optional<parse_error> m_error_info;
 
 public:
     log_parser(std::filesystem::path const& path, log_parser_context& ctx);
-    int parse();
     std::unique_ptr<log_data> gen();
-    parse_error const& get_error_info() const;
 
 private:
+    int  parse();
     void error(); // called on (syntax) errors
-    int  lex(); // returns the next token from the
-        // lexical scanner.
+    int  lex(); // returns the next token from the lexical scanner.
     void print(); // use, e.g., d_token, d_loc
     void exceptionHandler(std::exception const& exc);
 

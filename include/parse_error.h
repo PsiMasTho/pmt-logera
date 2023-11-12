@@ -10,6 +10,14 @@
 
 struct parse_error
 {
+    enum : int
+    {
+        SEMANTIC,
+        SYNTAX,
+        EXCEPTION
+    };
+
+    int error_type;
     std::string filename;
     std::string msg;
     std::size_t line_nr;

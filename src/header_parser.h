@@ -10,9 +10,8 @@
 
 #include "parse_error.h"
 #include <filesystem>
-#include <fstream>
-#include <iosfwd>
-#include <optional>
+#include <memory>
+#include <string>
 
 struct header_data;
 class header_parser_context;
@@ -24,18 +23,15 @@ class header_parser : public header_parser_base {
     std::string const& d_matched;
 
     header_parser_context& m_ctx;
-    std::optional<parse_error> m_error_info;
 
 public:
     explicit header_parser(std::filesystem::path const& path, header_parser_context& ctx);
-    int parse();
     std::unique_ptr<header_data> gen();
-    parse_error const& get_error_info() const;
 
 private:
+    int  parse();
     void error(); // called on (syntax) errors
-    int  lex(); // returns the next token from the
-        // lexical scanner.
+    int  lex(); // returns the next token from the lexical scanner.
     void print(); // use, e.g., d_token, d_loc
     void exceptionHandler(std::exception const& exc);
 

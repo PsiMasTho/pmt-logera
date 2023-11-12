@@ -25,6 +25,7 @@ struct variable_data
 
 struct header_data
 {
+    std::string filename;
     std::vector<attribute_data> attrs;
     std::vector<variable_data> vars;
 };

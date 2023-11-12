@@ -5,9 +5,34 @@
 
 #pragma once
 
-#include <iosfwd>
+#include "parse_error.h"
+
+#include <span>
+#include <vector>
+#include <utility>
 
 struct header_data;
+
+class error_context
+{
+    std::vector<parse_error> m_errors;
+
+public:
+    template <typename... Args>
+    void push_error(Args&&... args);
+    auto get_errors() const -> std::span<parse_error const>;
+};
+
+template <typename... Args>
+inline void error_context::push_error(Args&&... args)
+{
+    m_errors.emplace_back(std::forward<Args>(args)...);
+}
+
+inline auto error_context::get_errors() const -> std::span<parse_error const>
+{
+    return m_errors;
+}
 
 // assuming unsorted data
 auto does_var_exist_lin(std::string const& var_name, header_data const& hd) -> bool;

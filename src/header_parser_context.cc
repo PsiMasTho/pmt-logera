@@ -5,14 +5,18 @@
 
 #include "header_parser_context.h"
 
-#include "parser_context_common.h"
+#include "header_scanner.h"
+
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <numeric>
 #include <stdexcept>
 #include <type_traits>
+#include <filesystem>
 
 using namespace std;
+using fmt::format;
 
 namespace
 {
@@ -33,14 +37,20 @@ header_parser_context::header_parser_context()
     : m_target{make_unique<header_data>()}
     , m_attr_name_hashes{}
     , m_var_name_hashes{}
+    , m_scanner{nullptr}
 { }
+
+void header_parser_context::set_scanner(header_scanner const& scanner)
+{
+    m_scanner = &scanner;
+}
 
 void header_parser_context::add_var(string const& var_name)
 {
     auto const var_name_hash = hash<string>{}(var_name);
 
     if(m_var_name_hashes.contains(var_name_hash))
-        throw runtime_error("Variable name is not unique: "s + var_name);
+        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Variable name is not unique: {}", var_name), m_scanner->lineNr());
     else
     {
         m_var_name_hashes.insert(var_name_hash);
@@ -53,7 +63,7 @@ void header_parser_context::add_attr(string const& attr_name)
     auto const attr_name_hash = hash<string>{}(attr_name);
 
     if(m_attr_name_hashes.contains(attr_name_hash))
-        throw runtime_error("Attribute name is not unique: "s + attr_name);
+        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Attribute name is not unique: {}", attr_name), m_scanner->lineNr());
     else
     {
         m_attr_name_hashes.insert(attr_name_hash);
@@ -64,12 +74,12 @@ void header_parser_context::add_attr(string const& attr_name)
 void header_parser_context::add_regex_to_last_attr(string const& expr)
 {
     if(m_target->attrs.empty())
-        throw runtime_error("Trying to add regex without an attribute: "s + expr);
+        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Trying to add regex without an attribute: {}", expr), m_scanner->lineNr());
 
     // check if the regex is unique
     auto const& last_attr = m_target->attrs.back();
     if(any_of(last_attr.reg_exprs.begin(), last_attr.reg_exprs.end(), [&expr](string const& reg_expr) { return reg_expr == expr; }))
-        throw runtime_error("Regex is not unique to attribute: "s + expr);
+        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Regex is not unique to attribute: {}", expr), m_scanner->lineNr());
 
     m_target->attrs.back().reg_exprs.emplace_back(expr);
 }
@@ -78,18 +88,19 @@ void header_parser_context::add_attr_to_last_var(string const& attr_name)
 {
     auto const last_var_itr = get_last_var_itr();
     if(last_var_itr == m_target->vars.end())
-        throw runtime_error("Attemtpting to add attribute without a variable: "s + attr_name);
+        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Trying to add attribute without a variable: {}", attr_name), m_scanner->lineNr());
 
     auto const attr_idx = get_attr_idx_lin(attr_name, *m_target);
 
     if(last_var_itr->attr_indices[attr_idx])
-        throw runtime_error("Attempting to add attribute twice: "s + attr_name);
+        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Attepmting to add attribute twice: {}", attr_name), m_scanner->lineNr());
 
     last_var_itr->attr_indices[attr_idx] = true;
 }
 
 unique_ptr<header_data> header_parser_context::release_header_data()
 {
+    set_filename_from_scanner();
     sort_target_by_name();
     return move(m_target);
 }
@@ -108,6 +119,15 @@ vector<attribute_data>::iterator header_parser_context::get_last_attr_itr()
         return m_target->attrs.end();
 
     return prev(m_target->attrs.end());
+}
+
+void header_parser_context::set_filename_from_scanner()
+{
+    if(m_scanner == nullptr)
+        return;
+
+    filesystem::path const filename_path(m_scanner->filename());
+    m_target->filename = filename_path.filename().string();;
 }
 
 void header_parser_context::sort_target_by_name()

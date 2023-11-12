@@ -348,7 +348,7 @@ Base::~Base()
 
 
 // base/base1
-log_parserBase::log_parserBase()
+log_parser_base::log_parser_base()
 :
     d_token(Reserved_::UNDETERMINED_),
     // $insert baseclasscode
@@ -358,7 +358,7 @@ log_parserBase::log_parserBase()
 }
 
 // base/clearin
-void log_parserBase::clearin_()
+void log_parser_base::clearin_()
 {
     d_nErrors_ = 0;
     d_stackIdx = -1;
@@ -374,20 +374,20 @@ void log_parserBase::clearin_()
 
 // base/debugfunctions
 
-void log_parserBase::setDebug(bool mode)
+void log_parser_base::setDebug(bool mode)
 {
     d_actionCases_ = false;
     d_debug_ = mode;
 }
 
-void log_parserBase::setDebug(DebugMode_ mode)
+void log_parser_base::setDebug(DebugMode_ mode)
 {
     d_actionCases_ = mode & ACTIONCASES;
     d_debug_ =       mode & ON;
 }
 
 // base/lex
-void log_parserBase::lex_(int token)
+void log_parser_base::lex_(int token)
 {
     d_token = token;
 
@@ -398,7 +398,7 @@ void log_parserBase::lex_(int token)
 }
 
 // base/lookup
-int log_parserBase::lookup_() const
+int log_parser_base::lookup_() const
 {
     // if the final transition is negative, then we should reduce by the rule
     // given by its positive value.
@@ -433,7 +433,7 @@ int log_parserBase::lookup_() const
 }
 
 // base/pop
-void log_parserBase::pop_(size_t count)
+void log_parser_base::pop_(size_t count)
 {
     if (d_stackIdx < static_cast<int>(count))
     {
@@ -447,7 +447,7 @@ void log_parserBase::pop_(size_t count)
 }
 
 // base/poptoken
-void log_parserBase::popToken_()
+void log_parser_base::popToken_()
 {
     d_token = d_next.first;
     d_val_ = std::move(d_next.second);
@@ -456,7 +456,7 @@ void log_parserBase::popToken_()
 }
 
 // base/push
-void log_parserBase::push_(size_t state)
+void log_parser_base::push_(size_t state)
 {
     size_t currentSize = d_stateStack.size();
     if (stackSize_() == currentSize)
@@ -480,21 +480,21 @@ void log_parserBase::push_(size_t state)
 }
 
 // base/pushtoken
-void log_parserBase::pushToken_(int token)
+void log_parser_base::pushToken_(int token)
 {
     d_next = TokenPair{ d_token, std::move(d_val_) };
     d_token = token;
 }
 
 // base/redotoken
-void log_parserBase::redoToken_()
+void log_parser_base::redoToken_()
 {
     if (d_token != Reserved_::UNDETERMINED_)
         pushToken_(d_token);
 }
 
 // base/reduce
-void log_parserBase::reduce_(int rule)
+void log_parser_base::reduce_(int rule)
 {
     PI_ const &pi = s_productionInfo[rule];
 
@@ -505,7 +505,7 @@ void log_parserBase::reduce_(int rule)
 }
 
 // base/shift
-void log_parserBase::shift_(int action)
+void log_parser_base::shift_(int action)
 {
     push_(action);
     popToken_();               // token processed
@@ -518,7 +518,7 @@ void log_parserBase::shift_(int action)
 }
 
 // base/startrecovery
-void log_parserBase::startRecovery_()
+void log_parser_base::startRecovery_()
 {
     int lastToken = d_token;                // give the unexpected token a
                                             // chance to be processed
@@ -535,7 +535,7 @@ void log_parserBase::startRecovery_()
 }
 
 // base/top
-inline size_t log_parserBase::top_() const
+inline size_t log_parser_base::top_() const
 {
     return d_stateStack[d_stackIdx].first;
 }
@@ -604,13 +604,13 @@ try
 
         case 5:
         {
-         m_ctx.set_active_variable_or_throw(vs_(-1).get<Tag_::STRING>());
+         m_ctx.set_active_variable_or_err(vs_(-1).get<Tag_::STRING>());
          }
         break;
 
         case 6:
         {
-         m_ctx.set_active_variable_or_throw(vs_(-1).get<Tag_::STRING>());
+         m_ctx.set_active_variable_or_err(vs_(-1).get<Tag_::STRING>());
          m_ctx.at_eof();
          ACCEPT();
          }
@@ -618,13 +618,13 @@ try
 
         case 7:
         {
-         m_ctx.create_entry_or_throw(vs_(-1).get<Tag_::SPARSE_ARRAY_STRING>().value());
+         m_ctx.create_entry_or_err(vs_(-1).get<Tag_::SPARSE_ARRAY_STRING>().value());
          }
         break;
 
         case 8:
         {
-         m_ctx.create_entry_or_throw(vs_(-1).get<Tag_::SPARSE_ARRAY_STRING>().value());
+         m_ctx.create_entry_or_err(vs_(-1).get<Tag_::SPARSE_ARRAY_STRING>().value());
          m_ctx.at_eof();
          ACCEPT();
          }
@@ -651,13 +651,13 @@ try
 
         case 12:
         {
-         d_val_ = m_ctx.make_attr_value_arr_or_throw(vs_(0).get<Tag_::STRING_PAIR>());
+         d_val_ = m_ctx.make_attr_value_arr_or_err(vs_(0).get<Tag_::STRING_PAIR>());
          }
         break;
 
         case 13:
         {
-         m_ctx.update_attr_value_arr_or_throw(vs_(-1).get<Tag_::SPARSE_ARRAY_STRING>().value(), vs_(0).get<Tag_::STRING_PAIR>());
+         m_ctx.update_attr_value_arr_or_err(vs_(-1).get<Tag_::SPARSE_ARRAY_STRING>().value(), vs_(0).get<Tag_::STRING_PAIR>());
          d_val_ = vs_(-1).get<Tag_::SPARSE_ARRAY_STRING>();
          }
         break;

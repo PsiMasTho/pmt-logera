@@ -48,24 +48,24 @@ statement:
 |
     variable NEWLINE
     {
-        m_ctx.set_active_variable_or_throw($1);
+        m_ctx.set_active_variable_or_err($1);
     }
 |
     variable EOF
     {
-        m_ctx.set_active_variable_or_throw($1);
+        m_ctx.set_active_variable_or_err($1);
         m_ctx.at_eof();
         ACCEPT();
     }
 |
     attr_value_arr NEWLINE
     {
-        m_ctx.create_entry_or_throw($1.value());
+        m_ctx.create_entry_or_err($1.value());
     }
 |
     attr_value_arr EOF
     {
-        m_ctx.create_entry_or_throw($1.value());
+        m_ctx.create_entry_or_err($1.value());
         m_ctx.at_eof();
         ACCEPT();
     }
@@ -89,12 +89,12 @@ attr_value_pair:
 attr_value_arr:
     attr_value_pair
     {
-        $$ = m_ctx.make_attr_value_arr_or_throw($1);
+        $$ = m_ctx.make_attr_value_arr_or_err($1);
     }
 |
     attr_value_arr attr_value_pair
     {
-        m_ctx.update_attr_value_arr_or_throw($1.value(), $2);
+        m_ctx.update_attr_value_arr_or_err($1.value(), $2);
         $$ = $1;
     }
 ;
