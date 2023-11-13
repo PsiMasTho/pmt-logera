@@ -1,11 +1,17 @@
-%scanner header_scanner.h
-%scanner-class-name header_scanner
-%parsefun-source header_parser_parse.cc
+//          Copyright (C) 2022 PsiMasTho (1cbb875@gmail.com)
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
 
-%token DECL_VAR
-       IDENT
-       DECL_ATTR
-       NEWLINE
+%scanner lexer.h
+%scanner-class-name lexer
+%parsefun-source header_parser_base.cc
+
+%token  DECL_VAR
+        IDENT
+        DECL_ATTR
+        NEWLINE
+        DATE // unused
 
 %stype std::string
 
@@ -32,7 +38,7 @@ line:
 identifier:
     IDENT
     {
-        $$ = d_scanner.matched();
+        $$ = m_lexer.matched();
     }
 ;
 

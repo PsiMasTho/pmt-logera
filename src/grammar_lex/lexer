@@ -1,0 +1,30 @@
+//          Copyright (C) 2022 PsiMasTho (1cbb875@gmail.com)
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
+%baseclass-header =      "lexer_base.h"
+%class-header =          "lexer.h"
+%implementation-header = "lexer.ih"
+%lex-source =            "lexer.cc"
+%class-name =            "lexer"
+
+nl             "\r\n"|"\n"
+
+%%
+
+    // ignore spaces and tabs on their own
+[ \t]+
+
+[0-9]{4}'-'[0-9]{2}'-'[0-9]{2}                               return tokens::Tokens_::DATE;
+
+">attr"					                                     return tokens::Tokens_::DECL_ATTR;
+
+">var"                                                       return tokens::Tokens_::DECL_VAR;
+
+[a-zA-Z_]+[a-zA-Z_0-9]*                                      return tokens::Tokens_::IDENT;
+
+#.*{nl}                                                      |
+{nl}                                                         return tokens::Tokens_::NEWLINE;
+
+.                                    	                     return matched()[0];

@@ -5,7 +5,7 @@
 
 #include "header_parser_context.h"
 
-#include "header_scanner.h"
+#include "lexer.h"
 
 #include <fmt/format.h>
 
@@ -37,12 +37,12 @@ header_parser_context::header_parser_context()
     : m_target{make_unique<header_data>()}
     , m_attr_name_hashes{}
     , m_var_name_hashes{}
-    , m_scanner{nullptr}
+    , m_lexer{nullptr}
 { }
 
-void header_parser_context::set_scanner(header_scanner const& scanner)
+void header_parser_context::set_lexer(lexer const& lex)
 {
-    m_scanner = &scanner;
+    m_lexer = &lex;
 }
 
 void header_parser_context::add_var(string const& var_name)
@@ -50,7 +50,7 @@ void header_parser_context::add_var(string const& var_name)
     auto const var_name_hash = hash<string>{}(var_name);
 
     if(m_var_name_hashes.contains(var_name_hash))
-        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Variable name is not unique: {}", var_name), m_scanner->lineNr());
+        push_error(parse_error::SEMANTIC, m_lexer->filename(), format("Variable name is not unique: {}", var_name), m_lexer->lineNr());
     else
     {
         m_var_name_hashes.insert(var_name_hash);
@@ -64,7 +64,7 @@ void header_parser_context::add_attr(string const& attr_name)
 
     if(m_attr_name_hashes.contains(attr_name_hash))
         push_error(
-            parse_error::SEMANTIC, m_scanner->filename(), format("Attribute name is not unique: {}", attr_name), m_scanner->lineNr());
+            parse_error::SEMANTIC, m_lexer->filename(), format("Attribute name is not unique: {}", attr_name), m_lexer->lineNr());
     else
     {
         m_attr_name_hashes.insert(attr_name_hash);
@@ -75,15 +75,21 @@ void header_parser_context::add_attr(string const& attr_name)
 void header_parser_context::add_regex_to_last_attr(string const& expr)
 {
     if(m_target->attrs.empty())
+    {
         push_error(parse_error::SEMANTIC,
-                   m_scanner->filename(),
+                   m_lexer->filename(),
                    format("Trying to add regex without an attribute: {}", expr),
-                   m_scanner->lineNr());
+                   m_lexer->lineNr());
+        return;
+    }
 
     // check if the regex is unique
     auto const& last_attr = m_target->attrs.back();
     if(any_of(last_attr.reg_exprs.begin(), last_attr.reg_exprs.end(), [&expr](string const& reg_expr) { return reg_expr == expr; }))
-        push_error(parse_error::SEMANTIC, m_scanner->filename(), format("Regex is not unique to attribute: {}", expr), m_scanner->lineNr());
+    {
+        push_error(parse_error::SEMANTIC, m_lexer->filename(), format("Regex is not unique to attribute: {}", expr), m_lexer->lineNr());
+        return;
+    }
 
     m_target->attrs.back().reg_exprs.emplace_back(expr);
 }
@@ -92,23 +98,29 @@ void header_parser_context::add_attr_to_last_var(string const& attr_name)
 {
     auto const last_var_itr = get_last_var_itr();
     if(last_var_itr == m_target->vars.end())
+    {
         push_error(parse_error::SEMANTIC,
-                   m_scanner->filename(),
+                   m_lexer->filename(),
                    format("Trying to add attribute without a variable: {}", attr_name),
-                   m_scanner->lineNr());
+                   m_lexer->lineNr());
+        return;
+    }
 
     auto const attr_idx = get_attr_idx_lin(attr_name, *m_target);
 
     if(last_var_itr->attr_indices[attr_idx])
+    {
         push_error(
-            parse_error::SEMANTIC, m_scanner->filename(), format("Attepmting to add attribute twice: {}", attr_name), m_scanner->lineNr());
+            parse_error::SEMANTIC, m_lexer->filename(), format("Attepmting to add attribute twice: {}", attr_name), m_lexer->lineNr());
+        return;
+    }
 
     last_var_itr->attr_indices[attr_idx] = true;
 }
 
 unique_ptr<header_data> header_parser_context::release_header_data()
 {
-    set_filename_from_scanner();
+    set_filename_from_lexer();
     sort_target_by_name();
     return move(m_target);
 }
@@ -129,12 +141,12 @@ vector<attribute_data>::iterator header_parser_context::get_last_attr_itr()
     return prev(m_target->attrs.end());
 }
 
-void header_parser_context::set_filename_from_scanner()
+void header_parser_context::set_filename_from_lexer()
 {
-    if(m_scanner == nullptr)
+    if(m_lexer == nullptr)
         return;
 
-    filesystem::path const filename_path(m_scanner->filename());
+    filesystem::path const filename_path(m_lexer->filename());
     m_target->filename = filename_path.filename().string();
     ;
 }

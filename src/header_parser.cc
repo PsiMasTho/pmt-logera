@@ -3,17 +3,23 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "header_parser.ih"
+#include "header_parser.h"
+
+#include "string_util.h"
+
+#include <fmt/format.h>
+
+using namespace std;
 
 header_parser::header_parser(std::filesystem::path const& path, header_parser_context& ctx)
-    : d_scanner(path)
-    , d_matched(d_scanner.matched())
+    : m_lexer(path)
+    , m_matched(m_lexer.matched())
     , m_ctx(ctx)
 { }
 
 unique_ptr<header_data> header_parser::gen()
 {
-    m_ctx.set_scanner(d_scanner);
+    m_ctx.set_lexer(m_lexer);
     if(parse() == 0) // no error encountered
         return m_ctx.release_header_data();
     else
@@ -22,7 +28,7 @@ unique_ptr<header_data> header_parser::gen()
 
 void header_parser::error()
 {
-    string match_txt = d_matched;
+    string match_txt = m_matched;
 
     if(match_txt.empty())
         match_txt = "<EOF>";
@@ -30,12 +36,12 @@ void header_parser::error()
         erase_and_replace(&match_txt, "\n", "*newline*");
 
     m_ctx.push_error(
-        parse_error::SYNTAX, d_scanner.filename(), fmt::format("Unexpected input: {} encountered.", match_txt), d_scanner.lineNr());
+        parse_error::SYNTAX, m_lexer.filename(), fmt::format("Unexpected input: {} encountered.", match_txt), m_lexer.lineNr());
     header_parser_base::ABORT();
 }
 
 void header_parser::exceptionHandler(exception const& exc)
 {
-    m_ctx.push_error(parse_error::EXCEPTION, d_scanner.filename(), exc.what(), d_scanner.lineNr());
+    m_ctx.push_error(parse_error::EXCEPTION, m_lexer.filename(), exc.what(), m_lexer.lineNr());
     header_parser_base::ABORT();
 }

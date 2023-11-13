@@ -18,7 +18,7 @@ namespace
 
 [[noreturn]] void throw_bad_ymd(string const& ymd_str)
 {
-    throw invalid_argument("Bad log_date string: "s + ymd_str);
+    throw invalid_argument("Bad date string: "s + ymd_str);
 }
 
 bool validate_ymd_str(string const& ymd_str)

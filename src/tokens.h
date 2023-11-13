@@ -1,9 +1,7 @@
-#ifndef INCLUDED_LOG_TOKEN_ENUMS_
-#define INCLUDED_LOG_TOKEN_ENUMS_
+#pragma once
 
 struct tokens
 {
-    // Symbolic tokens:
     enum Tokens_
     {
         DECL_VAR = 257,
@@ -12,7 +10,4 @@ struct tokens
         NEWLINE,
         DATE,
     };
-
 };
-
-#endif

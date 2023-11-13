@@ -14,7 +14,7 @@
 #include <vector>
 
 struct header_data;
-class header_scanner;
+class lexer;
 
 class header_parser_context : public error_context
 {
@@ -22,12 +22,12 @@ class header_parser_context : public error_context
     std::unordered_set<std::size_t> m_attr_name_hashes;
     std::unordered_set<std::size_t> m_var_name_hashes;
 
-    header_scanner const* m_scanner;
+    lexer const* m_lexer;
 
 public:
     header_parser_context();
 
-    void set_scanner(header_scanner const& scanner);
+    void set_lexer(lexer const& lex);
 
     void add_var(std::string const& var_name);
     void add_attr(std::string const& attr_name);
@@ -41,7 +41,7 @@ private:
     std::vector<variable_data>::iterator get_last_var_itr();
     std::vector<attribute_data>::iterator get_last_attr_itr();
 
-    void set_filename_from_scanner();
+    void set_filename_from_lexer();
 
     void sort_target_by_name();
 };

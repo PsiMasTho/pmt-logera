@@ -3,15 +3,17 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-%scanner log_scanner.h
-%scanner-class-name log_scanner
-%parsefun-source log_parser_parse.cc
+%scanner lexer.h
+%scanner-class-name lexer
+%parsefun-source log_parser_base.cc
 
 %baseclass-preinclude log_parser_base_preinclude.h
 
-%token IDENT
-       DATE
-       NEWLINE
+%token  DECL_VAR  // unused
+        IDENT
+        DECL_ATTR // unused
+        NEWLINE
+        DATE
 
 %polymorphic STRING:              std::string;
              STRING_PAIR:         std::pair<std::string, std::string>;
@@ -109,13 +111,13 @@ variable:
 identifier:
     IDENT
     {
-        $$ = d_scanner.matched();
+        $$ = m_lexer.matched();
     }
 ;
 
 date:
     DATE
     {
-        $$ = log_date{d_scanner.matched()};
+        $$ = log_date{m_lexer.matched()};
     }
 ;

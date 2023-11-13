@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-class log_scanner;
+class lexer;
 
 class regex_matcher
 {
@@ -33,7 +33,7 @@ class log_parser_context : public error_context
     std::vector<regex_matcher> m_matchers; // access attribute by index
 
     header_data const* m_header_data;
-    log_scanner const* m_scanner; // for getting the current line number
+    lexer const* m_lexer; // for getting the current line number
 
     std::optional<std::size_t> m_active_variable_idx;
     std::size_t m_entries_created_for_active_variable;
@@ -42,7 +42,7 @@ public:
     log_parser_context(header_data const* hd);
 
     void set_date(log_date const& date);
-    void set_scanner(log_scanner const& scanner);
+    void set_lexer(lexer const& lex);
 
     void set_active_variable_or_err(std::string const& var_name);
     void create_entry_or_err(sparse_array<std::string> const& attr_values);
@@ -58,6 +58,6 @@ public:
 
 private:
     void construct_regexes();
-    void set_filename_from_scanner();
+    void set_filename_from_lexer();
     void validate_attr_val_regex_or_err(std::size_t attr_idx, std::string const& attr_val);
 };

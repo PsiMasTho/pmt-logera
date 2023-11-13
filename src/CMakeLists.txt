@@ -2,6 +2,8 @@ file(GLOB LIB_SOURCES "*.cc")
 
 include(GNUInstallDirs)
 
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+
 add_library(${PROJECT_NAME} ${LIB_SOURCES} ${PROJ_PUBLIC_HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC

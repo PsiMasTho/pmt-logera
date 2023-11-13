@@ -1,11 +1,7 @@
-//          Copyright (C) 2022 PsiMasTho (1cbb875@gmail.com)
-// Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file LICENSE.txt or copy at
-//          https://www.boost.org/LICENSE_1_0.txt)
+#ifndef INCLUDED_HEADER_TOKEN_ENUMS_
+#define INCLUDED_HEADER_TOKEN_ENUMS_
 
-#pragma once
-
-struct header_tokens
+struct tokens
 {
     // Symbolic tokens:
     enum Tokens_
@@ -14,5 +10,9 @@ struct header_tokens
         IDENT,
         DECL_ATTR,
         NEWLINE,
+        DATE,
     };
+
 };
+
+#endif
