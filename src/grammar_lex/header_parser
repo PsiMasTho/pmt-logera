@@ -7,11 +7,14 @@
 %scanner-class-name lexer
 %parsefun-source header_parser_base.cc
 
+// Note: We have to list *ALL* of the tokens here even if we don't use them
 %token  DECL_VAR
         IDENT
         DECL_ATTR
         NEWLINE
-        DATE // unused
+        DATE       // unused
+        REGEX
+        ATTR_VALUE // unused
 
 %stype std::string
 
@@ -35,20 +38,13 @@ line:
     NEWLINE
 ;
 
-identifier:
-    IDENT
-    {
-        $$ = m_lexer.matched();
-    }
-;
-
 declare_attribute:
     DECL_ATTR identifier ';'
     {
         m_ctx.add_attr($2);
     }
 |
-    declare_attribute identifier ';'
+    declare_attribute regex ';'
     {
         m_ctx.add_regex_to_last_attr($2);
     }
@@ -63,5 +59,19 @@ declare_variable:
     declare_variable identifier ';'
     {
         m_ctx.add_attr_to_last_var($2);
+    }
+;
+
+identifier:
+    IDENT
+    {
+        $$ = m_lexer.matched();
+    }
+;
+
+regex:
+    REGEX
+    {
+        $$ = m_lexer.matched();
     }
 ;

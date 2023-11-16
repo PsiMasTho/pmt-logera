@@ -1,13 +1,7 @@
-# Tests
-find_package(Catch2 REQUIRED)
 
-# All tests sources
-file(GLOB_RECURSE TEST_SOURCES "*.cc")
-add_executable(${PROJECT_NAME}-tests ${TEST_SOURCES})
+add_executable(logera-print-tokens print_tokens.cc)
 
-# Using c++20
-target_compile_features(${PROJECT_NAME}-tests PRIVATE cxx_std_20)
+target_compile_features(logera-print-tokens PRIVATE cxx_std_20)
+target_link_libraries(logera-print-tokens PRIVATE logera)
 
-# Should be linked to the main library, as well as the Catch2 testing library
-target_link_libraries(${PROJECT_NAME}-tests PRIVATE logera Catch2::Catch2WithMain)
-target_compile_definitions(${PROJECT_NAME}-tests PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")
+add_subdirectory(unit)

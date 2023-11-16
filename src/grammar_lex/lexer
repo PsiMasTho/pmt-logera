@@ -3,28 +3,162 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+// Note: \n is an element of [[:space:]]
+
 %baseclass-header =      "lexer_base.h"
 %class-header =          "lexer.h"
 %implementation-header = "lexer.ih"
 %lex-source =            "lexer.cc"
 %class-name =            "lexer"
 
-nl             "\r\n"|"\n"
+ws                                                          [[:space:]]{-}[\n\r]+
+nl                                                          "\r\n"|"\n"+
+ident                                                       [a-zA-Z_]+[a-zA-Z_0-9]*
+regex                                                       [[:print:]]{-}[[:space:];#]+
+
+date                                                        [0-9]{4}'-'[0-9]{2}'-'[0-9]{2}
+
+attr_value                                                  [[:print:]]{-}[[:space:];#]+
+
+ident_value_pair                                            {ident}{ws}{attr_value}
+
+%x decl_attr_initial
+%x decl_attr_regex_seq
+
+%x decl_var_initial
+%x decl_var_value_seq
+
+%x logfile_initial
+%x logfile_attr_val_seq
 
 %%
+">attr"					                                    {
+                                                                begin(StartCondition_::decl_attr_initial);
+                                                                return tokens::Tokens_::DECL_ATTR;
+                                                            }
 
-    // ignore spaces and tabs on their own
-[ \t]+
+<decl_attr_initial>
+{
+    #.*{nl}                                                 |
+    {nl}                                                    {
+                                                                begin(StartCondition_::INITIAL);
+                                                                return tokens::Tokens_::NEWLINE;
+                                                            }
 
-[0-9]{4}'-'[0-9]{2}'-'[0-9]{2}                               return tokens::Tokens_::DATE;
+    {ident}                                                 return tokens::Tokens_::IDENT;                             
 
-">attr"					                                     return tokens::Tokens_::DECL_ATTR;
+    ';'                                                     {
+                                                                begin(StartCondition_::decl_attr_regex_seq);
+                                                                return ';';
+                                                            }
+    
+    {ws}
+}
 
-">var"                                                       return tokens::Tokens_::DECL_VAR;
+<decl_attr_regex_seq>
+{
+    #.*{nl}                                                 |
+    {nl}                                                    {
+                                                                begin(StartCondition_::INITIAL);
+                                                                return tokens::Tokens_::NEWLINE;
+                                                            }
+    
+    {regex}                                                 return tokens::Tokens_::REGEX;
 
-[a-zA-Z_]+[a-zA-Z_0-9]*                                      return tokens::Tokens_::IDENT;
+    {ws}
 
-#.*{nl}                                                      |
-{nl}                                                         return tokens::Tokens_::NEWLINE;
+    .                                                       return matched()[0];
+}
 
-.                                    	                     return matched()[0];
+">var"					                                    {
+                                                                begin(StartCondition_::decl_var_initial);
+                                                                return tokens::Tokens_::DECL_VAR;
+                                                            }
+
+<decl_var_initial>
+{
+    #.*{nl}                                                 |
+    {nl}                                                    {
+                                                                begin(StartCondition_::INITIAL);
+                                                                return tokens::Tokens_::NEWLINE;
+                                                            }
+
+    {ident}                                                 return tokens::Tokens_::IDENT;                              
+
+    ';'                                                     {
+                                                                begin(StartCondition_::decl_var_value_seq);
+                                                                return ';';
+                                                            }
+    
+    {ws} 
+}
+
+<decl_var_value_seq>
+{
+    #.*{nl}                                                 |
+    {nl}                                                    {
+                                                                begin(StartCondition_::INITIAL);
+                                                                return tokens::Tokens_::NEWLINE;
+                                                            }
+    
+    {ident}                                                 return tokens::Tokens_::IDENT;
+    
+    {ws}
+
+    .                                                       return matched()[0];
+}
+
+{date}                                                      {
+                                                                begin(StartCondition_::logfile_initial);
+                                                                return tokens::Tokens_::DATE;
+                                                            }
+
+<logfile_initial>
+{
+    #.*{nl}                                                 |
+    {nl}                                                    return tokens::Tokens_::NEWLINE;
+
+    {ident}/[[:space:]]*\:                                  {
+                                                                //redo(1);
+                                                                begin(StartCondition_::logfile_attr_val_seq);
+                                                                return tokens::Tokens_::IDENT;
+                                                            }
+    
+    {ws}
+
+    .                                                       return matched()[0];
+}
+
+<logfile_attr_val_seq>
+{
+    #.*{nl}                                                 |
+    {nl}                                                    return tokens::Tokens_::NEWLINE;
+
+    ':'                                                     return matched()[0];
+
+    {ident}/[[:space:]]*\:                                  {
+                                                                accept(0);
+                                                                begin(StartCondition_::logfile_initial);
+                                                            }
+    
+    {ident_value_pair}                                      {
+
+                                                                std::size_t const split = strchr(matched().data(), ' ') - matched().data();
+                                                                accept(split);
+                                                                return tokens::Tokens_::IDENT;
+                                                            }
+
+    {attr_value}                                            return tokens::Tokens_::ATTR_VALUE;
+                                     
+    {ws}
+
+    .                                                       return matched()[0];
+
+}
+
+#.*{nl}                                                     |
+{nl}                                                        return tokens::Tokens_::NEWLINE;
+
+{ws}
+
+.                                    	                    return matched()[0];

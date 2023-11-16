@@ -9,22 +9,26 @@
 
 %baseclass-preinclude log_parser_base_preinclude.h
 
+// Note: We have to list *ALL* of the tokens here even if we don't use them
 %token  DECL_VAR  // unused
         IDENT
         DECL_ATTR // unused
         NEWLINE
         DATE
+        REGEX     // unused
+        ATTR_VALUE
 
 %polymorphic STRING:              std::string;
              STRING_PAIR:         std::pair<std::string, std::string>;
              LOG_DATE:            log_date;
              SPARSE_ARRAY_STRING: std::optional<sparse_array<std::string>>;
 
-%type <STRING>              identifier;
-%type <STRING>              variable;
 %type <STRING_PAIR>         attr_value_pair;
-%type <LOG_DATE>            date;
 %type <SPARSE_ARRAY_STRING> attr_value_arr;
+%type <STRING>              variable;
+%type <STRING>              identifier;
+%type <LOG_DATE>            date;
+%type <STRING>              attr_value;
 
 %%
 
@@ -82,7 +86,7 @@ statement:
 ;
 
 attr_value_pair:
-    identifier identifier ';'
+    identifier attr_value ';'
     {
         $$ = make_pair($1, $2);
     }
@@ -119,5 +123,12 @@ date:
     DATE
     {
         $$ = log_date{m_lexer.matched()};
+    }
+;
+
+attr_value:
+    ATTR_VALUE
+    {
+        $$ = m_lexer.matched();
     }
 ;

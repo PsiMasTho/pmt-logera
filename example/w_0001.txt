@@ -4,16 +4,16 @@ bw:
     weight 71kg;
 
 dips:
-    weight 0kg; reps 2s10r; rpe 8;
+    			reps 2s10r; rpe 8;
     weight 5kg; reps 3s8r;  rpe 10;
 
 bench_press:
-    weight 60kg; reps 4s2r; incline 15deg;
+    weight 60kg;  reps 4s2r;    incline 15deg;
     weight 100kg; reps 5,4,4,1; incline 15deg;
 
 btn_situps:
     weight 2.5kg; reps 10,10,10,10;
-    weight 5kg; reps 5s10r;
+    weight 5kg;   reps 5s10r;
 
 treadmill:
     time 10:00;

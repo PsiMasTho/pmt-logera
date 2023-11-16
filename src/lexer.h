@@ -4,6 +4,7 @@
 #include "tokens.h"
 
 #include <string>
+#include <cstring>
 
 class lexer: public lexer_base
 {

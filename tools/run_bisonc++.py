@@ -1,7 +1,10 @@
 #!/bin/python3
 
+# Note: This script will also output bisonc++ warnings if there are any
+
 import argparse
 import os
+import subprocess
 import tempfile
 import glob
 
