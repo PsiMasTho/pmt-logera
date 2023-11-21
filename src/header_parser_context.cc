@@ -7,6 +7,8 @@
 
 #include "lexer.h"
 
+#include "utility.h"
+
 #include <fmt/format.h>
 
 #include <algorithm>
@@ -17,21 +19,6 @@
 
 using namespace std;
 using fmt::format;
-
-namespace
-{
-template <typename T, typename U>
-void indirect_sort(T data_begin, T data_end, U indices_begin)
-{
-    size_t const size = distance(data_begin, data_end);
-
-    vector<typename T::value_type> tmp(size);
-    transform(indices_begin, next(indices_begin, size), tmp.begin(), [&data_begin](size_t idx) { return *next(data_begin, idx); });
-
-    // write back
-    move(tmp.begin(), tmp.end(), data_begin);
-}
-} // namespace
 
 header_parser_context::header_parser_context()
     : m_target{make_unique<header_data>()}
@@ -165,10 +152,10 @@ void header_parser_context::sort_target_by_name()
         return m_target->attrs[lhs].name < m_target->attrs[rhs].name;
     });
 
-    // indirectly sort all variables' attribute indices
-    for(auto& var : m_target->vars)
-        indirect_sort(begin(var.attr_indices), end(var.attr_indices), begin(sorted_attr_indices));
+        // sort attributes
+    auto cache = indirect_rearrange(m_target->attrs.begin(), m_target->attrs.end(), sorted_attr_indices.begin(), nullptr);
 
-    // sort attributes
-    indirect_sort(begin(m_target->attrs), end(m_target->attrs), begin(sorted_attr_indices));
+        // indirectly sort all variables' attribute indices
+    for(auto& var : m_target->vars)
+        cache = indirect_rearrange(begin(var.attr_indices), end(var.attr_indices), begin(sorted_attr_indices), move(cache));
 }

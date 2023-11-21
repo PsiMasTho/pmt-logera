@@ -3,7 +3,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "string_util.h"
+#include "utility.h"
 
 #include <string>
 
@@ -11,10 +11,11 @@ using namespace std;
 
 void erase_and_replace(string* target, string const& to_erase, string const& to_replace)
 {
-    size_t const pos = target->find(to_erase);
-    if(pos != string::npos)
+    size_t pos = target->find(to_erase);
+    while (pos != string::npos)
     {
         target->erase(pos, to_erase.size());
         target->insert(pos, to_replace);
+        pos = target->find(to_erase, pos + to_replace.size());
     }
 }

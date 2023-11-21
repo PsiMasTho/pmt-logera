@@ -5,6 +5,12 @@
 
 #pragma once
 
-#include <iosfwd>
+#include <stdexcept>
+#include <string>
 
-void erase_and_replace(std::string* target, std::string const& to_erase, std::string const& to_replace);
+struct cmdl_exception : public std::invalid_argument
+{
+    explicit cmdl_exception(std::string const& what)
+        : std::invalid_argument(what)
+    { }
+};

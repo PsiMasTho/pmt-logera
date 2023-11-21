@@ -5,7 +5,7 @@
 
 #include "log_parser.h"
 
-#include "string_util.h"
+#include "utility.h"
 
 #include <fmt/format.h>
 

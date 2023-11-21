@@ -3,6 +3,7 @@ file(GLOB LIB_SOURCES "*.cc")
 include(GNUInstallDirs)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(BUILD_LOGERA_TO_CSV "Build logera to csv converter" ON)
 
 add_library(${PROJECT_NAME} ${LIB_SOURCES} ${PROJ_PUBLIC_HEADERS})
 
@@ -31,3 +32,7 @@ install(EXPORT ${PROJECT_NAME}-config
 
 find_package(fmt REQUIRED)
 target_link_libraries(${PROJECT_NAME} fmt::fmt)
+
+if (BUILD_LOGERA_TO_CSV)
+    add_subdirectory(to_csv)
+endif ()

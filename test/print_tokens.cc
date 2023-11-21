@@ -6,7 +6,7 @@
 
 #include "../src/lexer.h"
 #include "../src/tokens.h"
-#include "../src/string_util.h" // erase_and_replace
+#include "../src/utility.h" // erase_and_replace
 
 #include <iostream>
 #include <iomanip>
