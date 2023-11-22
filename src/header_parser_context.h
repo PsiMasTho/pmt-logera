@@ -14,7 +14,7 @@
 #include <vector>
 
 struct header_data;
-class lexer;
+class header_lexer;
 
 class header_parser_context : public error_context
 {
@@ -22,12 +22,12 @@ class header_parser_context : public error_context
     std::unordered_set<std::size_t> m_attr_name_hashes;
     std::unordered_set<std::size_t> m_var_name_hashes;
 
-    lexer const* m_lexer;
+    header_lexer const* m_lexer;
 
 public:
     header_parser_context();
 
-    void set_lexer(lexer const& lex);
+    void set_lexer(header_lexer const& lex);
 
     void add_var(std::string const& var_name);
     void add_attr(std::string const& attr_name);

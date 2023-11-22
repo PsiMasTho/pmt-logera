@@ -2,17 +2,15 @@
 
 #include <string>
 
-struct tokens
+struct header_tokens
 {
     enum Tokens_
     {
         DECL_VAR = 257,
-        IDENT,
         DECL_ATTR,
+        IDENT,
         NEWLINE,
-        DATE,
         REGEX,
-        ATTR_VALUE,
 
         MAX_TOKEN
     };
@@ -23,12 +21,10 @@ struct tokens
         static char const* const symbolic_tokens[] = 
         {
             "DECL_VAR",
-            "IDENT",
             "DECL_ATTR",
+            "IDENT",
             "NEWLINE",
-            "DATE",
             "REGEX",
-            "ATTR_VALUE"
         };
 
         if (token >= MAX_TOKEN)

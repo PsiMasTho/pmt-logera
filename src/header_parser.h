@@ -3,18 +3,17 @@
 #include "header_parser_base.h"
 
 #include "header_parser_context.h"
-#include "lexer.h"
+#include "header_lexer.h"
 
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <string_view>
 
 struct header_data;
 
 class header_parser : public header_parser_base {
-    lexer m_lexer;
-    std::string const& m_matched;
-
+    header_lexer m_lexer;
     header_parser_context& m_ctx;
 
 public:

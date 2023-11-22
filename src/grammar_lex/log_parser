@@ -3,32 +3,29 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-%scanner lexer.h
-%scanner-class-name lexer
+%scanner log_lexer.h
+%scanner-class-name log_lexer
 %parsefun-source log_parser_base.cc
+%token-class log_tokens
+%token-path log_tokens.h
 
 %baseclass-preinclude log_parser_base_preinclude.h
 
-// Note: We have to list *ALL* of the tokens here even if we don't use them
-%token  DECL_VAR  // unused
-        IDENT
-        DECL_ATTR // unused
+%token  IDENT
         NEWLINE
         DATE
-        REGEX     // unused
-        ATTR_VALUE
+        IDENT_VALUE_PAIR
 
 %polymorphic STRING:              std::string;
              STRING_PAIR:         std::pair<std::string, std::string>;
              LOG_DATE:            log_date;
              SPARSE_ARRAY_STRING: std::optional<sparse_array<std::string>>;
 
-%type <STRING_PAIR>         attr_value_pair;
-%type <SPARSE_ARRAY_STRING> attr_value_arr;
+%type <STRING_PAIR>         ident_value_pair;
+%type <SPARSE_ARRAY_STRING> ident_value_pair_list;
 %type <STRING>              variable;
 %type <STRING>              identifier;
 %type <LOG_DATE>            date;
-%type <STRING>              attr_value;
 
 %%
 
@@ -52,24 +49,17 @@ statement:
         ACCEPT();
     }
 |
-    variable NEWLINE
+    variable
     {
         m_ctx.set_active_variable_or_err($1);
     }
 |
-    variable EOF
-    {
-        m_ctx.set_active_variable_or_err($1);
-        m_ctx.at_eof();
-        ACCEPT();
-    }
-|
-    attr_value_arr NEWLINE
+    ident_value_pair_list NEWLINE
     {
         m_ctx.create_entry_or_err($1.value());
     }
 |
-    attr_value_arr EOF
+    ident_value_pair_list EOF
     {
         m_ctx.create_entry_or_err($1.value());
         m_ctx.at_eof();
@@ -85,22 +75,15 @@ statement:
     }
 ;
 
-attr_value_pair:
-    identifier attr_value ';'
+ident_value_pair_list:
+    ident_value_pair ';'
     {
-        $$ = make_pair($1, $2);
-    }
-;
-
-attr_value_arr:
-    attr_value_pair
-    {
-        $$ = m_ctx.make_attr_value_arr_or_err($1);
+        $$ = m_ctx.make_ident_value_pair_list_or_err($1);
     }
 |
-    attr_value_arr attr_value_pair
+    ident_value_pair_list ident_value_pair ';'
     {
-        m_ctx.update_attr_value_arr_or_err($1.value(), $2);
+        m_ctx.update_ident_value_pair_list_or_err($1.value(), $2);
         $$ = $1;
     }
 ;
@@ -115,20 +98,38 @@ variable:
 identifier:
     IDENT
     {
-        $$ = m_lexer.matched();
+        std::string const val{m_lexer.matched().data(), m_lexer.matched().size()};
+        $$ = std::move(val);
     }
 ;
 
 date:
     DATE
     {
-        $$ = log_date{m_lexer.matched()};
+        std::string const val{m_lexer.matched().data(), m_lexer.matched().size()};
+        $$ = log_date{val};
     }
 ;
 
-attr_value:
-    ATTR_VALUE
+ident_value_pair:
+    IDENT_VALUE_PAIR
     {
-        $$ = m_lexer.matched();
+        std::string val{m_lexer.matched().data(), m_lexer.matched().size()};
+
+        std::size_t const split = strchr(val.data(), ' ') - val.data();
+        std::string const s1 = val.substr(0, split);
+        std::string s2 = val.substr(split + 1);
+
+        // trim s2 lhs
+        std::size_t const s2_lhs = s2.find_first_not_of(' ');
+        if (s2_lhs != std::string::npos)
+            s2.erase(0, s2_lhs);
+        
+        // trim s2 rhs
+        std::size_t const s2_rhs = s2.find_last_not_of(' ');
+        if (s2_rhs != std::string::npos)
+            s2.erase(s2_rhs + 1);
+
+        $$ = make_pair(s1, s2);
     }
 ;

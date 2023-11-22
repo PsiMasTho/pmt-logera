@@ -26,8 +26,6 @@ def run_bisoncpp(prefix, output_dir):
 					  f"--filenames={prefix}_parser", 
 					  "--no-lines", 
 					  f"--class-name={prefix}_parser", 
-					  f"--token-class=tokens", 
-					  f"--token-path=tokens.h", 
 					  f"--target-directory={output_dir}"]
 	
 	bisoncpp_args = " ".join(bisoncpp_args)

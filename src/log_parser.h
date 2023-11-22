@@ -3,7 +3,7 @@
 #include "log_parser_base.h"
 
 #include "log_parser_context.h"
-#include "lexer.h"
+#include "log_lexer.h"
 
 #include <filesystem>
 #include <memory>
@@ -15,9 +15,7 @@ class log_parser_context;
 
 class log_parser : public log_parser_base {
 
-    lexer m_lexer;
-    std::string const& m_matched;
-    
+    log_lexer m_lexer;
     log_parser_context& m_ctx;
 
 public:

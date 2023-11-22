@@ -12,8 +12,7 @@
 using namespace std;
 
 log_parser::log_parser(std::filesystem::path const& path, log_parser_context& ctx)
-    : m_lexer(path)
-    , m_matched{m_lexer.matched()}
+    : m_lexer(path.c_str())
     , m_ctx{ctx}
 { }
 
@@ -33,7 +32,7 @@ unique_ptr<log_data> log_parser::gen()
 
 void log_parser::error()
 {
-    string match_txt = m_matched;
+    string match_txt{m_lexer.matched().data(), m_lexer.matched().size()};
 
     if(match_txt.empty())
         match_txt = "<EOF>";
@@ -41,12 +40,12 @@ void log_parser::error()
         erase_and_replace(&match_txt, "\n", "*newline*");
 
     m_ctx.push_error(
-        parse_error::SYNTAX, m_lexer.filename(), fmt::format("Unexpected input: {} encountered.", match_txt), m_lexer.lineNr());
+        parse_error::SYNTAX, m_lexer.filename(), fmt::format("Unexpected input: {} encountered.", match_txt), m_lexer.line_nr());
     log_parser_base::ABORT();
 }
 
 void log_parser::exceptionHandler(exception const& exc)
 {
-    m_ctx.push_error(parse_error::EXCEPTION, m_lexer.filename(), exc.what(), m_lexer.lineNr());
+    m_ctx.push_error(parse_error::EXCEPTION, m_lexer.filename(), exc.what(), m_lexer.line_nr());
     log_parser_base::ABORT();
 }

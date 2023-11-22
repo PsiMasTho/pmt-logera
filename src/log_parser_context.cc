@@ -7,7 +7,7 @@
 
 #include "archive_data.h"
 #include "log_date.h"
-#include "lexer.h"
+#include "log_lexer.h"
 
 #include <fmt/format.h>
 
@@ -51,7 +51,7 @@ void log_parser_context::set_date(log_date const& date)
     m_target->date = date;
 }
 
-void log_parser_context::set_lexer(lexer const& lex)
+void log_parser_context::set_lexer(log_lexer const& lex)
 {
     m_lexer = &lex;
 }
@@ -60,7 +60,7 @@ void log_parser_context::set_active_variable_or_err(string const& var_name)
 {
     if(!does_var_exist_bin(var_name, *m_header_data))
     {
-        push_error(parse_error::SEMANTIC, m_lexer->filename(), format("Variable: \"{}\" does not exist", var_name), m_lexer->lineNr());
+        push_error(parse_error::SEMANTIC, m_lexer->filename(), format("Variable: \"{}\" does not exist", var_name), m_lexer->line_nr());
         return;
     }
 
@@ -74,7 +74,7 @@ void log_parser_context::create_entry_or_err(sparse_array<string> const& attr_va
 {
     if(!m_active_variable_idx.has_value())
     {
-        push_error(parse_error::SEMANTIC, m_lexer->filename(), "No active variable", m_lexer->lineNr());
+        push_error(parse_error::SEMANTIC, m_lexer->filename(), "No active variable", m_lexer->line_nr());
         return;
     }
 
@@ -91,14 +91,14 @@ void log_parser_context::create_entry_or_err(sparse_array<string> const& attr_va
                        format("Variable: \"{}\" does not have attribute: \"{}\"",
                               m_header_data->vars[var_idx].name,
                               m_header_data->attrs[idx].name),
-                       m_lexer->lineNr());
+                       m_lexer->line_nr());
     }
 
     m_target->entries.emplace_back(m_header_data->vars[var_idx].name, attr_values);
     ++m_entries_created_for_active_variable;
 }
 
-auto log_parser_context::make_attr_value_arr_or_err(pair<string, string> const& attr_value_pair) -> sparse_array<string>
+auto log_parser_context::make_ident_value_pair_list_or_err(pair<string, string> const& attr_value_pair) -> sparse_array<string>
 {
     // validate regex
     size_t const attr_idx = get_attr_idx_bin(attr_value_pair.first, *m_header_data);
@@ -110,7 +110,7 @@ auto log_parser_context::make_attr_value_arr_or_err(pair<string, string> const& 
     return ret;
 }
 
-void log_parser_context::update_attr_value_arr_or_err(sparse_array<string>& attr_value_arr, pair<string, string> const& attr_value_pair)
+void log_parser_context::update_ident_value_pair_list_or_err(sparse_array<string>& attr_value_arr, pair<string, string> const& attr_value_pair)
 {
     // validate regex
     size_t const attr_idx = get_attr_idx_bin(attr_value_pair.first, *m_header_data);
@@ -122,7 +122,7 @@ void log_parser_context::update_attr_value_arr_or_err(sparse_array<string>& attr
         push_error(parse_error::SEMANTIC,
                    m_lexer->filename(),
                    format("Attribute: \"{}\" already added", attr_value_pair.first),
-                   m_lexer->lineNr());
+                   m_lexer->line_nr());
         return;
     }
     // add to sparse array
@@ -136,7 +136,7 @@ void log_parser_context::at_eof()
         push_error(parse_error::SEMANTIC,
                    m_lexer->filename(),
                    format("End of file reached without any entries for: \"{}\"", m_header_data->vars[m_active_variable_idx.value()].name),
-                   m_lexer->lineNr());
+                   m_lexer->line_nr());
 }
 
 unique_ptr<log_data> log_parser_context::release_log_data()
@@ -175,5 +175,5 @@ void log_parser_context::validate_attr_val_regex_or_err(size_t attr_idx, string 
         push_error(parse_error::SEMANTIC,
                    m_lexer->filename(),
                    format("Invalid value: \"{}\". For attribute: \"{}\"", attr_val, m_header_data->attrs[attr_idx].name),
-                   m_lexer->lineNr());
+                   m_lexer->line_nr());
 }

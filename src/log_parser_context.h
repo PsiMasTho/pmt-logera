@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-class lexer;
+class log_lexer;
 
 class regex_matcher
 {
@@ -33,7 +33,7 @@ class log_parser_context : public error_context
     std::vector<regex_matcher> m_matchers; // access attribute by index
 
     header_data const* m_header_data;
-    lexer const* m_lexer; // for getting the current line number
+    log_lexer const* m_lexer; // for getting the current line number
 
     std::optional<std::size_t> m_active_variable_idx;
     std::size_t m_entries_created_for_active_variable;
@@ -42,13 +42,13 @@ public:
     log_parser_context(header_data const* hd);
 
     void set_date(log_date const& date);
-    void set_lexer(lexer const& lex);
+    void set_lexer(log_lexer const& lex);
 
     void set_active_variable_or_err(std::string const& var_name);
     void create_entry_or_err(sparse_array<std::string> const& attr_values);
 
-    auto make_attr_value_arr_or_err(std::pair<std::string, std::string> const& attr_value_pair) -> sparse_array<std::string>;
-    void update_attr_value_arr_or_err(sparse_array<std::string>& attr_value_arr,
+    auto make_ident_value_pair_list_or_err(std::pair<std::string, std::string> const& attr_value_pair) -> sparse_array<std::string>;
+    void update_ident_value_pair_list_or_err(sparse_array<std::string>& attr_value_arr,
                                       std::pair<std::string, std::string> const& attr_value_pair);
 
     void at_eof();

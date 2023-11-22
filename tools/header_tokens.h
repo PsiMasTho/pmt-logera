@@ -1,16 +1,16 @@
-#ifndef INCLUDED_LOG_TOKEN_ENUMS_
-#define INCLUDED_LOG_TOKEN_ENUMS_
+#ifndef INCLUDED_HEADER_TOKENS_
+#define INCLUDED_HEADER_TOKENS_
 
-struct tokens
+struct header_tokens
 {
     // Symbolic tokens:
     enum Tokens_
     {
         DECL_VAR = 257,
-        IDENT,
         DECL_ATTR,
+        IDENT,
         NEWLINE,
-        DATE,
+        REGEX,
     };
 
 };
