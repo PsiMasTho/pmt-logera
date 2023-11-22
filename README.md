@@ -65,7 +65,7 @@ For more information see examples/ folder.
 ### If building tests:
 * *Catch2*
 ### If modifying scanner and grammar files:
-* *bisonc++* and/or *flexc++* to (re)generate scanners and parsers
+* *bisonc++* and/or *ragel* to (re)generate scanners and parsers
 
 ## Building (linux)
 
