@@ -7,7 +7,7 @@
 
 #include "archive_data.h"
 #include "log_date.h"
-#include "log_lexer.h"
+#include "../lexer/lexed_file.h"
 
 #include <fmt/format.h>
 
@@ -37,9 +37,9 @@ bool regex_matcher::operator()(string const& str) const
 
 log_parser_context::log_parser_context(header_data const* hd)
     : m_target{make_unique<log_data>()}
-    , m_header_data{hd}
-    , m_lexer{nullptr}
     , m_matchers{}
+    , m_header_data{hd}
+    , m_walker{nullptr}
     , m_active_variable_idx{}
     , m_entries_created_for_active_variable{0}
 {
@@ -51,16 +51,16 @@ void log_parser_context::set_date(log_date const& date)
     m_target->date = date;
 }
 
-void log_parser_context::set_lexer(log_lexer const& lex)
+void log_parser_context::set_lexed_file_walker(lexed_file_walker const& lex)
 {
-    m_lexer = &lex;
+    m_walker = &lex;
 }
 
 void log_parser_context::set_active_variable_or_err(string const& var_name)
 {
     if(!does_var_exist_bin(var_name, *m_header_data))
     {
-        push_error(parse_error::SEMANTIC, m_lexer->filename(), format("Variable: \"{}\" does not exist", var_name), m_lexer->line_nr());
+        push_error(parse_error::SEMANTIC, m_walker->get_file().get_filename(), format("Variable: \"{}\" does not exist", var_name), m_walker->get_cur_line_nr());
         return;
     }
 
@@ -74,7 +74,7 @@ void log_parser_context::create_entry_or_err(sparse_array<string> const& attr_va
 {
     if(!m_active_variable_idx.has_value())
     {
-        push_error(parse_error::SEMANTIC, m_lexer->filename(), "No active variable", m_lexer->line_nr());
+        push_error(parse_error::SEMANTIC, m_walker->get_file().get_filename(), "No active variable", m_walker->get_cur_line_nr());
         return;
     }
 
@@ -87,11 +87,11 @@ void log_parser_context::create_entry_or_err(sparse_array<string> const& attr_va
 
         if(!does_var_have_attr_idx(var_idx, idx, *m_header_data))
             push_error(parse_error::SEMANTIC,
-                       m_lexer->filename(),
+                       m_walker->get_file().get_filename(),
                        format("Variable: \"{}\" does not have attribute: \"{}\"",
                               m_header_data->vars[var_idx].name,
                               m_header_data->attrs[idx].name),
-                       m_lexer->line_nr());
+                       m_walker->get_cur_line_nr());
     }
 
     m_target->entries.emplace_back(m_header_data->vars[var_idx].name, attr_values);
@@ -120,9 +120,9 @@ void log_parser_context::update_ident_value_pair_list_or_err(sparse_array<string
     if(attr_value_arr.exists(attr_idx))
     {
         push_error(parse_error::SEMANTIC,
-                   m_lexer->filename(),
+                   m_walker->get_file().get_filename(),
                    format("Attribute: \"{}\" already added", attr_value_pair.first),
-                   m_lexer->line_nr());
+                   m_walker->get_cur_line_nr());
         return;
     }
     // add to sparse array
@@ -134,17 +134,17 @@ void log_parser_context::at_eof()
 {
     if(m_active_variable_idx.has_value() && m_entries_created_for_active_variable == 0)
         push_error(parse_error::SEMANTIC,
-                   m_lexer->filename(),
+                   m_walker->get_file().get_filename(),
                    format("End of file reached without any entries for: \"{}\"", m_header_data->vars[m_active_variable_idx.value()].name),
-                   m_lexer->line_nr());
+                   m_walker->get_cur_line_nr());
 }
 
 unique_ptr<log_data> log_parser_context::release_log_data()
 {
-    set_filename_from_lexer();
+    set_filename();
     m_active_variable_idx.reset();
     m_entries_created_for_active_variable = 0;
-    m_lexer = nullptr;
+    m_walker = nullptr;
     return exchange(m_target, make_unique<log_data>());
 }
 
@@ -160,12 +160,12 @@ void log_parser_context::construct_regexes()
     }
 }
 
-void log_parser_context::set_filename_from_lexer()
+void log_parser_context::set_filename()
 {
-    if(!m_lexer)
+    if(!m_walker)
         return;
 
-    filesystem::path const filename_path(m_lexer->filename());
+    filesystem::path const filename_path(m_walker->get_file().get_filename());
     m_target->filename = filename_path.filename().string();
 }
 
@@ -173,7 +173,7 @@ void log_parser_context::validate_attr_val_regex_or_err(size_t attr_idx, string 
 {
     if(!m_matchers[attr_idx](attr_val))
         push_error(parse_error::SEMANTIC,
-                   m_lexer->filename(),
+                   m_walker->get_file().get_filename(),
                    format("Invalid value: \"{}\". For attribute: \"{}\"", attr_val, m_header_data->attrs[attr_idx].name),
-                   m_lexer->line_nr());
+                   m_walker->get_cur_line_nr());
 }

@@ -5,9 +5,8 @@
 
 #include "header_parser_context.h"
 
-#include "header_lexer.h"
-
-#include "utility.h"
+#include "../lexer/lexed_file.h"
+#include "../utility/utility.h"
 
 #include <fmt/format.h>
 
@@ -24,12 +23,12 @@ header_parser_context::header_parser_context()
     : m_target{make_unique<header_data>()}
     , m_attr_name_hashes{}
     , m_var_name_hashes{}
-    , m_lexer{nullptr}
+    , m_walker{nullptr}
 { }
 
-void header_parser_context::set_lexer(header_lexer const& lex)
+void header_parser_context::set_lexed_file_walker(lexed_file_walker const& lex)
 {
-    m_lexer = &lex;
+    m_walker = &lex;
 }
 
 void header_parser_context::add_var(string const& var_name)
@@ -37,7 +36,7 @@ void header_parser_context::add_var(string const& var_name)
     auto const var_name_hash = hash<string>{}(var_name);
 
     if(m_var_name_hashes.contains(var_name_hash))
-        push_error(parse_error::SEMANTIC, m_lexer->filename(), format("Variable name is not unique: {}", var_name), m_lexer->line_nr());
+        push_error(parse_error::SEMANTIC, m_walker->get_file().get_filename(), format("Variable name is not unique: {}", var_name), m_walker->get_cur_line_nr());
     else
     {
         m_var_name_hashes.insert(var_name_hash);
@@ -51,7 +50,7 @@ void header_parser_context::add_attr(string const& attr_name)
 
     if(m_attr_name_hashes.contains(attr_name_hash))
         push_error(
-            parse_error::SEMANTIC, m_lexer->filename(), format("Attribute name is not unique: {}", attr_name), m_lexer->line_nr());
+            parse_error::SEMANTIC, m_walker->get_file().get_filename(), format("Attribute name is not unique: {}", attr_name), m_walker->get_cur_line_nr());
     else
     {
         m_attr_name_hashes.insert(attr_name_hash);
@@ -64,9 +63,9 @@ void header_parser_context::add_regex_to_last_attr(string const& expr)
     if(m_target->attrs.empty())
     {
         push_error(parse_error::SEMANTIC,
-                   m_lexer->filename(),
+                   m_walker->get_file().get_filename(),
                    format("Trying to add regex without an attribute: {}", expr),
-                   m_lexer->line_nr());
+                   m_walker->get_cur_line_nr());
         return;
     }
 
@@ -74,7 +73,7 @@ void header_parser_context::add_regex_to_last_attr(string const& expr)
     auto const& last_attr = m_target->attrs.back();
     if(any_of(last_attr.reg_exprs.begin(), last_attr.reg_exprs.end(), [&expr](string const& reg_expr) { return reg_expr == expr; }))
     {
-        push_error(parse_error::SEMANTIC, m_lexer->filename(), format("Regex is not unique to attribute: {}", expr), m_lexer->line_nr());
+        push_error(parse_error::SEMANTIC, m_walker->get_file().get_filename(), format("Regex is not unique to attribute: {}", expr), m_walker->get_cur_line_nr());
         return;
     }
 
@@ -87,9 +86,9 @@ void header_parser_context::add_attr_to_last_var(string const& attr_name)
     if(last_var_itr == m_target->vars.end())
     {
         push_error(parse_error::SEMANTIC,
-                   m_lexer->filename(),
+                   m_walker->get_file().get_filename(),
                    format("Trying to add attribute without a variable: {}", attr_name),
-                   m_lexer->line_nr());
+                   m_walker->get_cur_line_nr());
         return;
     }
 
@@ -98,7 +97,7 @@ void header_parser_context::add_attr_to_last_var(string const& attr_name)
     if(last_var_itr->attr_indices[attr_idx])
     {
         push_error(
-            parse_error::SEMANTIC, m_lexer->filename(), format("Attepmting to add attribute twice: {}", attr_name), m_lexer->line_nr());
+            parse_error::SEMANTIC, m_walker->get_file().get_filename(), format("Attepmting to add attribute twice: {}", attr_name), m_walker->get_cur_line_nr());
         return;
     }
 
@@ -107,7 +106,7 @@ void header_parser_context::add_attr_to_last_var(string const& attr_name)
 
 unique_ptr<header_data> header_parser_context::release_header_data()
 {
-    set_filename_from_lexer();
+    set_filename_from_walker();
     sort_target_by_name();
     return move(m_target);
 }
@@ -128,12 +127,12 @@ vector<attribute_data>::iterator header_parser_context::get_last_attr_itr()
     return prev(m_target->attrs.end());
 }
 
-void header_parser_context::set_filename_from_lexer()
+void header_parser_context::set_filename_from_walker()
 {
-    if(m_lexer == nullptr)
+    if(m_walker == nullptr)
         return;
 
-    filesystem::path const filename_path(m_lexer->filename());
+    filesystem::path const filename_path(m_walker->get_file().get_filename());
     m_target->filename = filename_path.filename().string();
     ;
 }

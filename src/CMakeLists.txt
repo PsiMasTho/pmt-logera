@@ -7,6 +7,10 @@ option(BUILD_LOGERA_TO_CSV "Build logera to csv converter" ON)
 
 add_library(${PROJECT_NAME} ${LIB_SOURCES} ${PROJ_PUBLIC_HEADERS})
 
+add_subdirectory(lexer)
+add_subdirectory(parser)
+add_subdirectory(utility)
+
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)

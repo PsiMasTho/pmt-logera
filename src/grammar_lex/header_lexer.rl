@@ -1,5 +1,5 @@
 #include "header_lexer.h"
-#include "header_tokens.h"
+#include "tokens.h"
 
 %%{
     machine header_lexer;
@@ -16,58 +16,58 @@
     regex      = (print - (space | ';' | '#'))+;
 
     decl_attr_initial := |*
-        (nl)         { token(header_tokens::NEWLINE); fnext main;                fbreak;};
-        (comment)    { token(header_tokens::NEWLINE); fnext main;                fbreak;};
-        (ident)      { token(header_tokens::IDENT);                              fbreak;};
-        (';')        { token(';');             fnext decl_attr_regex_seq; fbreak;};
+        (nl)         { push_token(header_tokens::NEWLINE);   fnext main;};
+        (comment)    { push_token(header_tokens::NEWLINE);   fnext main;};
+        (ident)      { push_token(header_tokens::IDENT);};
+        (';')        { push_token(';');                      fnext decl_attr_regex_seq;};
         (ws)         { };
-        (any)        { token(*ts);                                        fbreak;};
+        (any)        { push_token(*ts);};
     *|;
 
     decl_attr_regex_seq := |*
-        (nl)         { token(header_tokens::NEWLINE); fnext main;                fbreak;};
-        (comment)    { token(header_tokens::NEWLINE); fnext main;                fbreak;};
-        (regex)      { token(header_tokens::REGEX);                              fbreak;};
+        (nl)         { push_token(header_tokens::NEWLINE);   fnext main;};
+        (comment)    { push_token(header_tokens::NEWLINE);   fnext main;};
+        (regex)      { push_token(header_tokens::REGEX);};
         (ws)         { };
-        (any)        { token(*ts);                                        fbreak;};
+        (any)        { push_token(*ts);};
     *|;
 
     decl_var_initial := |*
-        (nl)         { token(header_tokens::NEWLINE); fnext main;                fbreak;};
-        (comment)    { token(header_tokens::NEWLINE); fnext main;                fbreak;};
-        (ident)      { token(header_tokens::IDENT);                              fbreak;};
-        (';')        { token(';');             fnext decl_var_value_seq;  fbreak;};
+        (nl)         { push_token(header_tokens::NEWLINE);   fnext main;};
+        (comment)    { push_token(header_tokens::NEWLINE);   fnext main;};
+        (ident)      { push_token(header_tokens::IDENT);};
+        (';')        { push_token(';');                      fnext decl_var_value_seq;};
         (ws)         { };
-        (any)        { token(*ts);                                        fbreak;};
+        (any)        { push_token(*ts);};
     *|;
 
     decl_var_value_seq := |*
-        (nl)         { token(header_tokens::NEWLINE); fnext main;                fbreak;};
-        (comment)    { token(header_tokens::NEWLINE); fnext main;                fbreak;};
-        (ident)      { token(header_tokens::IDENT);                              fbreak;};
+        (nl)         { push_token(header_tokens::NEWLINE);   fnext main;};
+        (comment)    { push_token(header_tokens::NEWLINE);   fnext main;};
+        (ident)      { push_token(header_tokens::IDENT);};
         (ws)         { };
-        (any)        { token(*ts);                                        fbreak;};
+        (any)        { push_token(*ts);};
     *|;
  
     main := |*
-        (decl_var)   { token(header_tokens::DECL_VAR);  fnext decl_var_initial;  fbreak;};
-        (decl_attr)  { token(header_tokens::DECL_ATTR); fnext decl_attr_initial; fbreak;};
-        (nl)         { token(header_tokens::NEWLINE);                            fbreak;};
-        (comment)    { token(header_tokens::NEWLINE);                            fbreak;};
+        (decl_var)   { push_token(header_tokens::DECL_VAR);  fnext decl_var_initial;};
+        (decl_attr)  { push_token(header_tokens::DECL_ATTR); fnext decl_attr_initial;};
+        (nl)         { push_token(header_tokens::NEWLINE);};
+        (comment)    { push_token(header_tokens::NEWLINE);};
         (ws)         { };
-        (any)        { token(*ts);                                        fbreak;};
+        (any)        { push_token(*ts);};
     *|;
 }%%
 
 %% write data;
 
-void header_lexer::init(ragel_state& state)
+void header_lexer::init()
 {
     MAKE_RAGEL_STATE_AVAILABLE;
     %% write init;
 }
 
-void header_lexer::exec(ragel_state& state)
+void header_lexer::exec()
 {
     MAKE_RAGEL_STATE_AVAILABLE;
     %% write exec;

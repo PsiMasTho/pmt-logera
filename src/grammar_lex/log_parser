@@ -3,11 +3,13 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-%scanner log_lexer.h
-%scanner-class-name log_lexer
+%scanner ../lexer/lexed_file.h
+%scanner-class-name lexed_file_walker
+%scanner-token-function m_walker.advance()
+%scanner-matched-text-function m_walker.get_cur_match()
 %parsefun-source log_parser_base.cc
 %token-class log_tokens
-%token-path log_tokens.h
+%token-path ../lexer/tokens.h
 
 %baseclass-preinclude log_parser_base_preinclude.h
 
@@ -98,7 +100,7 @@ variable:
 identifier:
     IDENT
     {
-        std::string const val{m_lexer.matched().data(), m_lexer.matched().size()};
+        std::string const val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
         $$ = std::move(val);
     }
 ;
@@ -106,7 +108,7 @@ identifier:
 date:
     DATE
     {
-        std::string const val{m_lexer.matched().data(), m_lexer.matched().size()};
+        std::string const val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
         $$ = log_date{val};
     }
 ;
@@ -114,7 +116,7 @@ date:
 ident_value_pair:
     IDENT_VALUE_PAIR
     {
-        std::string val{m_lexer.matched().data(), m_lexer.matched().size()};
+        std::string val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
 
         std::size_t const split = strchr(val.data(), ' ') - val.data();
         std::string const s1 = val.substr(0, split);

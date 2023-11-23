@@ -3,7 +3,7 @@
 #include "header_parser_base.h"
 
 #include "header_parser_context.h"
-#include "header_lexer.h"
+#include "../lexer/lexed_file.h"
 
 #include <filesystem>
 #include <memory>
@@ -13,11 +13,12 @@
 struct header_data;
 
 class header_parser : public header_parser_base {
-    header_lexer m_lexer;
+    
+    lexed_file_walker m_walker;
     header_parser_context& m_ctx;
 
 public:
-    explicit header_parser(std::filesystem::path const& path, header_parser_context& ctx);
+    explicit header_parser(lexed_file const& file, header_parser_context& ctx);
     std::unique_ptr<header_data> gen();
 
 private:
@@ -35,9 +36,12 @@ private:
     void print_();
 };
 
+#include <iostream>
+
 inline int header_parser::lex()
 {
-    return m_lexer.lex();
+    m_walker.advance();
+    return m_walker.get_cur_token_type();
 }
 
 inline void header_parser::print()

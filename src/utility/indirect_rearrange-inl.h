@@ -1,24 +1,12 @@
-//          Copyright (C) 2022 PsiMasTho (1cbb875@gmail.com)
-// Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file LICENSE.txt or copy at
-//          https://www.boost.org/LICENSE_1_0.txt)
+// clang-format off
+#ifdef __INTELLISENSE__
+    #include "utility.h"
+#endif
+// clang-format on
 
-#pragma once
-
+#include <vector>
 #include <algorithm>
 #include <iterator>
-#include <memory>
-#include <type_traits>
-#include <vector>
-
-/*
-    This function shuffles the elements of the range [data_begin, data_end)
-    according to the indices in the range [indices_begin, indices_end).
-
-    Because it is intended to be used in indirect sorting, where the indices
-    are often calculated once and then reused to sort many ranges, the indices
-    are stored in a buffer and reused if provided.
-*/
 
 template <typename T, typename U>
     requires(std::is_integral_v<typename U::value_type>)
@@ -52,10 +40,3 @@ auto indirect_rearrange(T data_begin, T data_end, U indices_begin, std::unique_p
 
     return buf;
 }
-
-#include <string>
-
-/*
-    Replaces all occurance of to_erase in target with to_replace iteratively.
-*/
-void erase_and_replace(std::string* target, std::string const& to_erase, std::string const& to_replace);

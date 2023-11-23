@@ -20,7 +20,7 @@ def run_ragel(input_file, output_file):
 
 def main(args):
 	input_dir = args.root_dir + "/src/grammar_lex/"
-	output_dir = args.root_dir + "/src/"
+	output_dir = args.root_dir + "/src/lexer/"
 
 	# Run ragel for header grammar first
 	if run_ragel(input_dir + "header_lexer.rl", output_dir + "/header_lexer.cc") != 0:

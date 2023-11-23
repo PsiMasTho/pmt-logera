@@ -14,7 +14,7 @@
 #include <vector>
 
 struct header_data;
-class header_lexer;
+class lexed_file_walker;
 
 class header_parser_context : public error_context
 {
@@ -22,12 +22,12 @@ class header_parser_context : public error_context
     std::unordered_set<std::size_t> m_attr_name_hashes;
     std::unordered_set<std::size_t> m_var_name_hashes;
 
-    header_lexer const* m_lexer;
+    lexed_file_walker const* m_walker;
 
 public:
     header_parser_context();
 
-    void set_lexer(header_lexer const& lex);
+    void set_lexed_file_walker(lexed_file_walker const& lex);
 
     void add_var(std::string const& var_name);
     void add_attr(std::string const& attr_name);
@@ -41,7 +41,7 @@ private:
     std::vector<variable_data>::iterator get_last_var_itr();
     std::vector<attribute_data>::iterator get_last_attr_itr();
 
-    void set_filename_from_lexer();
+    void set_filename_from_walker();
 
     void sort_target_by_name();
 };

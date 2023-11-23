@@ -4,7 +4,7 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include "csv_emitter.h"
-#include "../utility.h"
+#include "../utility/utility.h"
 
 #include <ostream>
 #include <algorithm>

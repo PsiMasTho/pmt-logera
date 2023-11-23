@@ -6,11 +6,15 @@
 #include "archive.h"
 
 #include "archive_data.h"
-#include "header_parser.h"
-#include "header_parser_context.h"
 #include "log_date.h"
-#include "log_parser.h"
-#include "log_parser_context.h"
+#include "parser/header_parser.h"
+#include "parser/header_parser_context.h"
+#include "parser/log_parser.h"
+#include "parser/log_parser_context.h"
+
+#include "lexer/lexed_file.h"
+#include "lexer/log_lexer.h"
+#include "lexer/header_lexer.h"
 
 #include <algorithm>
 
@@ -77,18 +81,44 @@ auto archive::get_log_data() const -> std::span<std::unique_ptr<log_data> const>
 
 void archive::parse_header(std::filesystem::path const& header_path)
 {
+    header_lexer lexer(header_path.c_str());
+
+    if (lexer.lex() != 0)
+    {
+        throw std::runtime_error("failed to lex header file"); // todo: get rid of this
+        return;
+    }
+
+    auto result = lexer.release_result();
+
     header_parser_context ctx;
-    header_parser parser(header_path, ctx);
+    header_parser parser(result, ctx);
     m_header_data = parser.gen();
     move(ctx.get_errors().begin(), ctx.get_errors().end(), back_inserter(m_errors));
 }
 
+#include <list>
+
 void archive::parse_log_files(std::vector<std::filesystem::path> const& log_paths)
 {
     log_parser_context ctx(m_header_data.get());
+
+    list<lexed_file> files;
+
     for(auto const& pth : log_paths)
     {
-        log_parser parser(pth, ctx);
+        log_lexer lexer(pth.c_str());
+
+        if (lexer.lex() != 0)
+        {
+            throw std::runtime_error("failed to lex log file"); // todo: get rid of this
+            return;
+        }
+
+        files.push_back(lexer.release_result());
+        lexed_file_walker walker(files.back());
+
+        log_parser parser(walker, ctx);
         m_log_data.push_back(parser.gen());
     }
 

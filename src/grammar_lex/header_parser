@@ -3,11 +3,13 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-%scanner header_lexer.h
-%scanner-class-name header_lexer
+%scanner ../lexer/lexed_file.h
+%scanner-class-name lexed_file_walker
+%scanner-token-function m_walker.advance()
+%scanner-matched-text-function m_walker.get_cur_match()
 %parsefun-source header_parser_base.cc
 %token-class header_tokens
-%token-path header_tokens.h
+%token-path ../lexer/tokens.h
 
 %baseclass-preinclude header_parser_base_preinclude.h
 
@@ -30,11 +32,11 @@ input:
 line:
     declare_attribute NEWLINE
 |
-    declare_attribute EOF
+    declare_attribute eof
 |
     declare_variable NEWLINE
 |
-    declare_variable EOF
+    declare_variable eof
 |
     NEWLINE
 ;
@@ -66,7 +68,7 @@ declare_variable:
 identifier:
     IDENT
     {
-        std::string val{m_lexer.matched().data(), m_lexer.matched().size()};
+        std::string val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
         $$ = std::move(val);
     }
 ;
@@ -74,7 +76,13 @@ identifier:
 regex:
     REGEX
     {
-        std::string val{m_lexer.matched().data(), m_lexer.matched().size()};
+        std::string val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
         $$ = std::move(val);
     }
+;
+
+eof:
+    EOF
+|
+    '\0'
 ;

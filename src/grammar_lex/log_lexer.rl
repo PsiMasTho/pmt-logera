@@ -1,5 +1,5 @@
 #include "log_lexer.h"
-#include "log_tokens.h"
+#include "tokens.h"
 
 %%{
     machine log_lexer;
@@ -18,41 +18,41 @@
     ident_value_pair = ident ws + attr_value;
 
     log_file_initial := |*
-        (nl)              { token(log_tokens::NEWLINE);                             fbreak;};
-        (comment)         { token(log_tokens::NEWLINE);                             fbreak;};
-        (ident)           { token(log_tokens::IDENT);                               fbreak;};
-        (last_colon)      { token(':');                 fnext logfile_attr_val_seq; fbreak;};
+        (nl)              { push_token(log_tokens::NEWLINE);};
+        (comment)         { push_token(log_tokens::NEWLINE);};
+        (ident)           { push_token(log_tokens::IDENT);};
+        (last_colon)      { push_token(':'); fnext logfile_attr_val_seq;};
         (ws)              { };
-        (any)             { token(*ts);                                             fbreak;};
+        (any)             { push_token(*ts);};
     *|;
 
     logfile_attr_val_seq := |*
-        (nl)              { token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; fnext log_file_initial;} fbreak;};
-        (comment)         { token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; fnext log_file_initial;} fbreak;};
-        (ident_value_pair){ token(log_tokens::IDENT_VALUE_PAIR); n_seq_nl = 0;      fbreak;};
-        (';')             { token(';'); n_seq_nl = 0;                               fbreak;};
+        (nl)              { push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; fnext log_file_initial;}};
+        (comment)         { push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; fnext log_file_initial;}};
+        (ident_value_pair){ push_token(log_tokens::IDENT_VALUE_PAIR); n_seq_nl = 0;};
+        (';')             { push_token(';'); n_seq_nl = 0;};
         (ws)              { };
-        (any)             { token(*ts); n_seq_nl = 0;                               fbreak;};
+        (any)             { push_token(*ts); n_seq_nl = 0;};
     *|;
  
     main := |*
-        (date)            { token(log_tokens::DATE);      fnext log_file_initial;  fbreak;};
-        (nl)              { token(log_tokens::NEWLINE);                            fbreak;};
-        (comment)         { token(log_tokens::NEWLINE);                            fbreak;};
+        (date)            { push_token(log_tokens::DATE); fnext log_file_initial;};
+        (nl)              { push_token(log_tokens::NEWLINE);};
+        (comment)         { push_token(log_tokens::NEWLINE);};
         (ws)              { };
-        (any)             { token(*ts);                                            fbreak;};
+        (any)             { push_token(*ts);};
     *|;
 }%%
 
 %% write data;
 
-void log_lexer::init(ragel_state& state)
+void log_lexer::init()
 {
     MAKE_RAGEL_STATE_AVAILABLE;
     %% write init;
 }
 
-void log_lexer::exec(ragel_state& state)
+void log_lexer::exec()
 {
     static int n_seq_nl = 0;
     MAKE_RAGEL_STATE_AVAILABLE;

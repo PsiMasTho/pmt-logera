@@ -1,14 +1,14 @@
 
 /* #line 1 "../src/grammar_lex/log_lexer.rl" */
 #include "log_lexer.h"
-#include "log_tokens.h"
+#include "tokens.h"
 
 
 /* #line 45 "../src/grammar_lex/log_lexer.rl" */
 
 
 
-/* #line 7 "../src//log_lexer.cc" */
+/* #line 7 "../src/lexer//log_lexer.cc" */
 static const int log_lexer_start = 19;
 static const int log_lexer_first_final = 19;
 static const int log_lexer_error = -1;
@@ -20,11 +20,11 @@ static const int log_lexer_en_main = 19;
 
 /* #line 48 "../src/grammar_lex/log_lexer.rl" */
 
-void log_lexer::init(ragel_state& state)
+void log_lexer::init()
 {
     MAKE_RAGEL_STATE_AVAILABLE;
     
-/* #line 19 "../src//log_lexer.cc" */
+/* #line 19 "../src/lexer//log_lexer.cc" */
 	{
 	cs = log_lexer_start;
 	ts = 0;
@@ -35,12 +35,12 @@ void log_lexer::init(ragel_state& state)
 /* #line 53 "../src/grammar_lex/log_lexer.rl" */
 }
 
-void log_lexer::exec(ragel_state& state)
+void log_lexer::exec()
 {
     static int n_seq_nl = 0;
     MAKE_RAGEL_STATE_AVAILABLE;
     
-/* #line 31 "../src//log_lexer.cc" */
+/* #line 31 "../src/lexer//log_lexer.cc" */
 	{
 	if ( p == pe )
 		goto _test_eof;
@@ -96,28 +96,28 @@ _resume:
 	{
 tr0:
 /* #line 41 "../src/grammar_lex/log_lexer.rl" */
-	{{p = ((te))-1;}{ token(log_tokens::NEWLINE);                            {p++; cs = 19; goto _out;}}}
+	{{p = ((te))-1;}{ push_token(log_tokens::NEWLINE);}}
 	goto st19;
 tr1:
 /* #line 41 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(log_tokens::NEWLINE);                            {p++; cs = 19; goto _out;}}}
+	{te = p+1;{ push_token(log_tokens::NEWLINE);}}
 	goto st19;
 tr2:
 /* #line 43 "../src/grammar_lex/log_lexer.rl" */
-	{{p = ((te))-1;}{ token(*ts);                                            {p++; cs = 19; goto _out;}}}
+	{{p = ((te))-1;}{ push_token(*ts);}}
 	goto st19;
 tr10:
 	cs = 19;
 /* #line 39 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(log_tokens::DATE);      cs = 24;  {p++; goto _out;}}}
+	{te = p+1;{ push_token(log_tokens::DATE); cs = 24;}}
 	goto _again;
 tr11:
 /* #line 40 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(log_tokens::NEWLINE);                            {p++; cs = 19; goto _out;}}}
+	{te = p+1;{ push_token(log_tokens::NEWLINE);}}
 	goto st19;
 tr30:
 /* #line 43 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(*ts);                                            {p++; cs = 19; goto _out;}}}
+	{te = p+1;{ push_token(*ts);}}
 	goto st19;
 tr31:
 /* #line 42 "../src/grammar_lex/log_lexer.rl" */
@@ -125,11 +125,11 @@ tr31:
 	goto st19;
 tr36:
 /* #line 43 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ token(*ts);                                            {p++; cs = 19; goto _out;}}}
+	{te = p;p--;{ push_token(*ts);}}
 	goto st19;
 tr37:
 /* #line 41 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ token(log_tokens::NEWLINE);                            {p++; cs = 19; goto _out;}}}
+	{te = p;p--;{ push_token(log_tokens::NEWLINE);}}
 	goto st19;
 st19:
 /* #line 1 "NONE" */
@@ -139,7 +139,7 @@ st19:
 case 19:
 /* #line 1 "NONE" */
 	{ts = p;}
-/* #line 118 "../src//log_lexer.cc" */
+/* #line 118 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 10: goto tr11;
 		case 13: goto st20;
@@ -168,7 +168,7 @@ st21:
 	if ( ++p == pe )
 		goto _test_eof21;
 case 21:
-/* #line 145 "../src//log_lexer.cc" */
+/* #line 145 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 10: goto tr1;
 		case 13: goto st0;
@@ -194,7 +194,7 @@ st22:
 	if ( ++p == pe )
 		goto _test_eof22;
 case 22:
-/* #line 169 "../src//log_lexer.cc" */
+/* #line 169 "../src/lexer//log_lexer.cc" */
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto st1;
 	goto tr36;
@@ -262,7 +262,7 @@ st23:
 	if ( ++p == pe )
 		goto _test_eof23;
 case 23:
-/* #line 235 "../src//log_lexer.cc" */
+/* #line 235 "../src/lexer//log_lexer.cc" */
 	if ( (*p) == 79 )
 		goto st9;
 	goto tr36;
@@ -275,43 +275,43 @@ case 9:
 	goto tr2;
 tr12:
 /* #line 22 "../src/grammar_lex/log_lexer.rl" */
-	{{p = ((te))-1;}{ token(log_tokens::NEWLINE);                             {p++; cs = 24; goto _out;}}}
+	{{p = ((te))-1;}{ push_token(log_tokens::NEWLINE);}}
 	goto st24;
 tr13:
 /* #line 22 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(log_tokens::NEWLINE);                             {p++; cs = 24; goto _out;}}}
+	{te = p+1;{ push_token(log_tokens::NEWLINE);}}
 	goto st24;
 tr14:
 /* #line 26 "../src/grammar_lex/log_lexer.rl" */
-	{{p = ((te))-1;}{ token(*ts);                                             {p++; cs = 24; goto _out;}}}
+	{{p = ((te))-1;}{ push_token(*ts);}}
 	goto st24;
 tr16:
 	cs = 24;
 /* #line 24 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(':');                 cs = 32; {p++; goto _out;}}}
+	{te = p+1;{ push_token(':'); cs = 32;}}
 	goto _again;
 tr20:
 	cs = 24;
 /* #line 1 "NONE" */
 	{	switch( act ) {
 	case 1:
-	{{p = ((te))-1;} token(log_tokens::NEWLINE);                             {p++; goto _out;}}
+	{{p = ((te))-1;} push_token(log_tokens::NEWLINE);}
 	break;
 	case 3:
-	{{p = ((te))-1;} token(log_tokens::IDENT);                               {p++; goto _out;}}
+	{{p = ((te))-1;} push_token(log_tokens::IDENT);}
 	break;
 	case 4:
-	{{p = ((te))-1;} token(':');                 cs = 32; {p++; goto _out;}}
+	{{p = ((te))-1;} push_token(':'); cs = 32;}
 	break;
 	case 6:
-	{{p = ((te))-1;} token(*ts);                                             {p++; goto _out;}}
+	{{p = ((te))-1;} push_token(*ts);}
 	break;
 	}
 	}
 	goto _again;
 tr41:
 /* #line 26 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(*ts);                                             {p++; cs = 24; goto _out;}}}
+	{te = p+1;{ push_token(*ts);}}
 	goto st24;
 tr42:
 /* #line 25 "../src/grammar_lex/log_lexer.rl" */
@@ -319,24 +319,24 @@ tr42:
 	goto st24;
 tr43:
 /* #line 21 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(log_tokens::NEWLINE);                             {p++; cs = 24; goto _out;}}}
+	{te = p+1;{ push_token(log_tokens::NEWLINE);}}
 	goto st24;
 tr49:
 /* #line 26 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ token(*ts);                                             {p++; cs = 24; goto _out;}}}
+	{te = p;p--;{ push_token(*ts);}}
 	goto st24;
 tr50:
 /* #line 22 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ token(log_tokens::NEWLINE);                             {p++; cs = 24; goto _out;}}}
+	{te = p;p--;{ push_token(log_tokens::NEWLINE);}}
 	goto st24;
 tr52:
 	cs = 24;
 /* #line 24 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ token(':');                 cs = 32; {p++; goto _out;}}}
+	{te = p;p--;{ push_token(':'); cs = 32;}}
 	goto _again;
 tr53:
 /* #line 23 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ token(log_tokens::IDENT);                               {p++; cs = 24; goto _out;}}}
+	{te = p;p--;{ push_token(log_tokens::IDENT);}}
 	goto st24;
 st24:
 /* #line 1 "NONE" */
@@ -346,7 +346,7 @@ st24:
 case 24:
 /* #line 1 "NONE" */
 	{ts = p;}
-/* #line 304 "../src//log_lexer.cc" */
+/* #line 304 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 10: goto tr43;
 		case 13: goto st25;
@@ -380,7 +380,7 @@ st26:
 	if ( ++p == pe )
 		goto _test_eof26;
 case 26:
-/* #line 336 "../src//log_lexer.cc" */
+/* #line 336 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 10: goto tr13;
 		case 13: goto st10;
@@ -408,7 +408,7 @@ st27:
 	if ( ++p == pe )
 		goto _test_eof27;
 case 27:
-/* #line 361 "../src//log_lexer.cc" */
+/* #line 361 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 10: goto tr16;
 		case 13: goto st12;
@@ -450,7 +450,7 @@ st28:
 	if ( ++p == pe )
 		goto _test_eof28;
 case 28:
-/* #line 400 "../src//log_lexer.cc" */
+/* #line 400 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 10: goto tr16;
 		case 13: goto st12;
@@ -491,7 +491,7 @@ st29:
 	if ( ++p == pe )
 		goto _test_eof29;
 case 29:
-/* #line 436 "../src//log_lexer.cc" */
+/* #line 436 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 46: goto tr47;
 		case 95: goto tr47;
@@ -544,33 +544,33 @@ case 31:
 tr22:
 	cs = 32;
 /* #line 31 "../src/grammar_lex/log_lexer.rl" */
-	{{p = ((te))-1;}{ token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;} {p++; goto _out;}}}
+	{{p = ((te))-1;}{ push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;}}}
 	goto _again;
 tr23:
 	cs = 32;
 /* #line 31 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;} {p++; goto _out;}}}
+	{te = p+1;{ push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;}}}
 	goto _again;
 tr24:
 	cs = 32;
 /* #line 1 "NONE" */
 	{	switch( act ) {
 	case 7:
-	{{p = ((te))-1;} token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;} {p++; goto _out;}}
+	{{p = ((te))-1;} push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;}}
 	break;
 	case 12:
-	{{p = ((te))-1;} token(*ts); n_seq_nl = 0;                               {p++; goto _out;}}
+	{{p = ((te))-1;} push_token(*ts); n_seq_nl = 0;}
 	break;
 	}
 	}
 	goto _again;
 tr28:
 /* #line 35 "../src/grammar_lex/log_lexer.rl" */
-	{{p = ((te))-1;}{ token(*ts); n_seq_nl = 0;                               {p++; cs = 32; goto _out;}}}
+	{{p = ((te))-1;}{ push_token(*ts); n_seq_nl = 0;}}
 	goto st32;
 tr56:
 /* #line 35 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(*ts); n_seq_nl = 0;                               {p++; cs = 32; goto _out;}}}
+	{te = p+1;{ push_token(*ts); n_seq_nl = 0;}}
 	goto st32;
 tr57:
 /* #line 34 "../src/grammar_lex/log_lexer.rl" */
@@ -579,24 +579,24 @@ tr57:
 tr58:
 	cs = 32;
 /* #line 30 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;} {p++; goto _out;}}}
+	{te = p+1;{ push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;}}}
 	goto _again;
 tr61:
 /* #line 33 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ token(';'); n_seq_nl = 0;                               {p++; cs = 32; goto _out;}}}
+	{te = p+1;{ push_token(';'); n_seq_nl = 0;}}
 	goto st32;
 tr64:
 /* #line 35 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ token(*ts); n_seq_nl = 0;                               {p++; cs = 32; goto _out;}}}
+	{te = p;p--;{ push_token(*ts); n_seq_nl = 0;}}
 	goto st32;
 tr65:
 	cs = 32;
 /* #line 31 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;} {p++; goto _out;}}}
+	{te = p;p--;{ push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;}}}
 	goto _again;
 tr67:
 /* #line 32 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ token(log_tokens::IDENT_VALUE_PAIR); n_seq_nl = 0;      {p++; cs = 32; goto _out;}}}
+	{te = p;p--;{ push_token(log_tokens::IDENT_VALUE_PAIR); n_seq_nl = 0;}}
 	goto st32;
 st32:
 /* #line 1 "NONE" */
@@ -606,7 +606,7 @@ st32:
 case 32:
 /* #line 1 "NONE" */
 	{ts = p;}
-/* #line 537 "../src//log_lexer.cc" */
+/* #line 537 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 10: goto tr58;
 		case 13: goto st33;
@@ -640,7 +640,7 @@ st34:
 	if ( ++p == pe )
 		goto _test_eof34;
 case 34:
-/* #line 569 "../src//log_lexer.cc" */
+/* #line 569 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 10: goto tr23;
 		case 13: goto st15;
@@ -674,7 +674,7 @@ st35:
 	if ( ++p == pe )
 		goto _test_eof35;
 case 35:
-/* #line 598 "../src//log_lexer.cc" */
+/* #line 598 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 9: goto st16;
 		case 32: goto st16;
@@ -758,7 +758,7 @@ st37:
 	if ( ++p == pe )
 		goto _test_eof37;
 case 37:
-/* #line 679 "../src//log_lexer.cc" */
+/* #line 679 "../src/lexer//log_lexer.cc" */
 	switch( (*p) ) {
 		case 9: goto st16;
 		case 32: goto st16;
@@ -883,7 +883,6 @@ case 18:
 	}
 	}
 
-	_out: {}
 	}
 
 /* #line 60 "../src/grammar_lex/log_lexer.rl" */

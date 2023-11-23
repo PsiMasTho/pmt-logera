@@ -3,7 +3,7 @@
 #include "log_parser_base.h"
 
 #include "log_parser_context.h"
-#include "log_lexer.h"
+#include "../lexer/lexed_file.h"
 
 #include <filesystem>
 #include <memory>
@@ -15,11 +15,11 @@ class log_parser_context;
 
 class log_parser : public log_parser_base {
 
-    log_lexer m_lexer;
+    lexed_file_walker& m_walker;
     log_parser_context& m_ctx;
 
 public:
-    log_parser(std::filesystem::path const& path, log_parser_context& ctx);
+    log_parser(lexed_file_walker& walker, log_parser_context& ctx);
     std::unique_ptr<log_data> gen();
 
 private:
@@ -39,7 +39,8 @@ private:
 
 inline int log_parser::lex()
 {
-    return m_lexer.lex();
+    m_walker.advance();
+    return m_walker.get_cur_token_type();
 }
 
 inline void log_parser::print()

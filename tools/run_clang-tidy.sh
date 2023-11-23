@@ -4,11 +4,7 @@
 files=(`find ../src/ -name *.cc`)
 
 #auto generated files and external libs
-skip=( "../src/header_scanner/lex.cc"  \
-       "../src/header_parser/parse.cc" \
-       "../src/log_scanner/lex.cc"     \
-       "../src/log_parser/parse.cc"    \ 
-       "../src/argparse/argparse.hpp" )
+skip=( "../eternal/argparse/argparse.hpp" )
 
 #remove auto generated files
 for path in "${skip[@]}"
@@ -25,4 +21,4 @@ done
 
 echo -e "\n"
 
-clang-tidy-15 --config-file clang-tidy-config "${files[@]}" -- -std=c++20
+clang-tidy-17 --config-file clang-tidy-config "${files[@]}" -- -std=c++20
