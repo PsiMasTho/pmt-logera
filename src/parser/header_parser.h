@@ -15,7 +15,6 @@ struct header_data;
 class header_parser : public header_parser_base {
     
     lexed_file_walker m_walker;
-    header_parser_context& m_ctx;
 
 public:
     explicit header_parser(lexed_file const& file, header_parser_context& ctx);
@@ -35,8 +34,6 @@ private:
     void nextToken_();
     void print_();
 };
-
-#include <iostream>
 
 inline int header_parser::lex()
 {

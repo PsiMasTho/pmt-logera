@@ -31,7 +31,7 @@ auto read_file_unix(char const* filename, uint32_t* size) -> unique_ptr<char[]>
 
         // read file
     auto bytes_read = read(fd, buffer.get(), *size);
-    if (bytes_read == -1)
+    if (bytes_read == -1 || bytes_read != *size)
         return nullptr;
 
     return buffer;

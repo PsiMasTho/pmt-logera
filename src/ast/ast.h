@@ -1,37 +1,66 @@
 #pragma once
 
-#include <bits/stdc++.h>
+#include "../lexer/lexed_file.h"
 
-using ast_node = std::variant<
-    class log_file_node,
-    class date_node,
-    class log_entry_node,
-    class ident_value_pair_node,
-    class ident_value_pair_list_node>;
+#include <variant>
+#include <vector>
 
-class log_file_node
+using offset_t = uint32_t;
+
+using header_file_node = std::variant<
+    struct variable_node,
+    struct regex_node,
+    struct decl_var_node,
+    struct eof_node>;
+
+using log_file_node = std::variant<
+    struct date_node,
+    struct variable_node,
+    struct newline_node,
+    struct eof_node,
+    struct ident_value_pair_node,
+    struct ident_value_pair_list_node>;
+
+struct date_node
 {
-    std::vector<ast_node> m_statements;
+    offset_t m_date;
 };
 
-class date_node
+struct variable_node
 {
-    std::string_view m_date;
+    offset_t m_identifier;
 };
 
-class ident_value_pair_node
+struct newline_node
 {
-    std::string_view m_identifier;
-    std::string_view m_value;
+    offset_t m_newline;
 };
 
-class ident_value_pair_list_node
+struct eof_node
+{
+    offset_t m_eof;
+};
+
+struct ident_value_pair_node
+{
+    offset_t m_pair;
+    // variable_node m_variable;
+    // value_node m_value;
+};
+
+struct ident_value_pair_list_node
 {
     std::vector<ident_value_pair_node> m_pairs;
 };
 
-class log_entry_node
+struct header_file_ast
 {
-    std::string_view m_identifier;
-    std::vector<ident_value_pair_list_node> m_entries;
+    offset_t m_lexed_file;
+    std::vector<header_file_node> m_nodes;
+};
+
+struct log_file_ast
+{
+    offset_t m_lexed_file;
+    std::vector<log_file_node> m_nodes;
 };

@@ -104,7 +104,7 @@ tr1:
 	goto st19;
 tr2:
 /* #line 43 "../src/grammar_lex/log_lexer.rl" */
-	{{p = ((te))-1;}{ push_token(*ts);}}
+	{{p = ((te))-1;}{ if (te == pe - 1) push_token(-1); else push_token(*ts);}}
 	goto st19;
 tr10:
 	cs = 19;
@@ -117,7 +117,7 @@ tr11:
 	goto st19;
 tr30:
 /* #line 43 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ push_token(*ts);}}
+	{te = p+1;{ if (te == pe - 1) push_token(-1); else push_token(*ts);}}
 	goto st19;
 tr31:
 /* #line 42 "../src/grammar_lex/log_lexer.rl" */
@@ -125,7 +125,7 @@ tr31:
 	goto st19;
 tr36:
 /* #line 43 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ push_token(*ts);}}
+	{te = p;p--;{ if (te == pe - 1) push_token(-1); else push_token(*ts);}}
 	goto st19;
 tr37:
 /* #line 41 "../src/grammar_lex/log_lexer.rl" */
@@ -283,7 +283,7 @@ tr13:
 	goto st24;
 tr14:
 /* #line 26 "../src/grammar_lex/log_lexer.rl" */
-	{{p = ((te))-1;}{ push_token(*ts);}}
+	{{p = ((te))-1;}{ if (te == pe - 1) push_token(-1); else push_token(*ts);}}
 	goto st24;
 tr16:
 	cs = 24;
@@ -304,14 +304,14 @@ tr20:
 	{{p = ((te))-1;} push_token(':'); cs = 32;}
 	break;
 	case 6:
-	{{p = ((te))-1;} push_token(*ts);}
+	{{p = ((te))-1;} if (te == pe - 1) push_token(-1); else push_token(*ts);}
 	break;
 	}
 	}
 	goto _again;
 tr41:
 /* #line 26 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ push_token(*ts);}}
+	{te = p+1;{ if (te == pe - 1) push_token(-1); else push_token(*ts);}}
 	goto st24;
 tr42:
 /* #line 25 "../src/grammar_lex/log_lexer.rl" */
@@ -323,7 +323,7 @@ tr43:
 	goto st24;
 tr49:
 /* #line 26 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ push_token(*ts);}}
+	{te = p;p--;{ if (te == pe - 1) push_token(-1); else push_token(*ts);}}
 	goto st24;
 tr50:
 /* #line 22 "../src/grammar_lex/log_lexer.rl" */
@@ -559,18 +559,18 @@ tr24:
 	{{p = ((te))-1;} push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; cs = 24;}}
 	break;
 	case 12:
-	{{p = ((te))-1;} push_token(*ts); n_seq_nl = 0;}
+	{{p = ((te))-1;} if (te == pe - 1) push_token(-1); else push_token(*ts);}
 	break;
 	}
 	}
 	goto _again;
 tr28:
 /* #line 35 "../src/grammar_lex/log_lexer.rl" */
-	{{p = ((te))-1;}{ push_token(*ts); n_seq_nl = 0;}}
+	{{p = ((te))-1;}{ if (te == pe - 1) push_token(-1); else push_token(*ts);}}
 	goto st32;
 tr56:
 /* #line 35 "../src/grammar_lex/log_lexer.rl" */
-	{te = p+1;{ push_token(*ts); n_seq_nl = 0;}}
+	{te = p+1;{ if (te == pe - 1) push_token(-1); else push_token(*ts);}}
 	goto st32;
 tr57:
 /* #line 34 "../src/grammar_lex/log_lexer.rl" */
@@ -587,7 +587,7 @@ tr61:
 	goto st32;
 tr64:
 /* #line 35 "../src/grammar_lex/log_lexer.rl" */
-	{te = p;p--;{ push_token(*ts); n_seq_nl = 0;}}
+	{te = p;p--;{ if (te == pe - 1) push_token(-1); else push_token(*ts);}}
 	goto st32;
 tr65:
 	cs = 32;

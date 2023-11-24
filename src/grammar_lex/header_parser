@@ -32,11 +32,11 @@ input:
 line:
     declare_attribute NEWLINE
 |
-    declare_attribute eof
+    declare_attribute EOF
 |
     declare_variable NEWLINE
 |
-    declare_variable eof
+    declare_variable EOF
 |
     NEWLINE
 ;
@@ -79,10 +79,4 @@ regex:
         std::string val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
         $$ = std::move(val);
     }
-;
-
-eof:
-    EOF
-|
-    '\0'
 ;

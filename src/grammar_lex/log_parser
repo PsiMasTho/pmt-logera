@@ -18,16 +18,19 @@
         DATE
         IDENT_VALUE_PAIR
 
-%polymorphic STRING:              std::string;
-             STRING_PAIR:         std::pair<std::string, std::string>;
-             LOG_DATE:            log_date;
-             SPARSE_ARRAY_STRING: std::optional<sparse_array<std::string>>;
+%polymorphic    OFFSET_T:                   uint32_t;
+                DATE_NODE:                  date_node;
+                VARIABLE_NODE:              variable_node;
+                IDENT_VALUE_PAIR_NODE:      ident_value_pair_node;
+                IDENT_VALUE_PAIR_LIST_NODE: ident_value_pair_list_node;
+                LOG_FILE_NODE:              log_file_node;
 
-%type <STRING_PAIR>         ident_value_pair;
-%type <SPARSE_ARRAY_STRING> ident_value_pair_list;
-%type <STRING>              variable;
-%type <STRING>              identifier;
-%type <LOG_DATE>            date;
+%type <IDENT_VALUE_PAIR_NODE>      ident_value_pair;
+%type <IDENT_VALUE_PAIR_LIST_NODE> ident_value_pair_list;
+%type <OFFSET_T>                   variable;
+%type <OFFSET_T>                   identifier;
+%type <DATE_NODE>                  date;
+%type <LOG_FILE_NODE>              statement;
 
 %%
 
@@ -35,44 +38,59 @@ input:
     // empty
 |
     input statement
+    {
+        // ignore newline and eof nodes
+        if (std::holds_alternative<newline_node>($2) || std::holds_alternative<eof_node>($2))
+            return;
+
+        m_ast.m_nodes.push_back($2);
+    }
 ;
 
 // todo: the extra production rules for EOF are hacky but work for now
 statement:
     date NEWLINE
     {
-        m_ctx.set_date($1);
+        log_file_node const lfn = date_node{$1};
+        $$ = lfn;
     }
 |
     date EOF
     {
-        m_ctx.set_date($1);
-        m_ctx.at_eof();
-        ACCEPT();
+        log_file_node const lfn = date_node{$1};
+        $$ = lfn;
     }
 |
     variable
     {
-        m_ctx.set_active_variable_or_err($1);
+        log_file_node const lfn = variable_node{$1};
+        $$ = lfn;
     }
 |
     ident_value_pair_list NEWLINE
     {
-        m_ctx.create_entry_or_err($1.value());
+        log_file_node const lfn = ident_value_pair_list_node{$1};
+        $$ = lfn;
     }
 |
     ident_value_pair_list EOF
     {
-        m_ctx.create_entry_or_err($1.value());
-        m_ctx.at_eof();
-        ACCEPT();
+        log_file_node const lfn = ident_value_pair_list_node{$1};
+        $$ = lfn;
     }
 |
     NEWLINE
+    {
+        auto const offset = m_walker.get_cur_token_record_offset();
+        log_file_node const lfn = newline_node{offset};
+        $$ = lfn;
+    }
 |
     EOF
     {
-        m_ctx.at_eof();
+        auto const offset = m_walker.get_cur_token_record_offset();
+        log_file_node const lfn = eof_node{offset};
+        $$ = lfn;
         ACCEPT();
     }
 ;
@@ -80,13 +98,14 @@ statement:
 ident_value_pair_list:
     ident_value_pair ';'
     {
-        $$ = m_ctx.make_ident_value_pair_list_or_err($1);
+        $$ = ident_value_pair_list_node{};
+        $$.m_pairs.push_back($1);
     }
 |
     ident_value_pair_list ident_value_pair ';'
     {
-        m_ctx.update_ident_value_pair_list_or_err($1.value(), $2);
         $$ = $1;
+        $$.m_pairs.push_back($2);
     }
 ;
 
@@ -100,38 +119,23 @@ variable:
 identifier:
     IDENT
     {
-        std::string const val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
-        $$ = std::move(val);
+        auto const offset = m_walker.get_cur_token_record_offset();
+        $$ = offset;
     }
 ;
 
 date:
     DATE
     {
-        std::string const val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
-        $$ = log_date{val};
+        auto const offset = m_walker.get_cur_token_record_offset();
+        $$ = date_node{offset};
     }
 ;
 
 ident_value_pair:
     IDENT_VALUE_PAIR
     {
-        std::string val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
-
-        std::size_t const split = strchr(val.data(), ' ') - val.data();
-        std::string const s1 = val.substr(0, split);
-        std::string s2 = val.substr(split + 1);
-
-        // trim s2 lhs
-        std::size_t const s2_lhs = s2.find_first_not_of(' ');
-        if (s2_lhs != std::string::npos)
-            s2.erase(0, s2_lhs);
-        
-        // trim s2 rhs
-        std::size_t const s2_rhs = s2.find_last_not_of(' ');
-        if (s2_rhs != std::string::npos)
-            s2.erase(s2_rhs + 1);
-
-        $$ = make_pair(s1, s2);
+        auto const offset = m_walker.get_cur_token_record_offset();
+        $$ = ident_value_pair_node{offset};
     }
 ;

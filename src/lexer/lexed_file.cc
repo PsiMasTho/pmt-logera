@@ -58,9 +58,9 @@ auto lexed_file::get_match_length_at(uint32_t idx) const -> uint16_t
     return m_tokens[idx].length;
 }
 
-auto lexed_file::get_token_type_at(uint32_t idx) const -> underlying_token_t
+auto lexed_file::get_token_at(uint32_t idx) const -> underlying_token_t
 {
-    return m_tokens[idx].type;
+    return m_tokens[idx].tok;
 }
 
 auto lexed_file::get_line_nr_at(uint32_t idx) const -> uint32_t
@@ -68,7 +68,7 @@ auto lexed_file::get_line_nr_at(uint32_t idx) const -> uint32_t
     return count_line_nr(m_buffer.get(), m_tokens[idx].offset);
 }
 
-void lexed_file::push_token(underlying_token_t tok, uint32_t offset, uint16_t len)
+void lexed_file::push_token_record(underlying_token_t tok, uint32_t offset, uint16_t len)
 {
     m_tokens.emplace_back(offset, len, tok);
 }
@@ -88,9 +88,14 @@ void lexed_file_walker::advance()
     ++m_index;
 }
 
+auto lexed_file_walker::get_cur_token_record_offset() const -> uint32_t
+{
+    return m_index;
+}
+
 auto lexed_file_walker::get_cur_token_type() const -> underlying_token_t
 {
-    return m_file->get_token_type_at(m_index);
+    return m_file->get_token_at(m_index);
 }
 
 auto lexed_file_walker::get_cur_match() const -> string_view

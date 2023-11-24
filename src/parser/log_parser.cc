@@ -11,41 +11,35 @@
 
 using namespace std;
 
-log_parser::log_parser(lexed_file_walker& walker, log_parser_context& ctx)
-    : m_walker(walker)
-    , m_ctx{ctx}
+log_parser::log_parser(lexed_file const& file, offset_t lexed_file_offset)
+    : m_walker(file)
+    , m_ast({lexed_file_offset, {}})
 { }
 
-unique_ptr<log_data> log_parser::gen()
+auto log_parser::gen() -> optional<log_file_ast>
 {
-    m_ctx.set_lexed_file_walker(m_walker.get_file());
     if(parse() == 0) // no error encountered
-        return m_ctx.release_log_data();
+        return std::move(m_ast);
     else
-    {
-        // if error encountered, then release the log_data
-        // so that the context can be reused.
-        m_ctx.release_log_data();
-        return nullptr;
-    }
+        return nullopt;
 }
 
 void log_parser::error()
 {
-    string match_txt{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
+    // string match_txt{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
 
-    if(match_txt.empty())
-        match_txt = "<EOF>";
-    else
-        erase_and_replace(&match_txt, "\n", "*newline*");
+    // if(match_txt.empty())
+    //     match_txt = "<EOF>";
+    // else
+    //     erase_and_replace(&match_txt, "\n", "*newline*");
 
-    m_ctx.push_error(
-        parse_error::SYNTAX, m_walker.get_file().get_filename(), fmt::format("Unexpected input: {} encountered.", match_txt), m_walker.get_cur_line_nr());
+    // m_ctx.push_error(
+    //     parse_error::SYNTAX, m_walker.get_file().get_filename(), fmt::format("Unexpected input: {} encountered.", match_txt), m_walker.get_cur_line_nr());
     log_parser_base::ABORT();
 }
 
 void log_parser::exceptionHandler(exception const& exc)
 {
-    m_ctx.push_error(parse_error::EXCEPTION, m_walker.get_file().get_filename(), exc.what(), m_walker.get_cur_line_nr());
+    // m_ctx.push_error(parse_error::EXCEPTION, m_walker.get_file().get_filename(), exc.what(), m_walker.get_cur_line_nr());
     log_parser_base::ABORT();
 }
