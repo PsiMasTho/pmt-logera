@@ -2,14 +2,12 @@
 
 #include "log_parser_base.h"
 
-#include "log_parser_context.h"
+#include "../type_aliases.h"
 #include "../lexer/lexed_file.h"
-#include "../ast/log_file_ast.h"
+#include "../ast/ast.h"
 
-#include <filesystem>
-#include <memory>
-#include <string>
 #include <optional>
+#include <exception>
 
 struct log_file_ast;
 class log_parser_context;
@@ -17,11 +15,11 @@ class log_parser_context;
 class log_parser : public log_parser_base {
 
     lexed_file_walker m_walker;
-    log_file_ast m_ast;
+    ast<ast_node> m_ast;
 
 public:
-    log_parser(lexed_file const& file, offset_t lexed_file_offset);
-    auto gen() -> std::optional<log_file_ast>;
+    log_parser(lexed_file const& file);
+    auto gen() -> std::optional<ast<ast_node>>;
 
 private:
     int  parse();
@@ -37,8 +35,6 @@ private:
     void nextToken_();
     void print_();
 };
-
-#include <iostream>
 
 inline int log_parser::lex()
 {

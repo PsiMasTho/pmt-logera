@@ -7,4 +7,4 @@
 
 #include <cstring>
 
-#include "../ast/log_file_ast.h"
+#include "../ast/log_nodes.h"

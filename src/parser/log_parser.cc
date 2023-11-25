@@ -11,12 +11,14 @@
 
 using namespace std;
 
-log_parser::log_parser(lexed_file const& file, offset_t lexed_file_offset)
+log_parser::log_parser(lexed_file const& file)
     : m_walker(file)
-    , m_ast({lexed_file_offset, {}})
-{ }
+    , m_ast(ast<ast_node>{})
+{
+    m_ast.add_node(ast_node{0, static_cast<u8>(log_node_enum::ROOT)});
+}
 
-auto log_parser::gen() -> optional<log_file_ast>
+auto log_parser::gen() -> optional<ast<ast_node>>
 {
     if(parse() == 0) // no error encountered
         return std::move(m_ast);

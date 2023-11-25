@@ -7,7 +7,7 @@
 
 #include <cstdio>
 
-auto read_file_portable(char const* filename, uint32_t* size) -> unique_ptr<char[]>
+auto read_file_portable(char const* filename) -> unique_ptr<char[]>
 {
     // open file and make an RAII guard
     FILE* file = fopen(filename, "r");
@@ -19,16 +19,16 @@ auto read_file_portable(char const* filename, uint32_t* size) -> unique_ptr<char
 
     // find size of file
     fseek(file, 0, SEEK_END);
-    *size = ftell(file);
+    u32 const size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
     // create buffer
-    auto buffer = make_unique_for_overwrite<char[]>(*size + 1);
-    buffer[*size] = '\0';
+    auto buffer = make_unique_for_overwrite<char[]>(size + 1);
+    buffer[size] = '\0';
 
     // read file
-    auto bytes_read = fread(buffer.get(), 1, *size, file);
-    if (bytes_read != *size)
+    auto bytes_read = fread(buffer.get(), 1, size, file);
+    if (bytes_read != size)
         return nullptr;
 
     return buffer;

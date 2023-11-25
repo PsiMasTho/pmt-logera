@@ -5,8 +5,8 @@
 // clang-format on
 
 template <typename derived>
-lexer_base<derived>::lexer_base(char const* infile)
-:   m_result(infile)
+lexer_base<derived>::lexer_base(buffer_t buffer)
+:   m_result(buffer)
 {
     m_p = m_result.get_buffer();
     m_pe = m_p + m_result.get_buffer_size();
@@ -15,9 +15,9 @@ lexer_base<derived>::lexer_base(char const* infile)
 }
 
 template <typename derived>
-auto lexer_base<derived>::lex() -> int
+auto lexer_base<derived>::lex() -> i32
 {
-    int ret_code = 0;
+    i32 ret_code = 0;
     while (true)
     {
         static_cast<derived*>(this)->exec();
@@ -49,9 +49,9 @@ auto lexer_base<derived>::release_result() -> lexed_file
 template <typename derived>
 void lexer_base<derived>::push_token(auto tok)
 {
-    uint32_t const offset = static_cast<uint32_t>(m_ts - m_result.get_buffer());
-    uint16_t const len = static_cast<uint16_t>(m_te - m_ts);
-    underlying_token_t const type = static_cast<underlying_token_t>(tok);
+    u32 const offset = static_cast<u32>(m_ts - m_result.get_buffer());
+    u16 const len = static_cast<u16>(m_te - m_ts);
+    token_t const type = static_cast<token_t>(tok);
 
     m_result.push_token_record(type, offset, len);
 }

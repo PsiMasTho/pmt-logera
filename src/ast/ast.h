@@ -1,66 +1,31 @@
 #pragma once
 
-#include "../lexer/lexed_file.h"
-
-#include <variant>
 #include <vector>
+#include <limits>
+#include <algorithm>
 
-using offset_t = uint32_t;
+#include "../type_aliases.h"
 
-using header_file_node = std::variant<
-    struct variable_node,
-    struct regex_node,
-    struct decl_var_node,
-    struct eof_node>;
-
-using log_file_node = std::variant<
-    struct date_node,
-    struct variable_node,
-    struct newline_node,
-    struct eof_node,
-    struct ident_value_pair_node,
-    struct ident_value_pair_list_node>;
-
-struct date_node
+struct ast_node
 {
-    offset_t m_date;
+    u32 offset;
+    u8  type;
 };
 
-struct variable_node
+template <typename T>
+class ast
 {
-    offset_t m_identifier;
+    std::vector<T> m_nodes;
+    std::vector<std::vector<u32>> m_children;
+public:
+    auto add_node(T node) -> u32;
+    void add_child(u32 parent_idx, u32 child_idx);
+
+    auto get_node(u32 idx) const -> T const&;
+    auto get_children(u32 idx) const -> std::vector<u32> const&;
+
+private:
+    
 };
 
-struct newline_node
-{
-    offset_t m_newline;
-};
-
-struct eof_node
-{
-    offset_t m_eof;
-};
-
-struct ident_value_pair_node
-{
-    offset_t m_pair;
-    // variable_node m_variable;
-    // value_node m_value;
-};
-
-struct ident_value_pair_list_node
-{
-    std::vector<ident_value_pair_node> m_pairs;
-};
-
-struct header_file_ast
-{
-    offset_t m_lexed_file;
-    std::vector<header_file_node> m_nodes;
-};
-
-struct log_file_ast
-{
-    offset_t m_lexed_file;
-    std::vector<log_file_node> m_nodes;
-};
+#include "ast-inl.h"

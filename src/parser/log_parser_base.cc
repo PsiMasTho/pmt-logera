@@ -612,7 +612,7 @@ try
 
         case 8:
         {
-         auto const offset = m_walker.get_cur_token_record_offset();
+         auto const offset = m_walker.get_cur_token_record_source_location();
          log_file_node const lfn = newline_node{offset};
          d_val_ = lfn;
          }
@@ -620,7 +620,7 @@ try
 
         case 9:
         {
-         auto const offset = m_walker.get_cur_token_record_offset();
+         auto const offset = m_walker.get_cur_token_record_source_location();
          log_file_node const lfn = eof_node{offset};
          d_val_ = lfn;
          ACCEPT();
@@ -649,21 +649,21 @@ try
 
         case 13:
         {
-         auto const offset = m_walker.get_cur_token_record_offset();
+         auto const offset = m_walker.get_cur_token_record_source_location();
          d_val_ = offset;
          }
         break;
 
         case 14:
         {
-         auto const offset = m_walker.get_cur_token_record_offset();
+         auto const offset = m_walker.get_cur_token_record_source_location();
          d_val_ = date_node{offset};
          }
         break;
 
         case 15:
         {
-         auto const offset = m_walker.get_cur_token_record_offset();
+         auto const offset = m_walker.get_cur_token_record_source_location();
          d_val_ = ident_value_pair_node{offset};
          }
         break;

@@ -1,0 +1,192 @@
+//          Copyright (C) 2022 PsiMasTho (1cbb875@gmail.com)
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
+%scanner ../lexer/lexed_file.h
+%scanner-class-name lexed_file_walker
+%scanner-token-function m_walker.advance()
+%scanner-matched-text-function m_walker.get_cur_match()
+%parsefun-source log_parser_base.cc
+%token-class log_tokens
+%token-path ../lexer/tokens.h
+
+%baseclass-preinclude log_parser_base_preinclude.h
+
+%token  IDENT
+        NEWLINE
+        DATE
+        IDENT_VALUE_PAIR
+
+%polymorphic INDEX: u32;
+
+%type <INDEX> ident_value_pair;
+%type <INDEX> ident_value_pair_list;
+%type <INDEX> variable;
+%type <INDEX> identifier;
+%type <INDEX> date;
+%type <INDEX> statement;
+
+%%
+
+// bottom up process:
+// add node, set the returned index as semantic value
+// use semantic value to add child nodes higher up the tree
+
+input:
+    // empty
+|
+    input statement
+    {
+        // Add this statement to the root node
+        m_ast.add_child(0, $2);
+    }
+;
+
+// todo: the extra production rules for EOF are hacky but work for now
+statement:
+    date NEWLINE
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+
+        auto const this_idx = m_ast.add_node(node);
+        m_ast.add_child(this_idx, $1);
+        m_ast.add_child(this_idx, $2);
+        $$ = this_idx;
+    }
+|
+    date EOF
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+
+        auto const this_idx = m_ast.add_node(node);
+        m_ast.add_child(this_idx, $1);
+        m_ast.add_child(this_idx, $2);
+        $$ = this_idx;
+    }
+|
+    variable
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+
+        auto const this_idx = m_ast.add_node(node);
+        m_ast.add_child(this_idx, $1);
+        $$ = this_idx;
+    }
+|
+    ident_value_pair_list NEWLINE
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+
+        auto const this_idx = m_ast.add_node(node);
+        m_ast.add_child(this_idx, $1);
+        m_ast.add_child(this_idx, $2);
+        $$ = this_idx;
+    }
+|
+    ident_value_pair_list EOF
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+
+        auto const this_idx = m_ast.add_node(node);
+        m_ast.add_child(this_idx, $1);
+        m_ast.add_child(this_idx, $2);
+        $$ = this_idx;
+    }
+|
+    NEWLINE
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+
+        auto const this_idx = m_ast.add_node(node);
+        m_ast.add_child(this_idx, $1);
+        $$ = this_idx;
+    }
+|
+    EOF
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+
+        auto const this_idx = m_ast.add_node(node);
+        m_ast.add_child(this_idx, $1);
+        $$ = this_idx;
+    }
+;
+
+ident_value_pair_list:
+    ident_value_pair ';'
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::IDENT_VALUE_PAIR_LIST)};
+        auto const this_idx = m_ast.add_node(node);
+
+        m_ast.add_child(this_idx, $1);
+
+        $$ = this_idx;
+    }
+|
+    ident_value_pair_list ident_value_pair ';'
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::IDENT_VALUE_PAIR_LIST)};
+        auto const this_idx = m_ast.add_node(node);
+
+        m_ast.add_child(this_idx, $1);
+        m_ast.add_child(this_idx, $2);
+
+        $$ = this_idx;
+    }
+;
+
+variable:
+    identifier ':'
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::VARIABLE)};
+        auto const this_idx = m_ast.add_node(node);
+
+        m_ast.add_child(this_idx, $1);
+
+        $$ = this_idx;
+    }
+;
+
+identifier:
+    IDENT
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::IDENTIFIER)};
+        auto const this_idx = m_ast.add_node(node);
+
+        $$ = this_idx;
+    }
+;
+
+date:
+    DATE
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::DATE)};
+        auto const this_idx = m_ast.add_node(node);
+
+        $$ = this_idx;
+    }
+;
+
+ident_value_pair:
+    IDENT_VALUE_PAIR
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::IDENT_VALUE_PAIR)};
+        auto const this_idx = m_ast.add_node(node);
+
+        $$ = this_idx;
+    }
+;

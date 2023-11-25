@@ -4,9 +4,9 @@
 */
 
 #include "../src/lexer/header_lexer.h"
-#include "../src/lexer/tokens.h"
-
 #include "../src/utility/utility.h" // erase_and_replace
+
+#include "token_names.h"
 
 #include <fmt/format.h>
 

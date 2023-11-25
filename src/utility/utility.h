@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "../type_aliases.h"
+
 #include <memory>
 #include <type_traits>
 #include <string>
@@ -34,9 +36,9 @@ void erase_and_replace(std::string* target, std::string const& to_erase, std::st
     The size including the null terminator is stored in size.
 
 */
-auto read_file(char const* filename, uint32_t* size) -> std::unique_ptr<char[]>;
+auto read_file(char const* filename) -> std::unique_ptr<char[]>;
 
 /*
     Returns the line number of the character at char_index in buffer.
 */
-auto count_line_nr(char const* buffer, uint32_t char_index) -> uint32_t;
+auto count_line_nr(char const* buffer, u32 char_index) -> u32;

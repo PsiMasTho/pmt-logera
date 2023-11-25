@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <fcntl.h> 
 
-auto read_file_unix(char const* filename, uint32_t* size) -> unique_ptr<char[]>
+auto read_file_unix(char const* filename) -> unique_ptr<char[]>
 {
         // open file and make an RAII guard
     int fd = open(filename, O_RDONLY);
@@ -19,19 +19,19 @@ auto read_file_unix(char const* filename, uint32_t* size) -> unique_ptr<char[]>
         return nullptr;
 
         // find size of file
-    *size = lseek(fd, 0, SEEK_END);
+    u32 const size = lseek(fd, 0, SEEK_END);
     lseek(fd, 0, SEEK_SET);
 
         // Advise the kernel of our access pattern.
     posix_fadvise(fd, 0, 0, POSIX_FADV_SEQUENTIAL);
 
         // create buffer
-    auto buffer = make_unique_for_overwrite<char[]>(*size + 1);
-    buffer[*size] = '\0';
+    auto buffer = make_unique_for_overwrite<char[]>(size + 1);
+    buffer[size] = '\0';
 
         // read file
-    auto bytes_read = read(fd, buffer.get(), *size);
-    if (bytes_read == -1 || bytes_read != *size)
+    auto bytes_read = read(fd, buffer.get(), size);
+    if (bytes_read == -1 || bytes_read != size)
         return nullptr;
 
     return buffer;

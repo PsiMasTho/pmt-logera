@@ -26,23 +26,23 @@ void erase_and_replace(string* target, string const& to_erase, string const& to_
     }
 }
 
-auto read_file(char const* filename, uint32_t* size) -> unique_ptr<char[]>
+auto read_file(char const* filename) -> unique_ptr<char[]>
 {
     #if __unix__
-        return read_file_unix(filename, size);
+        return read_file_unix(filename);
     #else
-        return read_file_portable(filename, size);
+        return read_file_portable(filename);
     #endif
 }
 
-auto count_line_nr(char const* buffer, uint32_t char_index) -> uint32_t
+auto count_line_nr(char const* buffer, u32 char_index) -> u32
 {
-    uint32_t ret = 1;
+    u32 ret = 1;
     char const* p = buffer;
     while (p)
     {
         p = (char*) memchr(p, '\n', char_index - (p - buffer));
-        uint32_t const incr = p ? 1 : 0;
+        u32 const incr = p ? 1 : 0;
         ret += incr;
         p += incr;
     }

@@ -22,7 +22,7 @@ def replace_str_in_files(file_list, old, new):
 def run_bisoncpp(prefix, output_dir):
 	assert prefix == "header" or prefix == "log"
 	
-	bisoncpp_args =  [f"../src/grammar_lex/{prefix}_parser",
+	bisoncpp_args =  [f"../src/parser/{prefix}_parser",
 					  f"--filenames={prefix}_parser", 
 					  "--no-lines", 
 					  f"--class-name={prefix}_parser", 

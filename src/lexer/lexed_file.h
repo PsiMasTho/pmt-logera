@@ -1,41 +1,31 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <vector>
+#include "tokens.h"
+#include "../type_aliases.h"
 
-#include "tokens.h" // underlying_token_t
+#include <memory>
+#include <string_view>
+#include <vector>
 
 class lexed_file
 {
-    struct token_record
-    {
-        u_int32_t          offset; // offset in buffer
-        u_int16_t          length; // length of the string
-        underlying_token_t tok;   // token (enumeration from tokens.h)
-    };
-
-    std::string               m_filename;
     std::vector<token_record> m_tokens;
-    std::unique_ptr<char[]>   m_buffer;
-    uint32_t                  m_buffer_size;
+    buffer_t   m_buffer;
 public:
-    lexed_file(char const* filename);
+    lexed_file(buffer_t buffer);
     
-    auto get_filename() const -> std::string const&;
     auto get_buffer() -> char*;
     auto get_buffer() const -> char const*;
-    auto get_buffer_size() const -> uint32_t;
-    auto get_token_count() const -> uint32_t;
 
-    auto get_match_at(uint32_t idx) const -> std::string_view;
-    auto get_match_offset_at(uint32_t idx) const -> uint32_t;
-    auto get_match_length_at(uint32_t idx) const -> uint16_t;
-    auto get_token_at(uint32_t idx) const -> underlying_token_t;
-    auto get_line_nr_at(uint32_t idx) const -> uint32_t;
+    auto get_token_count() const -> u32;
 
-    void push_token_record(underlying_token_t tok, uint32_t offset, uint16_t len);
+    auto get_match_at(u32 idx) const -> std::string_view;
+    auto get_match_source_location(u32 idx) const -> u32;
+    auto get_match_length_at(u32 idx) const -> u16;
+    auto get_token_at(u32 idx) const -> token_t;
+    auto get_line_nr_at(u32 idx) const -> u32;
+
+    void push_token_record(token_t tok, u32 offset, u16 len);
 };
 
 /*
@@ -44,7 +34,7 @@ public:
 class lexed_file_walker
 {
     lexed_file const* m_file;
-    uint32_t m_index;
+    u32 m_index;
 
 public:
     lexed_file_walker(lexed_file const& file);
@@ -52,8 +42,8 @@ public:
 
     void advance();
 
-    auto get_cur_token_record_offset() const -> uint32_t;
-    auto get_cur_token_type() const -> underlying_token_t;
+    auto get_cur_token_record_source_location() const -> u32;
+    auto get_cur_token_type() const -> token_t;
     auto get_cur_match() const -> std::string_view;
-    auto get_cur_line_nr() const -> uint32_t;
+    auto get_cur_line_nr() const -> u32;
 };
