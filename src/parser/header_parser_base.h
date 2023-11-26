@@ -5,104 +5,99 @@
 #define header_parser_base_h_included
 
 #include <exception>
-#include <vector>
 #include <iostream>
+#include <vector>
 // $insert preincludes
-#include "header_parser_base_preinclude.h"
 #include "../lexer/tokens.h"
+#include "header_parser_base_preinclude.h"
 
 // hdr/baseclass
 
 namespace // anonymous
 {
-    struct PI_;
+struct PI_;
 }
 
-
-
 // $insert parserbase
-class header_parser_base: public header_tokens
+class header_parser_base : public header_tokens
 {
-    public:
-        enum DebugMode_
-        {
-            OFF           = 0,
-            ON            = 1 << 0,
-            ACTIONCASES   = 1 << 1
-        };
+public:
+    enum DebugMode_
+    {
+        OFF = 0,
+        ON = 1 << 0,
+        ACTIONCASES = 1 << 1
+    };
 
-// $insert tokens
-// $insert STYPE
-using STYPE_ = u32;
+    // $insert tokens
+    // $insert STYPE
+    using STYPE_ = u32;
 
+private:
+    // state  semval
+    using StatePair = std::pair<size_t, STYPE_>;
+    // token   semval
+    using TokenPair = std::pair<int, STYPE_>;
 
-    private:
-                        // state  semval
-        using StatePair = std::pair<size_t, STYPE_>;
-                       // token   semval
-        using TokenPair = std::pair<int,    STYPE_>;
+    int d_stackIdx = -1;
+    std::vector<StatePair> d_stateStack;
+    StatePair* d_vsp = 0; // points to the topmost value stack
+    size_t d_state = 0;
 
-        int d_stackIdx = -1;
-        std::vector<StatePair> d_stateStack;
-        StatePair  *d_vsp = 0;       // points to the topmost value stack
-        size_t      d_state = 0;
+    TokenPair d_next;
+    int d_token;
 
-        TokenPair   d_next;
-        int         d_token;
+    bool d_terminalToken = false;
+    bool d_recovery = false;
 
-        bool        d_terminalToken = false;
-        bool        d_recovery = false;
+protected:
+    enum Return_
+    {
+        PARSE_ACCEPT_ = 0, // values used as parse()'s return values
+        PARSE_ABORT_ = 1
+    };
+    enum ErrorRecovery_
+    {
+        UNEXPECTED_TOKEN_,
+    };
 
+    bool d_actionCases_ = false; // set by options/directives
+    bool d_debug_ = true;
+    size_t d_requiredTokens_;
+    size_t d_nErrors_; // initialized by clearin()
+    size_t d_acceptedTokens_;
+    STYPE_ d_val_;
 
-    protected:
-        enum Return_
-        {
-            PARSE_ACCEPT_ = 0,   // values used as parse()'s return values
-            PARSE_ABORT_  = 1
-        };
-        enum ErrorRecovery_
-        {
-            UNEXPECTED_TOKEN_,
-        };
+    header_parser_base();
 
-        bool        d_actionCases_ = false;    // set by options/directives
-        bool        d_debug_ = true;
-        size_t      d_requiredTokens_;
-        size_t      d_nErrors_;                // initialized by clearin()
-        size_t      d_acceptedTokens_;
-        STYPE_     d_val_;
+    void ABORT() const;
+    void ACCEPT() const;
+    void ERROR() const;
 
+    STYPE_& vs_(int idx); // value stack element idx
+    int lookup_() const;
+    int savedToken_() const;
+    int token_() const;
+    size_t stackSize_() const;
+    size_t state_() const;
+    size_t top_() const;
+    void clearin_();
+    void errorVerbose_();
+    void lex_(int token);
+    void popToken_();
+    void pop_(size_t count = 1);
+    void pushToken_(int token);
+    void push_(size_t nextState);
+    void redoToken_();
+    bool recovery_() const;
+    void reduce_(int rule);
+    void shift_(int state);
+    void startRecovery_();
 
-        header_parser_base();
-
-        void ABORT() const;
-        void ACCEPT() const;
-        void ERROR() const;
-
-        STYPE_ &vs_(int idx);             // value stack element idx 
-        int  lookup_() const;
-        int  savedToken_() const;
-        int  token_() const;
-        size_t stackSize_() const;
-        size_t state_() const;
-        size_t top_() const;
-        void clearin_();
-        void errorVerbose_();
-        void lex_(int token);
-        void popToken_();
-        void pop_(size_t count = 1);
-        void pushToken_(int token);
-        void push_(size_t nextState);
-        void redoToken_();
-        bool recovery_() const;
-        void reduce_(int rule);
-        void shift_(int state);
-        void startRecovery_();
-
-    public:
-        void setDebug(bool mode);
-        void setDebug(DebugMode_ mode);
-}; 
+public:
+    void setDebug(bool mode);
+    void setDebug(DebugMode_ mode);
+};
 
 // hdr/abort
 inline void header_parser_base::ABORT() const
@@ -115,7 +110,6 @@ inline void header_parser_base::ACCEPT() const
 {
     throw PARSE_ACCEPT_;
 }
-
 
 // hdr/error
 inline void header_parser_base::ERROR() const
@@ -130,16 +124,13 @@ inline int header_parser_base::savedToken_() const
 }
 
 // hdr/opbitand
-inline header_parser_base::DebugMode_ operator&(header_parser_base::DebugMode_ lhs,
-                                     header_parser_base::DebugMode_ rhs)
+inline header_parser_base::DebugMode_ operator&(header_parser_base::DebugMode_ lhs, header_parser_base::DebugMode_ rhs)
 {
-    return static_cast<header_parser_base::DebugMode_>(
-            static_cast<int>(lhs) & rhs);
+    return static_cast<header_parser_base::DebugMode_>(static_cast<int>(lhs) & rhs);
 }
 
 // hdr/opbitor
-inline header_parser_base::DebugMode_ operator|(header_parser_base::DebugMode_ lhs, 
-                                     header_parser_base::DebugMode_ rhs)
+inline header_parser_base::DebugMode_ operator|(header_parser_base::DebugMode_ lhs, header_parser_base::DebugMode_ rhs)
 {
     return static_cast<header_parser_base::DebugMode_>(static_cast<int>(lhs) | rhs);
 };
@@ -169,14 +160,9 @@ inline int header_parser_base::token_() const
 }
 
 // hdr/vs
-inline header_parser_base::STYPE_ &header_parser_base::vs_(int idx) 
+inline header_parser_base::STYPE_& header_parser_base::vs_(int idx)
 {
     return (d_vsp + idx)->second;
 }
 
-
-
 #endif
-
-
-

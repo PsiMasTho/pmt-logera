@@ -9,8 +9,8 @@
 #include <fmt/format.h>
 
 #include "cmdl_exception.h"
-#include "program_opts.h"
 #include "csv_emitter.h"
+#include "program_opts.h"
 
 #include <logera/archive.h>
 #include <logera/archive_data.h>
@@ -31,13 +31,17 @@ argparse::ArgumentParser get_arg_parser()
 
     ret.set_assign_chars("=");
 
-	ret.add_argument("-a", "--align").help("align generated csv columns").implicit_value(true).default_value(false).nargs(0);
+    ret.add_argument("-a", "--align").help("align generated csv columns").implicit_value(true).default_value(false).nargs(0);
 
     ret.add_argument("-v", "--verbose").help("verbose output").implicit_value(true).default_value(false).nargs(0);
 
     ret.add_argument("-c", "--color").help("colored errors").implicit_value(true).default_value(false).nargs(0);
 
-    ret.add_argument("--sort-cols-by-width").help("sort columns by width, widest to the right").implicit_value(true).default_value(false).nargs(0);
+    ret.add_argument("--sort-cols-by-width")
+        .help("sort columns by width, widest to the right")
+        .implicit_value(true)
+        .default_value(false)
+        .nargs(0);
 
     ret.add_argument("-d", "--directory").nargs(1).help("directory containing log files");
 
@@ -65,12 +69,12 @@ auto parse_args(int argc, char** argv) -> program_opts
 
 vector<string> get_header_line(header_data const& header)
 {
-    static string const s_date =     "date";
+    static string const s_date = "date";
     static string const s_filename = "filename";
-    static string const s_var =      "var";
+    static string const s_var = "var";
 
     vector<string> ret{s_date, s_filename, s_var};
-    for (size_t idx = 0; idx < header.attrs.size(); ++idx)
+    for(size_t idx = 0; idx < header.attrs.size(); ++idx)
         ret.push_back(header.attrs[idx].name);
 
     return ret;
@@ -82,9 +86,9 @@ auto get_log_line(log_date const& date, string const& filename, entry_data const
     ret.push_back(date.to_string());
     ret.push_back(filename);
     ret.push_back(entry.var_name);
-    for (size_t idx = 0; idx < entry.attr_values.capacity(); ++idx)
+    for(size_t idx = 0; idx < entry.attr_values.capacity(); ++idx)
     {
-        if (entry.attr_values.exists(idx))
+        if(entry.attr_values.exists(idx))
             ret.push_back(entry.attr_values.get(idx));
         else
             ret.push_back("");
@@ -96,10 +100,10 @@ auto get_log_line(log_date const& date, string const& filename, entry_data const
 auto get_csv_emitter_flags(program_opts const& opts) -> csv_emitter::flags
 {
     csv_emitter::flags ret = csv_emitter::flags::NONE;
-    
-    ret |= opts.align              ? csv_emitter::flags::ALIGN              : csv_emitter::flags::NONE;
+
+    ret |= opts.align ? csv_emitter::flags::ALIGN : csv_emitter::flags::NONE;
     ret |= opts.sort_cols_by_width ? csv_emitter::flags::SORT_COLS_BY_WIDTH : csv_emitter::flags::NONE;
-    
+
     return ret;
 }
 
@@ -109,7 +113,7 @@ void print_error(parse_error const& error, bool color)
     if(color)
     {
         print(stderr, fg(fmt::color::red), "  Error parsing file\n");
-        print(stderr, fg(fmt::color::yellow), "    Type:          {}\n", err_types[static_cast<int>(error.error_type)]);    
+        print(stderr, fg(fmt::color::yellow), "    Type:          {}\n", err_types[static_cast<int>(error.error_type)]);
         print(stderr, fg(fmt::color::yellow), "    Filename:      {}\n", error.filename);
         print(stderr, fg(fmt::color::yellow), "    Error message: {}\n", error.msg);
         print(stderr, fg(fmt::color::yellow), "    Line:          {}\n\n", error.line_nr);
@@ -146,7 +150,7 @@ void generate_csv(archive const& ar, program_opts const& opts)
     for(auto const& log_data_ptr : ar.get_log_data())
         for(auto const& entry : log_data_ptr->entries)
             csv.add_row(get_log_line(log_data_ptr->date, log_data_ptr->filename, entry));
-    
+
     // write
     csv.emit(*opts.output_stream);
 }

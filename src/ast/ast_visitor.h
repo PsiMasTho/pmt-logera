@@ -3,22 +3,27 @@
 #include "ast.h"
 
 template <typename T>
-concept preorder_functor = requires(T t, ast_node const& node)
-{
-    { t.pre(node) } -> std::same_as<void>;
+concept preorder_functor = requires(T t, ast_node const& node) {
+    {
+        t.pre(node)
+    } -> std::same_as<void>;
 };
 
 template <typename T>
-concept postorder_functor = requires(T t, ast_node const& node)
-{
-    { t.post(node) } -> std::same_as<void>;
+concept postorder_functor = requires(T t, ast_node const& node) {
+    {
+        t.post(node)
+    } -> std::same_as<void>;
 };
 
 template <typename T>
-concept preorder_postorder_functor = requires(T t, ast_node const& node)
-{
-    { t.pre(node) } -> std::same_as<void>;
-    { t.post(node) } -> std::same_as<void>;
+concept preorder_postorder_functor = requires(T t, ast_node const& node) {
+    {
+        t.pre(node)
+    } -> std::same_as<void>;
+    {
+        t.post(node)
+    } -> std::same_as<void>;
 };
 
 // functor muse have a pre() function that takes a node_t const& and returns void

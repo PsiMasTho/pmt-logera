@@ -1,7 +1,7 @@
 #pragma once
 
-#include "tokens.h"
 #include "../type_aliases.h"
+#include "tokens.h"
 
 #include <memory>
 #include <string_view>
@@ -10,10 +10,11 @@
 class lexed_file
 {
     std::vector<token_record> m_tokens;
-    buffer_t   m_buffer;
+    buffer_t m_buffer;
+
 public:
     lexed_file(buffer_t buffer);
-    
+
     auto get_buffer() -> char*;
     auto get_buffer() const -> char const*;
     auto get_buffer_size() const -> u32;

@@ -50,7 +50,7 @@ vector<filesystem::path> path_vec_from_args(argparse::ArgumentParser const& cmdl
 
 bool set_align(argparse::ArgumentParser const& cmdl)
 {
-	return cmdl.get<bool>("--align");
+    return cmdl.get<bool>("--align");
 }
 
 bool set_verbose(argparse::ArgumentParser const& cmdl)
@@ -129,7 +129,7 @@ vector<filesystem::path> set_log_files(argparse::ArgumentParser const& cmdl)
 
 program_opts::program_opts(argparse::ArgumentParser const& cmdl)
     : align{set_align(cmdl)}
-	, verbose{set_verbose(cmdl)}
+    , verbose{set_verbose(cmdl)}
     , color{set_color(cmdl)}
     , sort_cols_by_width{set_sort_cols_by_width(cmdl)}
     , header_file{set_header_file(cmdl)}
@@ -139,8 +139,8 @@ program_opts::program_opts(argparse::ArgumentParser const& cmdl)
 { }
 
 program_opts::program_opts()
-    : align{false} 
-	, verbose{false}
+    : align{false}
+    , verbose{false}
     , color{false}
     , sort_cols_by_width{false}
     , header_file{}

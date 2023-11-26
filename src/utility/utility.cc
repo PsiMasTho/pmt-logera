@@ -5,20 +5,20 @@
 
 #include "utility.h"
 
-#include <cstring>   // memchr
+#include <cstring> // memchr
 
 using namespace std;
 
 #if __unix__
-    #include "read_file_unix-inl.h"
+#    include "read_file_unix-inl.h"
 #else
-    #include "read_file_portable-inl.h"
+#    include "read_file_portable-inl.h"
 #endif
 
 void erase_and_replace(string* target, string const& to_erase, string const& to_replace)
 {
     size_t pos = target->find(to_erase);
-    while (pos != string::npos)
+    while(pos != string::npos)
     {
         target->erase(pos, to_erase.size());
         target->insert(pos, to_replace);
@@ -28,20 +28,20 @@ void erase_and_replace(string* target, string const& to_erase, string const& to_
 
 auto read_file(char const* filename) -> buffer_t
 {
-    #if __unix__
-        return read_file_unix(filename);
-    #else
-        return read_file_portable(filename);
-    #endif
+#if __unix__
+    return read_file_unix(filename);
+#else
+    return read_file_portable(filename);
+#endif
 }
 
 auto count_line_nr(char const* buffer, u32 char_index) -> u32
 {
     u32 ret = 1;
     char const* p = buffer;
-    while (p)
+    while(p)
     {
-        p = (char*) memchr(p, '\n', char_index - (p - buffer));
+        p = (char*)memchr(p, '\n', char_index - (p - buffer));
         u32 const incr = p ? 1 : 0;
         ret += incr;
         p += incr;

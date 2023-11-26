@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <vector>
 
 #include "../type_aliases.h"
 
@@ -14,7 +14,7 @@
 struct ast_node
 {
     u32 index; // *not* source_location, but index into lexed_file
-    u8  type;
+    u8 type;
 };
 
 template <typename T>
@@ -22,6 +22,7 @@ class ast
 {
     std::vector<T> m_nodes;
     std::vector<std::vector<u32>> m_children;
+
 public:
     auto add_node(T node) -> u32;
     void add_child(u32 parent_idx, u32 child_idx);
@@ -30,7 +31,6 @@ public:
     auto get_children(u32 idx) const -> std::vector<u32> const&;
 
 private:
-    
 };
 
 #include "ast-inl.h"

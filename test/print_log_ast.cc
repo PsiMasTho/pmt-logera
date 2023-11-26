@@ -109,7 +109,7 @@ void log_print_visitor::indent()
 
 void log_print_visitor::dedent()
 {
-    if (m_indent.size() >= 4)
+    if(m_indent.size() >= 4)
         m_indent = m_indent.substr(0, m_indent.size() - 4);
 }
 

@@ -2,17 +2,18 @@
 
 #include "log_parser_base.h"
 
-#include "../type_aliases.h"
-#include "../lexer/lexed_file.h"
 #include "../ast/ast.h"
+#include "../lexer/lexed_file.h"
+#include "../type_aliases.h"
 
-#include <optional>
 #include <exception>
+#include <optional>
 
 struct log_file_ast;
 class log_parser_context;
 
-class log_parser : public log_parser_base {
+class log_parser : public log_parser_base
+{
 
     lexed_file_walker m_walker;
     ast<ast_node> m_ast;
@@ -22,9 +23,9 @@ public:
     auto gen() -> std::optional<ast<ast_node>>;
 
 private:
-    int  parse();
+    int parse();
     void error(); // called on (syntax) errors
-    int  lex(); // returns the next token from the lexical scanner.
+    int lex(); // returns the next token from the lexical scanner.
     void print(); // use, e.g., d_token, d_loc
     void exceptionHandler(std::exception const& exc);
 
@@ -42,6 +43,4 @@ inline int log_parser::lex()
     return m_walker.get_cur_token_type();
 }
 
-inline void log_parser::print()
-{
-}
+inline void log_parser::print() { }

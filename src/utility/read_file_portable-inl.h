@@ -14,7 +14,7 @@ auto read_file_portable(char const* filename) -> buffer_t
     static auto const file_closer = [](FILE** file) { fclose(*file); };
     unique_ptr<FILE*, decltype(file_closer)> const file_guard(&file, file_closer);
 
-    if (file == nullptr)
+    if(file == nullptr)
         return make_pair(nullptr, 0);
 
     // find size of file
@@ -28,7 +28,7 @@ auto read_file_portable(char const* filename) -> buffer_t
 
     // read file
     auto bytes_read = fread(buffer.get(), 1, size, file);
-    if (bytes_read != size)
+    if(bytes_read != size)
         return make_pair(nullptr, 0);
 
     return make_pair(std::move(buffer), size);

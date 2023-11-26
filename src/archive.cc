@@ -12,9 +12,9 @@
 #include "parser/log_parser.h"
 #include "parser/log_parser_context.h"
 
+#include "lexer/header_lexer.h"
 #include "lexer/lexed_file.h"
 #include "lexer/log_lexer.h"
-#include "lexer/header_lexer.h"
 
 #include <algorithm>
 
@@ -83,7 +83,7 @@ void archive::parse_header(std::filesystem::path const& header_path)
 {
     header_lexer lexer(header_path.c_str());
 
-    if (lexer.lex() != 0)
+    if(lexer.lex() != 0)
     {
         throw std::runtime_error("failed to lex header file"); // todo: get rid of this
         return;
@@ -109,7 +109,7 @@ void archive::parse_log_files(std::vector<std::filesystem::path> const& log_path
     {
         log_lexer lexer(pth.c_str());
 
-        if (lexer.lex() != 0)
+        if(lexer.lex() != 0)
         {
             throw std::runtime_error("failed to lex log file"); // todo: get rid of this
             return;

@@ -8,8 +8,8 @@
 #include "../type_aliases.h"
 
 #include <memory>
-#include <type_traits>
 #include <string>
+#include <type_traits>
 
 /*
     This function shuffles the elements of the range [data_begin, data_end)

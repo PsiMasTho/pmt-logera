@@ -2,17 +2,15 @@
 
 #include "../utility/utility.h"
 
-#include <stdexcept>
 #include <limits>
+#include <stdexcept>
 
 using namespace std;
 
 lexed_file::lexed_file(buffer_t buffer)
-:   m_tokens{}
-,   m_buffer(std::move(buffer))
-{
-
-}
+    : m_tokens{}
+    , m_buffer(std::move(buffer))
+{ }
 
 auto lexed_file::get_buffer() -> char*
 {
@@ -66,8 +64,8 @@ void lexed_file::push_token_record(token_t tok, u32 loc, u16 len)
 }
 
 lexed_file_walker::lexed_file_walker(lexed_file const& file)
-:   m_file(&file)
-,   m_index(numeric_limits<u32>::max()) // roll over to 0 on first advance
+    : m_file(&file)
+    , m_index(numeric_limits<u32>::max()) // roll over to 0 on first advance
 { }
 
 auto lexed_file_walker::get_file() const -> lexed_file const&
@@ -99,4 +97,3 @@ auto lexed_file_walker::get_cur_line_nr() const -> u32
 {
     return m_file->get_line_nr_at(m_index);
 }
-

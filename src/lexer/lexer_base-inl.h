@@ -6,7 +6,7 @@
 
 template <typename derived>
 lexer_base<derived>::lexer_base(buffer_t buffer)
-:   m_result(std::move(buffer))
+    : m_result(std::move(buffer))
 {
     m_p = m_result.get_buffer();
     m_pe = m_p + m_result.get_buffer_size();
@@ -18,17 +18,17 @@ template <typename derived>
 auto lexer_base<derived>::lex() -> i32
 {
     i32 ret_code = 0;
-    while (true)
+    while(true)
     {
         static_cast<derived*>(this)->exec();
 
-        if (m_cs == -1) // error state
+        if(m_cs == -1) // error state
         {
             ret_code = -1;
             break;
         }
 
-        if (m_p == m_pe) // end of file (successful exit)
+        if(m_p == m_pe) // end of file (successful exit)
         {
             ret_code = 0;
             break;

@@ -4,7 +4,7 @@
 files=(`find ../src/ -name *.cc`)
 
 #auto generated files and external libs
-skip=( "../eternal/argparse/argparse.hpp" )
+skip=( "../external/argparse/argparse.hpp" )
 
 #remove auto generated files
 for path in "${skip[@]}"

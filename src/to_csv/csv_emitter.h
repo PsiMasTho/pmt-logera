@@ -6,8 +6,8 @@
 #pragma once
 
 #include <iosfwd>
-#include <vector>
 #include <string>
+#include <vector>
 
 // Writes log lines or vectors of strings to a
 // stream in CSV format according to RFC 4180.
@@ -16,23 +16,23 @@ class csv_emitter
 public:
     enum flags
     {
-        NONE               = 1u << 0,
-        ALIGN              = 1u << 1,
+        NONE = 1u << 0,
+        ALIGN = 1u << 1,
         SORT_COLS_BY_WIDTH = 1u << 2,
     };
 
     using row_t = std::vector<std::string>;
 
 private:
-    flags              m_flags;
-    std::vector<int>   m_col_max_width; // used for alignment
+    flags m_flags;
+    std::vector<int> m_col_max_width; // used for alignment
     std::vector<row_t> m_rows;
 
 public:
     explicit csv_emitter(flags f);
-    
+
     void emit(std::ostream& os);
-	void add_row(row_t row);
+    void add_row(row_t row);
 
 private:
     void emit_unaligned(std::ostream& os);
