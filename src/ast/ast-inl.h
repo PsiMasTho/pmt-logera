@@ -27,5 +27,5 @@ auto ast<T>::get_children(u32 idx) const -> std::vector<u32> const&
 template <typename T>
 auto ast<T>::add_child(u32 parent_idx, u32 child_idx) -> void
 {
-    m_children.push_back(child);
+    m_children[parent_idx].push_back(child_idx);
 }

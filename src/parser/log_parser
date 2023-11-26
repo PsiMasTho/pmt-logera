@@ -11,6 +11,10 @@
 %token-class log_tokens
 %token-path ../lexer/tokens.h
 
+%expect 1 // 1 error expected
+
+//%debug
+
 %baseclass-preinclude log_parser_base_preinclude.h
 
 %token  IDENT
@@ -18,20 +22,9 @@
         DATE
         IDENT_VALUE_PAIR
 
-%polymorphic INDEX: u32;
-
-%type <INDEX> ident_value_pair;
-%type <INDEX> ident_value_pair_list;
-%type <INDEX> variable;
-%type <INDEX> identifier;
-%type <INDEX> date;
-%type <INDEX> statement;
+%stype u32
 
 %%
-
-// bottom up process:
-// add node, set the returned index as semantic value
-// use semantic value to add child nodes higher up the tree
 
 input:
     // empty
@@ -41,80 +34,42 @@ input:
         // Add this statement to the root node
         m_ast.add_child(0, $2);
     }
+|
+    input NEWLINE
+|
+    input EOF
+    {
+        ACCEPT();
+    }
 ;
 
-// todo: the extra production rules for EOF are hacky but work for now
 statement:
-    date NEWLINE
+    date
     {
         auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+        auto const this_node = ast_node{this_location, static_cast<u8>(log_node_enum::STATEMENT)};
+        auto const this_idx = m_ast.add_node(this_node);
 
-        auto const this_idx = m_ast.add_node(node);
         m_ast.add_child(this_idx, $1);
-        m_ast.add_child(this_idx, $2);
-        $$ = this_idx;
-    }
-|
-    date EOF
-    {
-        auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
-
-        auto const this_idx = m_ast.add_node(node);
-        m_ast.add_child(this_idx, $1);
-        m_ast.add_child(this_idx, $2);
         $$ = this_idx;
     }
 |
     variable
     {
         auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+        auto const this_node = ast_node{this_location, static_cast<u8>(log_node_enum::STATEMENT)};
+        auto const this_idx = m_ast.add_node(this_node);
 
-        auto const this_idx = m_ast.add_node(node);
         m_ast.add_child(this_idx, $1);
         $$ = this_idx;
     }
 |
-    ident_value_pair_list NEWLINE
+    ident_value_pair_list
     {
         auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
+        auto const this_node = ast_node{this_location, static_cast<u8>(log_node_enum::STATEMENT)};
+        auto const this_idx = m_ast.add_node(this_node);
 
-        auto const this_idx = m_ast.add_node(node);
-        m_ast.add_child(this_idx, $1);
-        m_ast.add_child(this_idx, $2);
-        $$ = this_idx;
-    }
-|
-    ident_value_pair_list EOF
-    {
-        auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
-
-        auto const this_idx = m_ast.add_node(node);
-        m_ast.add_child(this_idx, $1);
-        m_ast.add_child(this_idx, $2);
-        $$ = this_idx;
-    }
-|
-    NEWLINE
-    {
-        auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
-
-        auto const this_idx = m_ast.add_node(node);
-        m_ast.add_child(this_idx, $1);
-        $$ = this_idx;
-    }
-|
-    EOF
-    {
-        auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::STATEMENT)};
-
-        auto const this_idx = m_ast.add_node(node);
         m_ast.add_child(this_idx, $1);
         $$ = this_idx;
     }
@@ -124,9 +79,8 @@ ident_value_pair_list:
     ident_value_pair ';'
     {
         auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::IDENT_VALUE_PAIR_LIST)};
-        auto const this_idx = m_ast.add_node(node);
-
+        auto const this_node = ast_node{this_location, static_cast<u8>(log_node_enum::IDENT_VALUE_PAIR_LIST)};
+        auto const this_idx = m_ast.add_node(this_node);
         m_ast.add_child(this_idx, $1);
 
         $$ = this_idx;
@@ -134,14 +88,8 @@ ident_value_pair_list:
 |
     ident_value_pair_list ident_value_pair ';'
     {
-        auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::IDENT_VALUE_PAIR_LIST)};
-        auto const this_idx = m_ast.add_node(node);
-
-        m_ast.add_child(this_idx, $1);
-        m_ast.add_child(this_idx, $2);
-
-        $$ = this_idx;
+        m_ast.add_child($1, $2);
+        $$ = $1;
     }
 ;
 
@@ -149,8 +97,8 @@ variable:
     identifier ':'
     {
         auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::VARIABLE)};
-        auto const this_idx = m_ast.add_node(node);
+        auto const this_node = ast_node{this_location, static_cast<u8>(log_node_enum::VARIABLE)};
+        auto const this_idx = m_ast.add_node(this_node);
 
         m_ast.add_child(this_idx, $1);
 
@@ -162,8 +110,8 @@ identifier:
     IDENT
     {
         auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::IDENTIFIER)};
-        auto const this_idx = m_ast.add_node(node);
+        auto const this_node = ast_node{this_location, static_cast<u8>(log_node_enum::IDENTIFIER)};
+        auto const this_idx = m_ast.add_node(this_node);
 
         $$ = this_idx;
     }
@@ -173,8 +121,8 @@ date:
     DATE
     {
         auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::DATE)};
-        auto const this_idx = m_ast.add_node(node);
+        auto const this_node = ast_node{this_location, static_cast<u8>(log_node_enum::DATE)};
+        auto const this_idx = m_ast.add_node(this_node);
 
         $$ = this_idx;
     }
@@ -184,8 +132,8 @@ ident_value_pair:
     IDENT_VALUE_PAIR
     {
         auto const this_location = m_walker.get_cur_token_record_source_location();
-        auto const this_node = ast_node{location, static_cast<u8>(log_node_enum::IDENT_VALUE_PAIR)};
-        auto const this_idx = m_ast.add_node(node);
+        auto const this_node = ast_node{this_location, static_cast<u8>(log_node_enum::IDENT_VALUE_PAIR)};
+        auto const this_idx = m_ast.add_node(this_node);
 
         $$ = this_idx;
     }

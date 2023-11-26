@@ -2,41 +2,59 @@
 
 #include "ast.h"
 
-template <typename Pre_Fn, typename Node_T>
-    requires std::is_invocable_v<Pre_Fn, Node_T const&>
+template <typename T>
+concept preorder_functor = requires(T t, ast_node const& node)
+{
+    { t.pre(node) } -> std::same_as<void>;
+};
+
+template <typename T>
+concept postorder_functor = requires(T t, ast_node const& node)
+{
+    { t.post(node) } -> std::same_as<void>;
+};
+
+template <typename T>
+concept preorder_postorder_functor = requires(T t, ast_node const& node)
+{
+    { t.pre(node) } -> std::same_as<void>;
+    { t.post(node) } -> std::same_as<void>;
+};
+
+// functor muse have a pre() function that takes a node_t const& and returns void
+template <typename Functor, typename Node_T>
+    requires preorder_functor<Functor>
 class ast_visitor_preorder
 {
     ast<Node_T> const& m_ast;
-    Pre_Fn m_pre_fn;
+    Functor m_fn;
 
 public:
-    ast_visitor_preorder(ast<Node_T> const& ast, Pre_Fn pre_fn);
+    ast_visitor_preorder(ast<Node_T> const& ast, Functor fn);
     void visit(u32 idx);
 };
 
-template <typename Post_Fn, typename Node_T>
-    requires std::is_invocable_v<Post_Fn, Node_T const&>
+template <typename Functor, typename Node_T>
+    requires postorder_functor<Functor>
 class ast_visitor_postorder
 {
     ast<Node_T> const& m_ast;
-    Post_Fn m_post_fn;
+    Functor m_fn;
 
 public:
-    ast_visitor_postorder(ast<Node_T> const& ast, Post_Fn post_fn);
+    ast_visitor_postorder(ast<Node_T> const& ast, Functor fn);
     void visit(u32 idx);
 };
 
-template <typename Pre_Fn, typename Post_Fn, typename Node_T>
-    requires std::is_invocable_v<Pre_Fn, Node_T const&> &&
-             std::is_invocable_v<Post_Fn, Node_T const&>
+template <typename Functor, typename Node_T>
+    requires preorder_postorder_functor<Functor>
 class ast_visitor
 {
     ast<Node_T> const& m_ast;
-    Pre_Fn m_pre_fn;
-    Post_Fn m_post_fn;
+    Functor m_fn;
 
 public:
-    ast_visitor(ast<Node_T> const& ast, Pre_Fn pre_fn, Post_Fn post_fn);
+    ast_visitor(ast<Node_T> const& ast, Functor fn);
     void visit(u32 idx);
 };
 

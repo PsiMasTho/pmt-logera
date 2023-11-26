@@ -2,23 +2,24 @@
 
 #include "header_parser_base.h"
 
-#include "header_parser_context.h"
+#include "../type_aliases.h"
 #include "../lexer/lexed_file.h"
+#include "../ast/ast.h"
 
-#include <filesystem>
-#include <memory>
-#include <string>
-#include <string_view>
+#include <optional>
+#include <exception>
 
-struct header_data;
+struct header_file_ast;
+class header_parser_context;
 
 class header_parser : public header_parser_base {
-    
+
     lexed_file_walker m_walker;
+    ast<ast_node> m_ast;
 
 public:
-    explicit header_parser(lexed_file const& file, header_parser_context& ctx);
-    std::unique_ptr<header_data> gen();
+    header_parser(lexed_file const& file);
+    auto gen() -> std::optional<ast<ast_node>>;
 
 private:
     int  parse();

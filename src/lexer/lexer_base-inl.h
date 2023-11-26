@@ -6,7 +6,7 @@
 
 template <typename derived>
 lexer_base<derived>::lexer_base(buffer_t buffer)
-:   m_result(buffer)
+:   m_result(std::move(buffer))
 {
     m_p = m_result.get_buffer();
     m_pe = m_p + m_result.get_buffer_size();

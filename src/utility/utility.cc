@@ -26,7 +26,7 @@ void erase_and_replace(string* target, string const& to_erase, string const& to_
     }
 }
 
-auto read_file(char const* filename) -> unique_ptr<char[]>
+auto read_file(char const* filename) -> buffer_t
 {
     #if __unix__
         return read_file_unix(filename);

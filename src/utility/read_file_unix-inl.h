@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <fcntl.h> 
 
-auto read_file_unix(char const* filename) -> unique_ptr<char[]>
+auto read_file_unix(char const* filename) -> buffer_t
 {
         // open file and make an RAII guard
     int fd = open(filename, O_RDONLY);
@@ -16,7 +16,7 @@ auto read_file_unix(char const* filename) -> unique_ptr<char[]>
     unique_ptr<int, decltype(fd_closer)> const fd_guard(&fd, fd_closer);
 
     if (fd == -1)
-        return nullptr;
+        return make_pair(nullptr, 0);
 
         // find size of file
     u32 const size = lseek(fd, 0, SEEK_END);
@@ -32,7 +32,7 @@ auto read_file_unix(char const* filename) -> unique_ptr<char[]>
         // read file
     auto bytes_read = read(fd, buffer.get(), size);
     if (bytes_read == -1 || bytes_read != size)
-        return nullptr;
+        return make_pair(nullptr, 0);
 
-    return buffer;
+    return make_pair(std::move(buffer), size);
 }

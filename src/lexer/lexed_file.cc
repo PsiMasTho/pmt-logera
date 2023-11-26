@@ -9,19 +9,24 @@ using namespace std;
 
 lexed_file::lexed_file(buffer_t buffer)
 :   m_tokens{}
-,   m_buffer(move(buffer))
+,   m_buffer(std::move(buffer))
 {
 
 }
 
 auto lexed_file::get_buffer() -> char*
 {
-    return m_buffer.get();
+    return m_buffer.first.get();
 }
 
 auto lexed_file::get_buffer() const -> char const*
 {
-    return m_buffer.get();
+    return m_buffer.first.get();
+}
+
+auto lexed_file::get_buffer_size() const -> u32
+{
+    return m_buffer.second;
 }
 
 auto lexed_file::get_token_count() const -> u32
@@ -31,7 +36,7 @@ auto lexed_file::get_token_count() const -> u32
 
 auto lexed_file::get_match_at(u32 idx) const -> string_view
 {
-    char const* start = m_buffer.get() + m_tokens[idx].loc;
+    char const* start = get_buffer() + m_tokens[idx].loc;
     return string_view(start, m_tokens[idx].length);
 }
 
@@ -52,7 +57,7 @@ auto lexed_file::get_token_at(u32 idx) const -> token_t
 
 auto lexed_file::get_line_nr_at(u32 idx) const -> u32
 {
-    return count_line_nr(m_buffer.get(), m_tokens[idx].loc);
+    return count_line_nr(get_buffer(), m_tokens[idx].loc);
 }
 
 void lexed_file::push_token_record(token_t tok, u32 loc, u16 len)

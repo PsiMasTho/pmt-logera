@@ -19,64 +19,89 @@
         NEWLINE
         REGEX
 
-%stype std::string
+%stype u32
 
 %%
 
 input:
     // empty
 |
-    input line
+    input statement
+    {
+        // Add this statement to the root node
+        m_ast.add_child(0, $2);
+    }
+|
+    input NEWLINE
+|
+    input EOF
+    {
+        ACCEPT();
+    }
 ;
 
-line:
-    declare_attribute NEWLINE
+statement:
+    declare_attribute 
 |
-    declare_attribute EOF
-|
-    declare_variable NEWLINE
-|
-    declare_variable EOF
-|
-    NEWLINE
+    declare_variable
 ;
 
 declare_attribute:
     DECL_ATTR identifier ';'
     {
-        m_ctx.add_attr($2);
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{this_location, static_cast<u8>(header_node_enum::DECL_ATTR)};
+        auto const this_idx = m_ast.add_node(this_node);
+
+        m_ast.add_child(this_idx, $2);
+
+        $$ = this_idx;
     }
 |
     declare_attribute regex ';'
     {
-        m_ctx.add_regex_to_last_attr($2);
+        m_ast.add_child($1, $2);
+        $$ = $1;
     }
 ;
 
 declare_variable:
     DECL_VAR identifier ';'
     {
-        m_ctx.add_var($2);
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{this_location, static_cast<u8>(header_node_enum::DECL_VAR)};
+        auto const this_idx = m_ast.add_node(this_node);
+
+        m_ast.add_child(this_idx, $2);
+
+        $$ = this_idx;
     }
 |
     declare_variable identifier ';'
     {
-        m_ctx.add_attr_to_last_var($2);
-    }
-;
-
-identifier:
-    IDENT
-    {
-        std::string val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
-        $$ = std::move(val);
+        m_ast.add_child($1, $2);
+        $$ = $1;
     }
 ;
 
 regex:
     REGEX
     {
-        std::string val{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
-        $$ = std::move(val);
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{this_location, static_cast<u8>(header_node_enum::REGEX)};
+        auto const this_idx = m_ast.add_node(this_node);
+
+        $$ = this_idx;
+    }
+;
+
+identifier:
+    IDENT
+    {
+        auto const this_location = m_walker.get_cur_token_record_source_location();
+        auto const this_node = ast_node{this_location, static_cast<u8>(header_node_enum::IDENTIFIER)};
+        auto const this_idx = m_ast.add_node(this_node);
+
+        $$ = this_idx;
     }
 ;

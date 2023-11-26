@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <utility>
 
 using i8 = int8_t;
 using i16 = int16_t;
@@ -15,6 +16,6 @@ using u64 = uint64_t;
 
 using token_t = i16; // underlying token type
 
-using buffer_t = std::unique_ptr<char[]>; // null terminated buffer
+using buffer_t = std::pair<std::unique_ptr<char[]>, u32>; // buffer, size
 
 using source_location_t = u32; // offset into buffer

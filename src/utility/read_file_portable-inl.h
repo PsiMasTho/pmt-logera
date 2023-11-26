@@ -7,7 +7,7 @@
 
 #include <cstdio>
 
-auto read_file_portable(char const* filename) -> unique_ptr<char[]>
+auto read_file_portable(char const* filename) -> buffer_t
 {
     // open file and make an RAII guard
     FILE* file = fopen(filename, "r");
@@ -15,7 +15,7 @@ auto read_file_portable(char const* filename) -> unique_ptr<char[]>
     unique_ptr<FILE*, decltype(file_closer)> const file_guard(&file, file_closer);
 
     if (file == nullptr)
-        return nullptr;
+        return make_pair(nullptr, 0);
 
     // find size of file
     fseek(file, 0, SEEK_END);
@@ -29,7 +29,7 @@ auto read_file_portable(char const* filename) -> unique_ptr<char[]>
     // read file
     auto bytes_read = fread(buffer.get(), 1, size, file);
     if (bytes_read != size)
-        return nullptr;
+        return make_pair(nullptr, 0);
 
-    return buffer;
+    return make_pair(std::move(buffer), size);
 }

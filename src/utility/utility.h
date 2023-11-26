@@ -36,7 +36,7 @@ void erase_and_replace(std::string* target, std::string const& to_erase, std::st
     The size including the null terminator is stored in size.
 
 */
-auto read_file(char const* filename) -> std::unique_ptr<char[]>;
+auto read_file(char const* filename) -> buffer_t;
 
 /*
     Returns the line number of the character at char_index in buffer.

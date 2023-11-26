@@ -4,46 +4,51 @@
 #endif
 // clang-format on
 
-template <typename Pre_Fn, typename Node_T>
-ast_visitor_preorder<Pre_Fn, Node_T>::ast_visitor_preorder(ast<Node_T> const& ast, Pre_Fn pre_fn)
+template <typename Functor, typename Node_T>
+    requires preorder_functor<Functor>
+ast_visitor_preorder<Functor, Node_T>::ast_visitor_preorder(ast<Node_T> const& ast, Functor fn)
     : m_ast(ast)
-    , m_pre_fn(pre_fn)
+    , m_fn(fn)
 { }
 
-template <typename Pre_Fn, typename Node_T>
-void ast_visitor_preorder<Pre_Fn, Node_T>::visit(u32 idx)
+template <typename Functor, typename Node_T>
+    requires preorder_functor<Functor>
+void ast_visitor_preorder<Functor, Node_T>::visit(u32 idx)
 {
-    m_pre_fn(m_ast.get_node(idx));
+    m_fn.pre(m_ast.get_node(idx));
     for(auto const& child : m_ast.get_children(idx))
         visit(child);
 }
 
-template <typename Post_Fn, typename Node_T>
-ast_visitor_postorder<Post_Fn, Node_T>::ast_visitor_postorder(ast<Node_T> const& ast, Post_Fn post_fn)
+template <typename Functor, typename Node_T>
+    requires postorder_functor<Functor>
+ast_visitor_postorder<Functor, Node_T>::ast_visitor_postorder(ast<Node_T> const& ast, Functor fn)
     : m_ast(ast)
-    , m_post_fn(post_fn)
+    , m_fn(fn)
 { }
 
-template <typename Post_Fn, typename Node_T>
-void ast_visitor_postorder<Post_Fn, Node_T>::visit(u32 idx)
+template <typename Functor, typename Node_T>
+    requires postorder_functor<Functor>
+void ast_visitor_postorder<Functor, Node_T>::visit(u32 idx)
 {
     for(auto const& child : m_ast.get_children(idx))
         visit(child);
-    m_post_fn(m_ast.get_node(idx));
+    m_fn.post(m_ast.get_node(idx));
 }
 
-template <typename Pre_Fn, typename Post_Fn, typename Node_T>
-ast_visitor<Pre_Fn, Post_Fn, Node_T>::ast_visitor(ast<Node_T> const& ast, Pre_Fn pre_fn, Post_Fn post_fn)
+template <typename Functor, typename Node_T>
+    requires preorder_postorder_functor<Functor>
+ast_visitor<Functor, Node_T>::ast_visitor(ast<Node_T> const& ast, Functor fn)
     : m_ast(ast)
-    , m_pre_fn(pre_fn)
-    , m_post_fn(post_fn)
+    , m_fn(fn)
 { }
 
-template <typename Pre_Fn, typename Post_Fn, typename Node_T>
-void ast_visitor<Pre_Fn, Post_Fn, Node_T>::visit(u32 idx)
+template <typename Functor, typename Node_T>
+    requires preorder_postorder_functor<Functor>
+void ast_visitor<Functor, Node_T>::visit(u32 idx)
 {
-    m_pre_fn(m_ast.get_node(idx));
+    m_fn.pre(m_ast.get_node(idx));
     for(auto const& child : m_ast.get_children(idx))
         visit(child);
-    m_post_fn(m_ast.get_node(idx));
+    m_fn.post(m_ast.get_node(idx));
 }

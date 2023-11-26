@@ -16,6 +16,7 @@ public:
     
     auto get_buffer() -> char*;
     auto get_buffer() const -> char const*;
+    auto get_buffer_size() const -> u32;
 
     auto get_token_count() const -> u32;
 

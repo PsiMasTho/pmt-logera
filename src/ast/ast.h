@@ -6,9 +6,14 @@
 
 #include "../type_aliases.h"
 
+/*
+    Each node is either a container or a leaf.
+    A container has children, and its index is generally not interesting.
+    A leaf has no children, and its index is the index into the lexed_file.
+*/
 struct ast_node
 {
-    u32 offset;
+    u32 index; // *not* source_location, but index into lexed_file
     u8  type;
 };
 
