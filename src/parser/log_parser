@@ -3,8 +3,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-%scanner ../lexer/lexed_file.h
-%scanner-class-name lexed_file_walker
+%scanner ../lexer/lexed_buffer.h
+%scanner-class-name lexed_buffer_walker
 %scanner-token-function m_walker.advance()
 %scanner-matched-text-function m_walker.get_cur_match()
 %parsefun-source log_parser_base.cc

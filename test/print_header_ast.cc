@@ -21,26 +21,26 @@ namespace fs = std::filesystem;
 
 class header_print_visitor
 {
-    lexed_file const& m_lexed_file;
+    lexed_buffer const& m_lexed_buffer;
     string m_indent = 0;
 
 public:
-    header_print_visitor(lexed_file const& lexed_file);
+    header_print_visitor(lexed_buffer const& lexed_buffer);
 
-    void pre(ast_node const& node);
-    void post(ast_node const& node);
+    auto pre(ast_node const& node) -> bool;
+    auto post(ast_node const& node) -> bool;
 
 private:
     void indent();
     void dedent();
 };
 
-header_print_visitor::header_print_visitor(lexed_file const& lexed_file)
-    : m_lexed_file(lexed_file)
+header_print_visitor::header_print_visitor(lexed_buffer const& lexed_buffer)
+    : m_lexed_buffer(lexed_buffer)
     , m_indent()
 { }
 
-void header_print_visitor::pre(ast_node const& node)
+auto header_print_visitor::pre(ast_node const& node) -> bool
 {
     switch(static_cast<header_node_enum>(node.type))
     {
@@ -56,11 +56,11 @@ void header_print_visitor::pre(ast_node const& node)
         break;
     case header_node_enum::IDENTIFIER:
         fmt::print("{}", m_indent);
-        fmt::print("identifier_node: {}\n", m_lexed_file.get_match_at(node.index));
+        fmt::print("identifier_node: {}\n", m_lexed_buffer.get_match_at(node.index));
         break;
     case header_node_enum::REGEX:
         fmt::print("{}", m_indent);
-        fmt::print("regex_node: {}\n", m_lexed_file.get_match_at(node.index));
+        fmt::print("regex_node: {}\n", m_lexed_buffer.get_match_at(node.index));
         break;
     case header_node_enum::DECL_VAR:
         fmt::print("{}", m_indent);
@@ -73,9 +73,11 @@ void header_print_visitor::pre(ast_node const& node)
         indent();
         break;
     }
+
+    return true;
 }
 
-void header_print_visitor::post(ast_node const& node)
+auto header_print_visitor::post(ast_node const& node) -> bool
 {
     switch(static_cast<header_node_enum>(node.type))
     {
@@ -97,6 +99,8 @@ void header_print_visitor::post(ast_node const& node)
     default:
         break;
     }
+
+    return true;
 }
 
 void header_print_visitor::indent()
@@ -140,7 +144,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    lexed_file lex_result = lexer.release_result();
+    lexed_buffer lex_result = lexer.release_result();
 
     header_parser parser(lex_result);
 
@@ -153,5 +157,5 @@ int main(int argc, char** argv)
     }
 
     ast_visitor visitor(ast.value(), header_print_visitor(lex_result));
-    visitor.visit(0);
+    visitor.visit();
 }

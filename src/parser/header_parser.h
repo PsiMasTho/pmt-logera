@@ -3,7 +3,7 @@
 #include "header_parser_base.h"
 
 #include "../ast/ast.h"
-#include "../lexer/lexed_file.h"
+#include "../lexer/lexed_buffer.h"
 #include "../type_aliases.h"
 
 #include <exception>
@@ -14,12 +14,11 @@ class header_parser_context;
 
 class header_parser : public header_parser_base
 {
-
-    lexed_file_walker m_walker;
+    lexed_buffer_walker m_walker;
     ast<ast_node> m_ast;
 
 public:
-    header_parser(lexed_file const& file);
+    header_parser(lexed_buffer const& file);
     auto gen() -> std::optional<ast<ast_node>>;
 
 private:

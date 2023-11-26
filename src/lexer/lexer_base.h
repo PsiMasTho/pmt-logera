@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../type_aliases.h"
-#include "lexed_file.h"
+#include "lexed_buffer.h"
 
 #ifndef MAKE_RAGEL_STATE_AVAILABLE
 #    define MAKE_RAGEL_STATE_AVAILABLE                                                                                                     \
@@ -26,12 +26,12 @@ protected:
     char* m_ts = nullptr; // token start
     char* m_te = nullptr; // token end
 
-    lexed_file m_result;
+    lexed_buffer m_result;
 
 public:
     explicit lexer_base(buffer_t buffer);
     auto lex() -> i32; // lexes entire file, returns 0 on success, 1 on error
-    auto release_result() -> lexed_file; // releases the lexed file
+    auto release_result() -> lexed_buffer; // releases the lexed file
 
 protected:
     void push_token(auto tok); // creates a token from the current state

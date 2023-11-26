@@ -13,7 +13,7 @@
 #include "parser/log_parser_context.h"
 
 #include "lexer/header_lexer.h"
-#include "lexer/lexed_file.h"
+#include "lexer/lexed_buffer.h"
 #include "lexer/log_lexer.h"
 
 #include <algorithm>
@@ -103,7 +103,7 @@ void archive::parse_log_files(std::vector<std::filesystem::path> const& log_path
 {
     log_parser_context ctx(m_header_data.get());
 
-    list<lexed_file> files;
+    list<lexed_buffer> files;
 
     for(auto const& pth : log_paths)
     {
@@ -116,7 +116,7 @@ void archive::parse_log_files(std::vector<std::filesystem::path> const& log_path
         }
 
         files.push_back(lexer.release_result());
-        lexed_file_walker walker(files.back());
+        lexed_buffer_walker walker(files.back());
 
         log_parser parser(walker, ctx);
         m_log_data.push_back(parser.gen());

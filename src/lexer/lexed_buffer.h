@@ -7,13 +7,13 @@
 #include <string_view>
 #include <vector>
 
-class lexed_file
+class lexed_buffer
 {
     std::vector<token_record> m_tokens;
     buffer_t m_buffer;
 
 public:
-    lexed_file(buffer_t buffer);
+    lexed_buffer(buffer_t buffer);
 
     auto get_buffer() -> char*;
     auto get_buffer() const -> char const*;
@@ -33,14 +33,14 @@ public:
 /*
     Advance must be called once before any of the get_cur_* functions.
 */
-class lexed_file_walker
+class lexed_buffer_walker
 {
-    lexed_file const* m_file;
+    lexed_buffer const* m_file;
     u32 m_index;
 
 public:
-    lexed_file_walker(lexed_file const& file);
-    auto get_file() const -> lexed_file const&;
+    lexed_buffer_walker(lexed_buffer const& file);
+    auto get_file() const -> lexed_buffer const&;
 
     void advance();
 

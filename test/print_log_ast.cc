@@ -21,26 +21,26 @@ namespace fs = std::filesystem;
 
 class log_print_visitor
 {
-    lexed_file const& m_lexed_file;
+    lexed_buffer const& m_lexed_buffer;
     string m_indent = 0;
 
 public:
-    log_print_visitor(lexed_file const& lexed_file);
+    log_print_visitor(lexed_buffer const& lexed_buffer);
 
-    void pre(ast_node const& node);
-    void post(ast_node const& node);
+    auto pre(ast_node const& node) -> bool;
+    auto post(ast_node const& node) -> bool;
 
 private:
     void indent();
     void dedent();
 };
 
-log_print_visitor::log_print_visitor(lexed_file const& lexed_file)
-    : m_lexed_file(lexed_file)
+log_print_visitor::log_print_visitor(lexed_buffer const& lexed_buffer)
+    : m_lexed_buffer(lexed_buffer)
     , m_indent()
 { }
 
-void log_print_visitor::pre(ast_node const& node)
+auto log_print_visitor::pre(ast_node const& node) -> bool
 {
     switch(static_cast<log_node_enum>(node.type))
     {
@@ -66,20 +66,22 @@ void log_print_visitor::pre(ast_node const& node)
         break;
     case log_node_enum::DATE:
         fmt::print("{}", m_indent);
-        fmt::print("date_node: {}\n", m_lexed_file.get_match_at(node.index));
+        fmt::print("date_node: {}\n", m_lexed_buffer.get_match_at(node.index));
         break;
     case log_node_enum::IDENTIFIER:
         fmt::print("{}", m_indent);
-        fmt::print("identifier_node: {}\n", m_lexed_file.get_match_at(node.index));
+        fmt::print("identifier_node: {}\n", m_lexed_buffer.get_match_at(node.index));
         break;
     case log_node_enum::IDENT_VALUE_PAIR:
         fmt::print("{}", m_indent);
-        fmt::print("ident_value_pair_node: {}\n", m_lexed_file.get_match_at(node.index));
+        fmt::print("ident_value_pair_node: {}\n", m_lexed_buffer.get_match_at(node.index));
         break;
     }
+
+    return true;
 }
 
-void log_print_visitor::post(ast_node const& node)
+auto log_print_visitor::post(ast_node const& node) -> bool
 {
     switch(static_cast<log_node_enum>(node.type))
     {
@@ -100,6 +102,8 @@ void log_print_visitor::post(ast_node const& node)
     default:
         break;
     }
+
+    return true;
 }
 
 void log_print_visitor::indent()
@@ -143,7 +147,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    lexed_file lex_result = lexer.release_result();
+    lexed_buffer lex_result = lexer.release_result();
 
     log_parser parser(lex_result);
 

@@ -11,7 +11,7 @@
 
 using namespace std;
 
-header_parser::header_parser(lexed_file const& file)
+header_parser::header_parser(lexed_buffer const& file)
     : m_walker(file)
     , m_ast(ast<ast_node>{})
 {

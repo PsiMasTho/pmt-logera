@@ -9,11 +9,11 @@
 /*
     Each node is either a container or a leaf.
     A container has children, and its index is generally not interesting.
-    A leaf has no children, and its index is the index into the lexed_file.
+    A leaf has no children, and its index is the index into the lexed_buffer.
 */
 struct ast_node
 {
-    u32 index; // *not* source_location, but index into lexed_file
+    u32 index; // *not* source_location, but index into lexed_buffer
     u8 type;
 };
 

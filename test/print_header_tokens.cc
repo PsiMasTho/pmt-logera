@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     }
 
     auto const result = l.release_result();
-    lexed_file_walker walker(result);
+    lexed_buffer_walker walker(result);
 
     // print total nr of tokens
     cout << "Total nr of tokens: " << result.get_token_count() << '\n';

@@ -41,7 +41,7 @@ auto lexer_base<derived>::lex() -> i32
 }
 
 template <typename derived>
-auto lexer_base<derived>::release_result() -> lexed_file
+auto lexer_base<derived>::release_result() -> lexed_buffer
 {
     return std::move(m_result);
 }

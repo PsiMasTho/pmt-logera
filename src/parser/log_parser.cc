@@ -11,7 +11,7 @@
 
 using namespace std;
 
-log_parser::log_parser(lexed_file const& file)
+log_parser::log_parser(lexed_buffer const& file)
     : m_walker(file)
     , m_ast(ast<ast_node>{})
 {
