@@ -14,7 +14,7 @@ using namespace std;
 log_parser::log_parser(lexed_buffer const& file)
     : m_walker(file)
     , m_ast{log_root_node{}}
-{}
+{ }
 
 auto log_parser::release_result() -> log_node
 {

@@ -29,13 +29,13 @@ void log_data_builder::operator()(log_node const& node)
 
 void log_data_builder::operator()(log_root_node const& node)
 {
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
 }
 
 void log_data_builder::operator()(log_statement_node const& node)
 {
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
 }
 
@@ -47,32 +47,32 @@ void log_data_builder::operator()(log_variable_node const& node)
 
 void log_data_builder::operator()(log_ident_value_pair_list_node const& node)
 {
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
     {
         auto const pair_node = get<log_ident_value_pair_node>(child);
         auto [attr_name, attr_val] = split_ident_value_pair(pair_node);
         auto const attr_idx = get_attr_idx(attr_name);
 
-        if (!attr_idx)
+        if(!attr_idx)
         {
             auto const line_nr = m_file.get_line_nr_at(pair_node.token_rec_idx);
             push_error(fmt::format("Attribute: \"{}\" does not exist", attr_name), line_nr);
             continue;
         }
 
-        if (!validate_attr_val_regex_or_err(*attr_idx, attr_val))
+        if(!validate_attr_val_regex_or_err(*attr_idx, attr_val))
             continue;
-        
+
         // todo: uniqueness check
 
         auto var_idx = *m_active_variable_idx;
 
-         if(!does_var_have_attr_idx(var_idx, *attr_idx))
-         {
+        if(!does_var_have_attr_idx(var_idx, *attr_idx))
+        {
             auto const line_nr = m_file.get_line_nr_at(pair_node.token_rec_idx);
             push_error(fmt::format("Variable: \"{}\" does not have attribute: \"{}\"", m_header.vars[var_idx].name, attr_name), line_nr);
             continue;
-         }
+        }
 
         m_result.entries.emplace_back
     }
@@ -86,7 +86,7 @@ void log_data_builder::operator()(log_date_node const& node)
     {
         m_result.date = log_date(date_str);
     }
-    catch (exception const& exc)
+    catch(exception const& exc)
     {
         auto const line_nr = m_file.get_line_nr_at(node.token_rec_idx);
         push_error(exc.what(), line_nr);

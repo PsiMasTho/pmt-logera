@@ -55,7 +55,7 @@ void log_printer::operator()(log_root_node const& node)
     fmt::print("{}", m_indent);
     fmt::print("root_node:\n");
     indent();
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
     dedent();
 }
@@ -65,7 +65,7 @@ void log_printer::operator()(log_statement_node const& node)
     fmt::print("{}", m_indent);
     fmt::print("statement_node:\n");
     indent();
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
     dedent();
 }
@@ -75,7 +75,7 @@ void log_printer::operator()(log_variable_node const& node)
     fmt::print("{}", m_indent);
     fmt::print("variable_node:\n");
     indent();
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
     dedent();
 }
@@ -86,7 +86,7 @@ void log_printer::operator()(log_ident_value_pair_list_node const& node)
     fmt::print("ident_value_pair_list_node: [\n");
 
     indent();
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
     dedent();
 

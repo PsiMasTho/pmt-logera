@@ -2,9 +2,9 @@
 
 #include "archive_data.h"
 
+#include <regex>
 #include <string>
 #include <vector>
-#include <regex>
 
 class regex_matcher
 {

@@ -32,7 +32,7 @@ public:
     void operator()(header_decl_var_node const& node);
     void operator()(header_decl_attr_node const& node);
     void operator()(header_identifier_node const& node); // leaf
-    void operator()(header_regex_node const& node);      // leaf
+    void operator()(header_regex_node const& node); // leaf
 
 private:
     void indent();
@@ -54,7 +54,7 @@ void header_printer::operator()(header_root_node const& node)
     fmt::print("{}", m_indent);
     fmt::print("root_node:\n");
     indent();
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
     dedent();
 }
@@ -64,7 +64,7 @@ void header_printer::operator()(header_statement_node const& node)
     fmt::print("{}", m_indent);
     fmt::print("statement_node:\n");
     indent();
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
     dedent();
 }
@@ -75,7 +75,7 @@ void header_printer::operator()(header_decl_var_node const& node)
     fmt::print("decl_attr_node: [\n");
 
     indent();
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
     dedent();
 
@@ -89,7 +89,7 @@ void header_printer::operator()(header_decl_attr_node const& node)
     fmt::print("decl_attr_node: [\n");
 
     indent();
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
         operator()(child);
     dedent();
 

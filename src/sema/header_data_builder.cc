@@ -15,7 +15,7 @@ header_data_builder::header_data_builder(std::string const& filename, lexed_buff
     , m_file(lexed_buffer)
     , m_result{}
     , m_errors{}
-{}
+{ }
 
 void header_data_builder::operator()(header_node const& node)
 {
@@ -44,15 +44,15 @@ void header_data_builder::operator()(header_decl_var_node const& node)
     auto const var_record = m_file.get_token_record_at(get<header_identifier_node>(node.children.front()).token_rec_idx);
 
     // first child:
-    if (!add_var_or_err(var_record))
+    if(!add_var_or_err(var_record))
         return;
-    
+
     // all other children:
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
     {
         auto const attr_record = m_file.get_token_record_at(get<header_identifier_node>(child).token_rec_idx);
 
-        if (!add_attr_to_last_var_or_err(attr_record))
+        if(!add_attr_to_last_var_or_err(attr_record))
             return;
     }
 }
@@ -62,18 +62,17 @@ void header_data_builder::operator()(header_decl_attr_node const& node)
     auto const attr_record = m_file.get_token_record_at(get<header_identifier_node>(node.children.front()).token_rec_idx);
 
     // first child:
-    if (!add_attr_or_err(attr_record))
+    if(!add_attr_or_err(attr_record))
         return;
 
     // all other children:
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
     {
         auto const expr_record = m_file.get_token_record_at(get<header_regex_node>(child).token_rec_idx);
 
-        if (!add_regex_to_last_attr_or_err(expr_record))
+        if(!add_regex_to_last_attr_or_err(expr_record))
             return;
     }
-    
 }
 
 auto header_data_builder::release_result() -> header_data
@@ -125,7 +124,7 @@ auto header_data_builder::add_attr_to_last_var_or_err(token_record attr) -> bool
     auto attr_name = to_string(m_file.get_match_at(attr));
     auto const attr_idx = get_attr_idx(attr_name);
 
-    if (!attr_idx)
+    if(!attr_idx)
     {
         push_error(fmt::format("Attribute '{}' does not exist", attr_name), m_file.get_line_nr_at(attr));
         return false;
@@ -146,7 +145,6 @@ auto header_data_builder::get_attr_idx(std::string const& attr_name) -> std::opt
 
     return distance(m_result.attrs.begin(), attr_itr);
 }
-
 
 void header_data_builder::sort_header_by_name()
 {

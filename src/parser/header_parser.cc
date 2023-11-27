@@ -14,7 +14,7 @@ using namespace std;
 header_parser::header_parser(lexed_buffer const& file)
     : m_walker(file)
     , m_ast(header_root_node{})
-{}
+{ }
 
 auto header_parser::release_result() -> header_node
 {

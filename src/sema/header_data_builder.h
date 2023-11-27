@@ -4,11 +4,11 @@
 #include "archive_data.h"
 #include "parse_error.h"
 
+#include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <span>
-#include <optional>
 
 class lexed_buffer;
 

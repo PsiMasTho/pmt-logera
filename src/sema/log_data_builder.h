@@ -1,15 +1,15 @@
 #pragma once
 
 #include "../ast/log_nodes.h"
-#include "regex_matcher.h"
 #include "archive_data.h"
 #include "parse_error.h"
+#include "regex_matcher.h"
 
+#include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <span>
-#include <optional>
 
 class lexed_buffer;
 
@@ -27,7 +27,10 @@ class log_data_builder
     u32 m_entries_created_for_active_variable;
 
 public:
-    log_data_builder(std::string const& filename, lexed_buffer const& lexed_buffer, header_data const& header, std::vector<regex_matcher> const& matchers);
+    log_data_builder(std::string const& filename,
+                     lexed_buffer const& lexed_buffer,
+                     header_data const& header,
+                     std::vector<regex_matcher> const& matchers);
 
     void operator()(log_node const& node);
 
@@ -54,5 +57,6 @@ private:
     auto validate_attr_val_regex_or_err(u32 attr_idx, std::string const& attr_val) -> bool;
 
     auto split_ident_value_pair(log_ident_value_pair_node node) -> std::pair<std::string, std::string>;
-    auto make_ident_value_pair_list_or_err(std::span<log_ident_value_pair_node const> nodes) -> std::optional<std::vector<ident_value_pair>>;
+    auto make_ident_value_pair_list_or_err(std::span<log_ident_value_pair_node const> nodes)
+        -> std::optional<std::vector<ident_value_pair>>;
 };
