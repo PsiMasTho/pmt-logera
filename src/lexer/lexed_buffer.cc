@@ -32,13 +32,23 @@ auto lexed_buffer::get_token_count() const -> u32
     return m_tokens.size();
 }
 
-auto lexed_buffer::get_match_at(u32 idx) const -> string_view
+auto lexed_buffer::get_match_at(token_record tok) const -> std::string_view
 {
-    char const* start = get_buffer() + m_tokens[idx].loc;
-    return string_view(start, m_tokens[idx].length);
+    char const* start = get_buffer() + tok.loc;
+    return string_view(start, tok.length);
 }
 
-auto lexed_buffer::get_match_source_location(u32 idx) const -> u32
+auto lexed_buffer::get_match_at(u32 idx) const -> string_view
+{
+    return get_match_at(m_tokens[idx]);
+}
+
+auto lexed_buffer::get_token_record_at(u32 idx) const -> token_record
+{
+    return m_tokens[idx];
+}
+
+auto lexed_buffer::get_match_source_location(u32 idx) const -> source_location_t
 {
     return m_tokens[idx].loc;
 }
@@ -53,9 +63,14 @@ auto lexed_buffer::get_token_at(u32 idx) const -> token_t
     return m_tokens[idx].tok;
 }
 
+auto lexed_buffer::get_line_nr_at(token_record tok) const -> u32
+{
+    return count_line_nr(get_buffer(), tok.loc);
+}
+
 auto lexed_buffer::get_line_nr_at(u32 idx) const -> u32
 {
-    return count_line_nr(get_buffer(), m_tokens[idx].loc);
+    return get_line_nr_at(m_tokens[idx]);
 }
 
 void lexed_buffer::push_token_record(token_t tok, u32 loc, u16 len)
@@ -78,9 +93,14 @@ void lexed_buffer_walker::advance()
     ++m_index;
 }
 
-auto lexed_buffer_walker::get_cur_token_record_source_location() const -> u32
+auto lexed_buffer_walker::get_cur_token_record_idx() const -> u32
 {
     return m_index;
+}
+
+auto lexed_buffer_walker::get_cur_token_record_source_location() const -> u32
+{
+    return m_file->get_match_source_location(m_index);
 }
 
 auto lexed_buffer_walker::get_cur_token_type() const -> token_t

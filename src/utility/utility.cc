@@ -48,3 +48,8 @@ auto count_line_nr(char const* buffer, u32 char_index) -> u32
     }
     return ret;
 }
+
+auto to_string(std::string_view sv) -> std::string
+{
+    return std::string(sv.data(), sv.size());
+}

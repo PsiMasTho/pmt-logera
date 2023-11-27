@@ -13,17 +13,13 @@ using namespace std;
 
 header_parser::header_parser(lexed_buffer const& file)
     : m_walker(file)
-    , m_ast(ast<ast_node>{})
-{
-    m_ast.add_node(ast_node{0, static_cast<u8>(header_node_enum::ROOT)});
-}
+    , m_ast(header_root_node{})
+{}
 
-auto header_parser::gen() -> optional<ast<ast_node>>
+auto header_parser::release_result() -> header_node
 {
-    if(parse() == 0) // no error encountered
-        return std::move(m_ast);
-    else
-        return nullopt;
+    parse();
+    return std::move(m_ast);
 }
 
 void header_parser::error()

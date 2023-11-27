@@ -1,10 +1,8 @@
 /*
-    This program is used to test the header parser. It takes a file as input and prints
+    This program is used to test the log parser. It takes a file as input and prints
     the AST.
 */
 
-#include "../src/ast/ast.h"
-#include "../src/ast/ast_visitor.h"
 #include "../src/ast/header_nodes.h"
 #include "../src/lexer/header_lexer.h"
 #include "../src/parser/header_parser.h"
@@ -19,96 +17,104 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-class header_print_visitor
+class header_printer
 {
     lexed_buffer const& m_lexed_buffer;
     string m_indent = 0;
 
 public:
-    header_print_visitor(lexed_buffer const& lexed_buffer);
+    header_printer(lexed_buffer const& lexed_buffer);
 
-    auto pre(ast_node const& node) -> bool;
-    auto post(ast_node const& node) -> bool;
+    void operator()(header_node const& node);
+
+    void operator()(header_root_node const& node);
+    void operator()(header_statement_node const& node);
+    void operator()(header_decl_var_node const& node);
+    void operator()(header_decl_attr_node const& node);
+    void operator()(header_identifier_node const& node); // leaf
+    void operator()(header_regex_node const& node);      // leaf
 
 private:
     void indent();
     void dedent();
 };
 
-header_print_visitor::header_print_visitor(lexed_buffer const& lexed_buffer)
+header_printer::header_printer(lexed_buffer const& lexed_buffer)
     : m_lexed_buffer(lexed_buffer)
     , m_indent()
 { }
 
-auto header_print_visitor::pre(ast_node const& node) -> bool
+void header_printer::operator()(header_node const& node)
 {
-    switch(static_cast<header_node_enum>(node.type))
-    {
-    case header_node_enum::ROOT:
-        fmt::print("{}", m_indent);
-        fmt::print("root_node:\n");
-        indent();
-        break;
-    case header_node_enum::STATEMENT:
-        fmt::print("{}", m_indent);
-        fmt::print("statement_node:\n");
-        indent();
-        break;
-    case header_node_enum::IDENTIFIER:
-        fmt::print("{}", m_indent);
-        fmt::print("identifier_node: {}\n", m_lexed_buffer.get_match_at(node.index));
-        break;
-    case header_node_enum::REGEX:
-        fmt::print("{}", m_indent);
-        fmt::print("regex_node: {}\n", m_lexed_buffer.get_match_at(node.index));
-        break;
-    case header_node_enum::DECL_VAR:
-        fmt::print("{}", m_indent);
-        fmt::print("decl_var_node: [\n");
-        indent();
-        break;
-    case header_node_enum::DECL_ATTR:
-        fmt::print("{}", m_indent);
-        fmt::print("decl_attr_node: [\n");
-        indent();
-        break;
-    }
-
-    return true;
+    visit(*this, node);
 }
 
-auto header_print_visitor::post(ast_node const& node) -> bool
+void header_printer::operator()(header_root_node const& node)
 {
-    switch(static_cast<header_node_enum>(node.type))
-    {
-    case header_node_enum::ROOT:
-        dedent();
-        break;
-    case header_node_enum::STATEMENT:
-        dedent();
-    case header_node_enum::DECL_VAR:
-        fmt::print("{}", m_indent);
-        fmt::print("]\n");
-        dedent();
-        break;
-    case header_node_enum::DECL_ATTR:
-        fmt::print("{}", m_indent);
-        fmt::print("]\n");
-        dedent();
-        break;
-    default:
-        break;
-    }
-
-    return true;
+    fmt::print("{}", m_indent);
+    fmt::print("root_node:\n");
+    indent();
+    for (auto const& child : node.children)
+        operator()(child);
+    dedent();
 }
 
-void header_print_visitor::indent()
+void header_printer::operator()(header_statement_node const& node)
+{
+    fmt::print("{}", m_indent);
+    fmt::print("statement_node:\n");
+    indent();
+    for (auto const& child : node.children)
+        operator()(child);
+    dedent();
+}
+
+void header_printer::operator()(header_decl_var_node const& node)
+{
+    fmt::print("{}", m_indent);
+    fmt::print("decl_attr_node: [\n");
+
+    indent();
+    for (auto const& child : node.children)
+        operator()(child);
+    dedent();
+
+    fmt::print("{}", m_indent);
+    fmt::print("]\n");
+}
+
+void header_printer::operator()(header_decl_attr_node const& node)
+{
+    fmt::print("{}", m_indent);
+    fmt::print("decl_attr_node: [\n");
+
+    indent();
+    for (auto const& child : node.children)
+        operator()(child);
+    dedent();
+
+    fmt::print("{}", m_indent);
+    fmt::print("]\n");
+}
+
+void header_printer::operator()(header_identifier_node const& node)
+{
+    fmt::print("{}", m_indent);
+    fmt::print("identifier_node: {}\n", m_lexed_buffer.get_match_at(node.token_rec_idx));
+}
+
+void header_printer::operator()(header_regex_node const& node)
+{
+    fmt::print("{}", m_indent);
+    fmt::print("regex_node: {}\n", m_lexed_buffer.get_match_at(node.token_rec_idx));
+}
+
+void header_printer::indent()
 {
     m_indent += "    ";
 }
 
-void header_print_visitor::dedent()
+void header_printer::dedent()
 {
     if(m_indent.size() >= 4)
         m_indent = m_indent.substr(0, m_indent.size() - 4);
@@ -148,14 +154,8 @@ int main(int argc, char** argv)
 
     header_parser parser(lex_result);
 
-    auto ast = parser.gen();
+    auto ast = parser.release_result();
 
-    if(!ast)
-    {
-        fmt::print("Error parsing file: {}\n", argv[1]);
-        return EXIT_FAILURE;
-    }
-
-    ast_visitor visitor(ast.value(), header_print_visitor(lex_result));
-    visitor.visit();
+    header_printer printer(lex_result);
+    printer(ast);
 }

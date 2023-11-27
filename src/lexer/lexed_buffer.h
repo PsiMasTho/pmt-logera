@@ -21,10 +21,16 @@ public:
 
     auto get_token_count() const -> u32;
 
+    auto get_match_at(token_record tok) const -> std::string_view;
     auto get_match_at(u32 idx) const -> std::string_view;
-    auto get_match_source_location(u32 idx) const -> u32;
+
+    auto get_token_record_at(u32 idx) const -> token_record;
+
+    auto get_match_source_location(u32 idx) const -> source_location_t;
     auto get_match_length_at(u32 idx) const -> u16;
     auto get_token_at(u32 idx) const -> token_t;
+
+    auto get_line_nr_at(token_record tok) const -> u32;
     auto get_line_nr_at(u32 idx) const -> u32;
 
     void push_token_record(token_t tok, u32 offset, u16 len);
@@ -44,6 +50,7 @@ public:
 
     void advance();
 
+    auto get_cur_token_record_idx() const -> u32;
     auto get_cur_token_record_source_location() const -> u32;
     auto get_cur_token_type() const -> token_t;
     auto get_cur_match() const -> std::string_view;

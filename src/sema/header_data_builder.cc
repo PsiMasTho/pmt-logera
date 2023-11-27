@@ -1,58 +1,79 @@
 #include "header_data_builder.h"
 
-#include "../ast/header_nodes.h"
 #include "../lexer/lexed_buffer.h"
-
 #include "../utility/utility.h"
+
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <numeric>
 
 using namespace std;
 
-header_data_builder::header_data_builder(string const& filename, lexed_buffer const& lexed_buffer)
+header_data_builder::header_data_builder(std::string const& filename, lexed_buffer const& lexed_buffer)
     : m_filename(filename)
     , m_file(lexed_buffer)
     , m_result{}
     , m_errors{}
-{ }
+{}
 
-auto header_data_builder::pre(ast_node const& node) -> bool
+void header_data_builder::operator()(header_node const& node)
 {
-    switch(static_cast<header_node_enum>(node.type))
+    visit(*this, node);
+}
+
+void header_data_builder::operator()(header_root_node const& node)
+{
+    m_result.filename = m_filename;
+
+    for(auto const& child : node.children)
+        operator()(child);
+
+    if(!has_errors())
+        sort_header_by_name();
+}
+
+void header_data_builder::operator()(header_statement_node const& node)
+{
+    for(auto const& child : node.children)
+        operator()(child);
+}
+
+void header_data_builder::operator()(header_decl_var_node const& node)
+{
+    auto const var_record = m_file.get_token_record_at(get<header_identifier_node>(node.children.front()).token_rec_idx);
+
+    // first child:
+    if (!add_var_or_err(var_record))
+        return;
+    
+    // all other children:
+    for (auto const& child : node.children)
     {
-    case header_node_enum::ROOT:
-        return pre_root(node.index);
-    case header_node_enum::STATEMENT:
-        return pre_statement(node.index);
-    case header_node_enum::DECL_VAR:
-        return pre_decl_var(node.index);
-    case header_node_enum::DECL_ATTR:
-        return pre_decl_attr(node.index);
-    case header_node_enum::IDENTIFIER:
-        return pre_identifier(node.index);
-    case header_node_enum::REGEX:
-        return pre_regex(node.index);
+        auto const attr_record = m_file.get_token_record_at(get<header_identifier_node>(child).token_rec_idx);
+
+        if (!add_attr_to_last_var_or_err(attr_record))
+            return;
     }
 }
 
-auto header_data_builder::post(ast_node const& node) -> bool
+void header_data_builder::operator()(header_decl_attr_node const& node)
 {
-    switch(static_cast<header_node_enum>(node.type))
+    auto const attr_record = m_file.get_token_record_at(get<header_identifier_node>(node.children.front()).token_rec_idx);
+
+    // first child:
+    if (!add_attr_or_err(attr_record))
+        return;
+
+    // all other children:
+    for (auto const& child : node.children)
     {
-    case header_node_enum::ROOT:
-        return post_root(node.index);
-    case header_node_enum::STATEMENT:
-        return post_statement(node.index);
-    case header_node_enum::DECL_VAR:
-        return post_decl_var(node.index);
-    case header_node_enum::DECL_ATTR:
-        return post_decl_attr(node.index);
-    case header_node_enum::IDENTIFIER:
-        return post_identifier(node.index);
-    case header_node_enum::REGEX:
-        return post_regex(node.index);
+        auto const expr_record = m_file.get_token_record_at(get<header_regex_node>(child).token_rec_idx);
+
+        if (!add_regex_to_last_attr_or_err(expr_record))
+            return;
     }
+    
 }
 
 auto header_data_builder::release_result() -> header_data
@@ -60,9 +81,9 @@ auto header_data_builder::release_result() -> header_data
     return std::move(m_result);
 }
 
-auto header_data_builder::release_errors() -> std::vector<parse_error>
+auto header_data_builder::get_errors() -> std::span<parse_error const>
 {
-    return std::move(m_errors);
+    return m_errors;
 }
 
 auto header_data_builder::has_errors() const -> bool
@@ -70,44 +91,62 @@ auto header_data_builder::has_errors() const -> bool
     return !m_errors.empty();
 }
 
-// ########################## pre ##########################
-auto header_data_builder::pre_root(u32 idx) -> bool
-{
-    m_result.filename = m_filename;
-}
-
-auto header_data_builder::pre_statement(u32 idx) -> bool { }
-
-auto header_data_builder::pre_decl_var(u32 idx) -> bool { }
-
-auto header_data_builder::pre_decl_attr(u32 idx) -> bool { }
-
-auto header_data_builder::pre_identifier(u32 idx) -> bool { }
-
-auto header_data_builder::pre_regex(u32 idx) -> bool { }
-
-// ########################## post ##########################
-auto header_data_builder::post_root(u32 idx) -> bool
-{
-    sort_header_by_name();
-}
-
-auto header_data_builder::post_statement(u32 idx) -> bool { }
-
-auto header_data_builder::post_decl_var(u32 idx) -> bool { }
-
-auto header_data_builder::post_decl_attr(u32 idx) -> bool { }
-
-auto header_data_builder::post_identifier(u32 idx) -> bool { }
-
-auto header_data_builder::post_regex(u32 idx) -> bool { }
-
-// ########################## helpers ##########################
-
 void header_data_builder::push_error(std::string const& msg, u32 line_nr)
 {
     m_errors.emplace_back(parse_error::SEMANTIC, m_filename, msg, line_nr);
 }
+
+auto header_data_builder::add_attr_or_err(token_record attr) -> bool
+{
+    // todo: checks
+    m_result.attrs.emplace_back(attribute_data{to_string(m_file.get_match_at(attr)), {}});
+
+    return true;
+}
+
+auto header_data_builder::add_var_or_err(token_record var) -> bool
+{
+    // todo: checks
+    m_result.vars.emplace_back(variable_data{to_string(m_file.get_match_at(var)), vector<bool>(m_result.attrs.size(), false)});
+
+    return true;
+}
+
+auto header_data_builder::add_regex_to_last_attr_or_err(token_record expr) -> bool
+{
+    // todo: checks
+    m_result.attrs.back().reg_exprs.emplace_back(to_string(m_file.get_match_at(expr)));
+
+    return true;
+}
+
+auto header_data_builder::add_attr_to_last_var_or_err(token_record attr) -> bool
+{
+    auto attr_name = to_string(m_file.get_match_at(attr));
+    auto const attr_idx = get_attr_idx(attr_name);
+
+    if (!attr_idx)
+    {
+        push_error(fmt::format("Attribute '{}' does not exist", attr_name), m_file.get_line_nr_at(attr));
+        return false;
+    }
+
+    m_result.vars.back().attr_indices[*attr_idx] = true;
+
+    return true;
+}
+
+auto header_data_builder::get_attr_idx(std::string const& attr_name) -> std::optional<u32>
+{
+    auto const attr_itr =
+        find_if(m_result.attrs.begin(), m_result.attrs.end(), [&attr_name](attribute_data const& attr) { return attr.name == attr_name; });
+
+    if(attr_itr == m_result.attrs.end())
+        return nullopt;
+
+    return distance(m_result.attrs.begin(), attr_itr);
+}
+
 
 void header_data_builder::sort_header_by_name()
 {

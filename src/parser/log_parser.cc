@@ -13,17 +13,13 @@ using namespace std;
 
 log_parser::log_parser(lexed_buffer const& file)
     : m_walker(file)
-    , m_ast(ast<ast_node>{})
-{
-    m_ast.add_node(ast_node{0, static_cast<u8>(log_node_enum::ROOT)});
-}
+    , m_ast{log_root_node{}}
+{}
 
-auto log_parser::gen() -> optional<ast<ast_node>>
+auto log_parser::release_result() -> log_node
 {
-    if(parse() == 0) // no error encountered
-        return std::move(m_ast);
-    else
-        return nullopt;
+    parse();
+    return std::move(m_ast);
 }
 
 void log_parser::error()

@@ -2,7 +2,7 @@
 
 #include "log_parser_base.h"
 
-#include "../ast/ast.h"
+#include "../ast/log_nodes.h"
 #include "../lexer/lexed_buffer.h"
 #include "../type_aliases.h"
 
@@ -15,11 +15,11 @@ class log_parser_context;
 class log_parser : public log_parser_base
 {
     lexed_buffer_walker m_walker;
-    ast<ast_node> m_ast;
+    log_node m_ast;
 
 public:
     log_parser(lexed_buffer const& file);
-    auto gen() -> std::optional<ast<ast_node>>;
+    auto release_result() -> log_node;
 
 private:
     int parse();

@@ -42,3 +42,9 @@ auto read_file(char const* filename) -> buffer_t;
     Returns the line number of the character at char_index in buffer.
 */
 auto count_line_nr(char const* buffer, u32 char_index) -> u32;
+
+/*
+    Turns a string_view into a string.
+*/
+
+auto to_string(std::string_view sv) -> std::string;
