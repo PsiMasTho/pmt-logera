@@ -1,6 +1,8 @@
 #pragma once
 
 #include "node_common.h"
+
+#include <optional>
 #include <variant>
 
 using log_node = std::variant<struct log_root_node,

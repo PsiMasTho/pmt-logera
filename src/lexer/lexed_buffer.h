@@ -41,7 +41,7 @@ public:
 */
 class lexed_buffer_walker
 {
-    lexed_buffer const* m_file;
+    lexed_buffer const* m_lex;
     u32 m_index;
 
 public:

@@ -79,13 +79,13 @@ void lexed_buffer::push_token_record(token_t tok, u32 loc, u16 len)
 }
 
 lexed_buffer_walker::lexed_buffer_walker(lexed_buffer const& file)
-    : m_file(&file)
+    : m_lex(&file)
     , m_index(numeric_limits<u32>::max()) // roll over to 0 on first advance
 { }
 
 auto lexed_buffer_walker::get_file() const -> lexed_buffer const&
 {
-    return *m_file;
+    return *m_lex;
 }
 
 void lexed_buffer_walker::advance()
@@ -100,20 +100,20 @@ auto lexed_buffer_walker::get_cur_token_record_idx() const -> u32
 
 auto lexed_buffer_walker::get_cur_token_record_source_location() const -> u32
 {
-    return m_file->get_match_source_location(m_index);
+    return m_lex->get_match_source_location(m_index);
 }
 
 auto lexed_buffer_walker::get_cur_token_type() const -> token_t
 {
-    return m_file->get_token_at(m_index);
+    return m_lex->get_token_at(m_index);
 }
 
 auto lexed_buffer_walker::get_cur_match() const -> string_view
 {
-    return m_file->get_match_at(m_index);
+    return m_lex->get_match_at(m_index);
 }
 
 auto lexed_buffer_walker::get_cur_line_nr() const -> u32
 {
-    return m_file->get_line_nr_at(m_index);
+    return m_lex->get_line_nr_at(m_index);
 }
