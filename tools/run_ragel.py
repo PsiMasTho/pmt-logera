@@ -19,7 +19,7 @@ def run_ragel(input_file, output_file):
 	return os.system("ragel " + ragel_args)
 
 def main(args):
-	input_dir = args.root_dir + "/src/grammar_lex/"
+	input_dir = args.root_dir + "/src/lexer/"
 	output_dir = args.root_dir + "/src/lexer/"
 
 	# Run ragel for header grammar first

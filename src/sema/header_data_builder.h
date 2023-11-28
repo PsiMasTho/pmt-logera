@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../ast/header_nodes.h"
 #include "archive_data.h"
 #include "parse_error.h"
 
@@ -11,41 +10,30 @@
 #include <vector>
 
 class lexed_buffer;
+class typed_header_ast;
 
 class header_data_builder
 {
     std::string m_filename;
-    lexed_buffer const& m_file;
+    lexed_buffer const& m_lex;
+    typed_header_ast const& m_header_ast;
     header_data m_result;
     std::vector<parse_error> m_errors;
 
 public:
-    header_data_builder(std::string const& filename, lexed_buffer const& lexed_buffer);
+    header_data_builder(std::string const& filename, lexed_buffer const& lexed_buffer, typed_header_ast const& header_ast);
 
-    void operator()(header_node const& node);
-
-    void operator()(header_root_node const& node);
-    void operator()(header_statement_node const& node);
-    void operator()(header_decl_var_node const& node);
-    void operator()(header_decl_attr_node const& node);
-    void operator()(header_identifier_node const& node){};
-    void operator()(header_regex_node const& node){};
-
+    void process();
     auto release_result() -> header_data;
 
     auto get_errors() -> std::span<parse_error const>;
     auto has_errors() const -> bool;
 
 private:
+    void process_decl_attr_statement(decl_attr_statement const& statement);
+    void process_decl_var_statement(decl_var_statement const& statement);
+
     void push_error(std::string const& msg, u32 line_nr);
 
-    auto add_attr_or_err(token_record attr) -> bool;
-    auto add_var_or_err(token_record var) -> bool;
-
-    auto add_regex_to_last_attr_or_err(token_record expr) -> bool;
-    auto add_attr_to_last_var_or_err(token_record attr) -> bool;
-
-    auto get_attr_idx(std::string const& attr_name) -> std::optional<u32>;
-
-    void sort_header_by_name();
+    auto get_attr_idx(std::string_view attr_name) -> std::optional<u32>;
 };

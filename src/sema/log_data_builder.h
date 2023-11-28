@@ -16,7 +16,7 @@ class lexed_buffer;
 class log_data_builder
 {
     std::string m_filename;
-    lexed_buffer const& m_file;
+    lexed_buffer const& m_lex;
     log_data m_result;
     std::vector<parse_error> m_errors;
     header_data const& m_header;

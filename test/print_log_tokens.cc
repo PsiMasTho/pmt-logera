@@ -30,7 +30,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    auto l = log_lexer(argv[1]);
+    auto l = log_lexer(read_file(argv[1]));
 
     if(l.lex() != 0)
     {

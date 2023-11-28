@@ -49,8 +49,14 @@ auto lexer_base<derived>::release_result() -> lexed_buffer
 template <typename derived>
 void lexer_base<derived>::push_token(auto tok)
 {
-    u32 const offset = static_cast<u32>(m_ts - m_result.get_buffer());
-    u16 const len = static_cast<u16>(m_te - m_ts);
+    push_token(tok, m_ts, m_te);
+}
+
+template <typename derived>
+void lexer_base<derived>::push_token(auto tok, char* start, char* end)
+{
+    u32 const offset = static_cast<u32>(start - m_result.get_buffer());
+    u16 const len = static_cast<u16>(end - start);
     token_t const type = static_cast<token_t>(tok);
 
     m_result.push_token_record(type, offset, len);

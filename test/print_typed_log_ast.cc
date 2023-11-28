@@ -1,8 +1,3 @@
-/*
-    This program is used to test the log parser. It takes a file as input and prints
-    the AST.
-*/
-
 #include "../src/lexer/log_lexer.h"
 #include "../src/parser/log_parser.h"
 #include "../src/sema/typed_log_ast_builder.h"
@@ -17,16 +12,16 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-void print_typed_log_ast(typed_log_ast const& ast)
+void print_typed_log_ast(typed_log_ast const& ast, lexed_buffer const& lex)
 {
-    fmt::print("date: {}\n", ast.date.to_string());
+    fmt::print("date: {}\n", lex.get_match_at(ast.date));
 
     for(auto const& statement : ast.entries)
     {
-        fmt::print("variable: {}\n", statement.variable);
+        fmt::print("variable: {}\n", lex.get_match_at(statement.variable));
 
         for(auto const& attr_val : statement.attr_vals)
-            fmt::print("    [{} -> {}]\n", attr_val.first, attr_val.second);
+            fmt::print("    [{} -> {}]\n", lex.get_match_at(attr_val.first), lex.get_match_at(attr_val.second));
     }
 }
 
@@ -72,5 +67,5 @@ int main(int argc, char** argv)
         return builder.release_result();
     }();
 
-    print_typed_log_ast(typed_ast);
+    print_typed_log_ast(typed_ast, lex_result);
 }

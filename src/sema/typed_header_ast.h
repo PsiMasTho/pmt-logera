@@ -5,22 +5,24 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <optional>
 
 using typed_header_statement = std::variant<struct decl_attr_statement, struct decl_var_statement>;
 
 struct decl_attr_statement
 {
-    std::string attribute;
-    std::vector<std::string> expressions;
+    u32 attribute;
+    std::vector<u32> expressions;
 };
 
 struct decl_var_statement
 {
-    std::string variable;
-    std::vector<std::string> attributes;
+    u32 variable;
+    std::vector<u32> attributes;
 };
 
-struct typed_log_ast
+struct typed_header_ast
 {
-    std::vector<typed_header_statement> statements;
+    std::vector<decl_attr_statement> decl_attr_statements;
+    std::vector<decl_var_statement> decl_var_statements;
 };

@@ -35,6 +35,7 @@ public:
 
 protected:
     void push_token(auto tok); // creates a token from the current state
+    void push_token(auto tok, char* start, char* end); // creates a token from the given start and end pointers
 };
 
 #include "lexer_base-inl.h" // implementation

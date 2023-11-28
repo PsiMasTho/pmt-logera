@@ -72,7 +72,7 @@ void header_printer::operator()(header_statement_node const& node)
 void header_printer::operator()(header_decl_var_node const& node)
 {
     fmt::print("{}", m_indent);
-    fmt::print("decl_attr_node: [\n");
+    fmt::print("decl_var_node: [\n");
 
     indent();
     for(auto const& child : node.children)

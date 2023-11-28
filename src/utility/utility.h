@@ -19,7 +19,6 @@
     are often calculated once and then reused to sort many ranges, the indices
     are stored in a buffer and reused if provided.
 */
-
 template <typename T, typename U>
     requires(std::is_integral_v<typename U::value_type>)
 auto indirect_rearrange(T data_begin, T data_end, U indices_begin, std::unique_ptr<typename U::value_type[]> buf);
@@ -32,13 +31,6 @@ auto indirect_rearrange(T data_begin, T data_end, U indices_begin, std::unique_p
 void erase_and_replace(std::string* target, std::string const& to_erase, std::string const& to_replace);
 
 /*
-    Reads the file into a buffer and returns the buffer.
-    The size including the null terminator is stored in size.
-
-*/
-auto read_file(char const* filename) -> buffer_t;
-
-/*
     Returns the line number of the character at char_index in buffer.
 */
 auto count_line_nr(char const* buffer, u32 char_index) -> u32;
@@ -46,5 +38,4 @@ auto count_line_nr(char const* buffer, u32 char_index) -> u32;
 /*
     Turns a string_view into a string.
 */
-
 auto to_string(std::string_view sv) -> std::string;

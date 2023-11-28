@@ -1,6 +1,8 @@
 #include "log_lexer.h"
 #include "tokens.h"
 
+#include <algorithm>
+
 %%{
     machine log_lexer;
 
@@ -27,12 +29,12 @@
     *|;
 
     logfile_attr_val_seq := |*
-        (nl)              { push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; fnext log_file_initial;}};
-        (comment)         { push_token(log_tokens::NEWLINE); ++n_seq_nl; if (n_seq_nl>1) { n_seq_nl = 0; fnext log_file_initial;}};
-        (ident_value_pair){ push_token(log_tokens::IDENT_VALUE_PAIR); n_seq_nl = 0;};
-        (';')             { push_token(';'); n_seq_nl = 0;};
+        (nl)              { push_token(log_tokens::NEWLINE); ++m_n_seq_nl; if (m_n_seq_nl>1) { m_n_seq_nl = 0; fnext log_file_initial;}};
+        (comment)         { push_token(log_tokens::NEWLINE); ++m_n_seq_nl; if (m_n_seq_nl>1) { m_n_seq_nl = 0; fnext log_file_initial;}};
+        (ident_value_pair){ push_ident_value_pair(m_ts, m_te); m_n_seq_nl = 0;};
+        (';')             { push_token(';'); m_n_seq_nl = 0;};
         (ws)              { };
-        (any)             { push_token(*ts); n_seq_nl = 0;};
+        (any)             { push_token(*ts); m_n_seq_nl = 0;};
     *|;
  
     main := |*
@@ -54,7 +56,21 @@ void log_lexer::init()
 
 void log_lexer::exec()
 {
-    static int n_seq_nl = 0;
     MAKE_RAGEL_STATE_AVAILABLE;
     %% write exec;
+}
+
+void log_lexer::push_ident_value_pair(char* start, char* end)
+{
+    // find first space
+    auto space = std::find(start, end, ' ');
+    
+    // push ident
+    push_token(log_tokens::IDENT, start, space);
+
+    // skip any consecutive spaces
+    auto next_char = std::find_if_not(space, end, [](char c) { return c == ' '; });
+    
+    // push attr_value
+    push_token(log_tokens::ATTR_VALUE, next_char, end);
 }

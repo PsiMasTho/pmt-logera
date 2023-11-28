@@ -19,14 +19,30 @@ public:
     auto release_result() -> typed_log_ast;
 
 private:
-    auto process(log_statement_node const& node) -> std::variant<std::vector<std::pair<std::string, std::string>>, std::string, log_date>;
-    auto process(log_variable_node const& node) -> std::string;
-    auto process(log_ident_value_pair_list_node const& node) -> std::vector<std::pair<std::string, std::string>>;
-    auto process(log_date_node const& node) -> log_date;
-    auto process(log_identifier_node const& node) -> std::string;
-    auto process(log_ident_value_pair_node const& node) -> std::pair<std::string, std::string>;
+
+        // wrapping primitives so that std::variant can distinguish between them
+    struct string_u32
+    {
+        u32 val;
+        operator u32() const { return val; }
+    };
+
+    struct date_u32
+    {
+        u32 val;
+        operator u32() const { return val; }
+    };
+
+    void process(log_root_node const& node);
+    auto process(log_statement_node const& node) -> std::variant<std::vector<std::pair<u32, u32>>, string_u32, date_u32>;
+    auto process(log_variable_node const& node) -> string_u32;
+    auto process(log_ident_value_pair_list_node const& node) -> std::vector<std::pair<u32, u32>>;
+    auto process(log_ident_value_pair_node const& node) -> std::pair<u32, u32>;
+    auto process(log_date_node const& node) -> date_u32;
+    auto process(log_attr_value_node const& node) -> string_u32;
+    auto process(log_identifier_node const& node) -> string_u32;
 
     // helpers
-    void set_date(log_date const& date);
-    void add_new_entry(std::string const& var_name, std::vector<std::pair<std::string, std::string>>&& attr_vals);
+    void set_date(date_u32 date);
+    void add_new_entry(string_u32 var, std::vector<std::pair<u32, u32>>&& pairs);
 };

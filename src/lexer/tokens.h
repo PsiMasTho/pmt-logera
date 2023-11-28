@@ -11,7 +11,7 @@ struct log_tokens
         IDENT = 257,
         NEWLINE,
         DATE,
-        IDENT_VALUE_PAIR,
+        ATTR_VALUE,
 
         MAX_TOKEN
     };

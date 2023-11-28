@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <cstddef>
 #include <string>
 
 struct parse_error
@@ -14,7 +13,7 @@ struct parse_error
     {
         SEMANTIC,
         SYNTAX,
-        EXCEPTION
+        STD_LIB
     };
 
     int error_type;

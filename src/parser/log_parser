@@ -17,24 +17,28 @@
 
 %baseclass-preinclude log_parser_base_preinclude.h
 
+// note: the order of these must match the order of the tokens in ../lexer/tokens.h
 %token  IDENT
         NEWLINE
         DATE
-        IDENT_VALUE_PAIR
+        ATTR_VALUE
 
-%polymorphic STATEMENT_NODE:             log_statement_node;
-             DATE_NODE:                  log_date_node;
-             VARIABLE_NODE:              log_variable_node;
-             IDENTIFIER_NODE:            log_identifier_node;
-             IDENT_VALUE_PAIR_NODE:      log_ident_value_pair_node;
-             IDENT_VALUE_PAIR_LIST_NODE: log_ident_value_pair_list_node;
+%polymorphic    STATEMENT_NODE:             log_statement_node;
+                VARIABLE_NODE:              log_variable_node;
+                IDENT_VALUE_PAIR_LIST_NODE: log_ident_value_pair_list_node;
+                IDENT_VALUE_PAIR_NODE:      log_ident_value_pair_node;
+                DATE_NODE:                  log_date_node;
+                ATTR_VALUE_NODE:            log_attr_value_node;
+                IDENTIFIER_NODE:            log_identifier_node;
 
 %type <STATEMENT_NODE>             statement;
-%type <DATE_NODE>                  date;
 %type <VARIABLE_NODE>              variable;
-%type <IDENTIFIER_NODE>            identifier;
-%type <IDENT_VALUE_PAIR_NODE>      ident_value_pair;
 %type <IDENT_VALUE_PAIR_LIST_NODE> ident_value_pair_list;
+%type <IDENT_VALUE_PAIR_NODE>      ident_value_pair;
+%type <ATTR_VALUE_NODE>            attr_value;
+%type <DATE_NODE>                  date;
+%type <IDENTIFIER_NODE>            identifier;
+
 
 %%
 
@@ -74,6 +78,14 @@ statement:
     }
 ;
 
+variable:
+    identifier ':'
+    {
+        $$ = log_variable_node{};
+        $$.children.push_back($1);
+    }
+;
+
 ident_value_pair_list:
     ident_value_pair ';'
     {
@@ -88,18 +100,19 @@ ident_value_pair_list:
     }
 ;
 
-variable:
-    identifier ':'
+ident_value_pair:
+    identifier attr_value
     {
-        $$ = log_variable_node{};
+        $$ = log_ident_value_pair_node{};
         $$.children.push_back($1);
+        $$.children.push_back($2);
     }
 ;
 
-identifier:
-    IDENT
+attr_value:
+    ATTR_VALUE
     {
-        $$ = log_identifier_node{};
+        $$ = log_attr_value_node{};
         $$.token_rec_idx = m_walker.get_cur_token_record_idx();
     }
 ;
@@ -112,10 +125,10 @@ date:
     }
 ;
 
-ident_value_pair:
-    IDENT_VALUE_PAIR
+identifier:
+    IDENT
     {
-        $$ = log_ident_value_pair_node{};
+        $$ = log_identifier_node{};
         $$.token_rec_idx = m_walker.get_cur_token_record_idx();
     }
 ;

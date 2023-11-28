@@ -9,11 +9,7 @@
 
 using namespace std;
 
-#if __unix__
-#    include "read_file_unix-inl.h"
-#else
-#    include "read_file_portable-inl.h"
-#endif
+
 
 void erase_and_replace(string* target, string const& to_erase, string const& to_replace)
 {
@@ -24,15 +20,6 @@ void erase_and_replace(string* target, string const& to_erase, string const& to_
         target->insert(pos, to_replace);
         pos = target->find(to_erase, pos + to_replace.size());
     }
-}
-
-auto read_file(char const* filename) -> buffer_t
-{
-#if __unix__
-    return read_file_unix(filename);
-#else
-    return read_file_portable(filename);
-#endif
 }
 
 auto count_line_nr(char const* buffer, u32 char_index) -> u32

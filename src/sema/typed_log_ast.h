@@ -7,19 +7,23 @@
 #include <variant>
 #include <vector>
 
+/*
+    Note: u32 here represents offsets into the lexed buffer.
+*/
+
 struct typed_log_entry
 {
-    std::string variable;
-    std::vector<std::pair<std::string, std::string>> attr_vals;
+    u32 variable;
+    std::vector<std::pair<u32, u32>> attr_vals;
 };
 
 struct typed_log_date
 {
-    log_date date;
+    u32 date;
 };
 
 struct typed_log_ast
 {
-    log_date date;
+    u32 date;
     std::vector<typed_log_entry> entries;
 };

@@ -17,6 +17,15 @@
 using namespace std;
 namespace fs = std::filesystem;
 
+                            // struct log_root_node,
+                            //   struct log_statement_node,
+                            //   struct log_variable_node,
+                            //   struct log_ident_value_pair_list_node,
+                            //   struct log_ident_value_pair_node,
+                            //   struct log_date_node,
+                            //   struct log_attr_value_node,
+                            //   struct log_identifier_node
+
 class log_printer
 {
     lexed_buffer const& m_lexed_buffer;
@@ -31,9 +40,10 @@ public:
     void operator()(log_statement_node const& node);
     void operator()(log_variable_node const& node);
     void operator()(log_ident_value_pair_list_node const& node);
-    void operator()(log_date_node const& node);
-    void operator()(log_identifier_node const& node);
     void operator()(log_ident_value_pair_node const& node);
+    void operator()(log_date_node const& node);
+    void operator()(log_attr_value_node const& node);
+    void operator()(log_identifier_node const& node);
 
 private:
     void indent();
@@ -63,11 +73,15 @@ void log_printer::operator()(log_root_node const& node)
 void log_printer::operator()(log_statement_node const& node)
 {
     fmt::print("{}", m_indent);
-    fmt::print("statement_node:\n");
+    fmt::print("statement_node: [\n");
+
     indent();
     for(auto const& child : node.children)
         operator()(child);
     dedent();
+
+    fmt::print("{}", m_indent);
+    fmt::print("]\n");
 }
 
 void log_printer::operator()(log_variable_node const& node)
@@ -94,22 +108,36 @@ void log_printer::operator()(log_ident_value_pair_list_node const& node)
     fmt::print("]\n");
 }
 
+void log_printer::operator()(log_ident_value_pair_node const& node)
+{
+    fmt::print("{}", m_indent);
+    fmt::print("ident_value_pair_node: [\n");
+
+    indent();
+    for(auto const& child : node.children)
+        operator()(child);
+    dedent();
+
+    fmt::print("{}", m_indent);
+    fmt::print("]\n");
+}
+
 void log_printer::operator()(log_date_node const& node)
 {
     fmt::print("{}", m_indent);
     fmt::print("date_node: {}\n", m_lexed_buffer.get_match_at(node.token_rec_idx));
 }
 
+void log_printer::operator()(log_attr_value_node const& node)
+{
+    fmt::print("{}", m_indent);
+    fmt::print("attr_value_node: {}\n", m_lexed_buffer.get_match_at(node.token_rec_idx));
+}
+
 void log_printer::operator()(log_identifier_node const& node)
 {
     fmt::print("{}", m_indent);
     fmt::print("identifier_node: {}\n", m_lexed_buffer.get_match_at(node.token_rec_idx));
-}
-
-void log_printer::operator()(log_ident_value_pair_node const& node)
-{
-    fmt::print("{}", m_indent);
-    fmt::print("ident_value_pair_node: {}\n", m_lexed_buffer.get_match_at(node.token_rec_idx));
 }
 
 void log_printer::indent()
@@ -119,7 +147,7 @@ void log_printer::indent()
 
 void log_printer::dedent()
 {
-    if(m_indent.size() >= 4)
+    if (m_indent.size() >= 4)
         m_indent = m_indent.substr(0, m_indent.size() - 4);
 }
 

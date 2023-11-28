@@ -4,7 +4,7 @@
 
 inline auto get_name(log_tokens::Tokens_ token) -> std::string
 {
-    static char const* const symbolic_tokens[] = {"IDENT", "NEWLINE", "DATE", "IDENT_VALUE_PAIR"};
+    static char const* const symbolic_tokens[] = {"IDENT", "NEWLINE", "DATE", "ATTR_VALUE"};
 
     if(token >= log_tokens::MAX_TOKEN)
         return "INVALID_TOKEN";
