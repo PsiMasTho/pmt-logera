@@ -24,13 +24,13 @@ auto typed_header_ast_builder::release_result() -> typed_header_ast
 
 void typed_header_ast_builder::process(header_root_node const& node)
 {
-    for (auto const& child : node.children)
+    for(auto const& child : node.children)
     {
         auto result = process(get<header_statement_node>(child));
 
-        if (holds_alternative<decl_attr_statement>(result))
+        if(holds_alternative<decl_attr_statement>(result))
             add_decl_attr_statement(std::move(get<decl_attr_statement>(result)));
-        else if (holds_alternative<decl_var_statement>(result))
+        else if(holds_alternative<decl_var_statement>(result))
             add_decl_var_statement(std::move(get<decl_var_statement>(result)));
         else
             throw runtime_error("Unknown header statement type");
@@ -39,9 +39,9 @@ void typed_header_ast_builder::process(header_root_node const& node)
 
 auto typed_header_ast_builder::process(header_statement_node const& node) -> std::variant<decl_attr_statement, decl_var_statement>
 {
-    if (holds_alternative<header_decl_var_node>(node.children[0]))
+    if(holds_alternative<header_decl_var_node>(node.children[0]))
         return process(get<header_decl_var_node>(node.children[0]));
-    else if (holds_alternative<header_decl_attr_node>(node.children[0]))
+    else if(holds_alternative<header_decl_attr_node>(node.children[0]))
         return process(get<header_decl_attr_node>(node.children[0]));
     else
         throw runtime_error("Unknown header statement type");
@@ -52,9 +52,9 @@ auto typed_header_ast_builder::process(header_decl_var_node const& node) -> decl
     decl_var_statement result;
     result.variable = process(get<header_identifier_node>(node.children.front()));
 
-    for (u32 i = 0; auto const& child : node.children)
+    for(u32 i = 0; auto const& child : node.children)
     {
-        if (i++ == 0)
+        if(i++ == 0)
             continue;
 
         result.attributes.push_back(process(get<header_identifier_node>(child)));
@@ -68,9 +68,9 @@ auto typed_header_ast_builder::process(header_decl_attr_node const& node) -> dec
     decl_attr_statement result;
     result.attribute = process(get<header_identifier_node>(node.children.front()));
 
-    for (u32 i = 0; auto const& child : node.children)
+    for(u32 i = 0; auto const& child : node.children)
     {
-        if (i++ == 0)
+        if(i++ == 0)
             continue;
 
         result.expressions.push_back(process(get<header_regex_node>(child)));
@@ -98,5 +98,3 @@ void typed_header_ast_builder::add_decl_var_statement(decl_var_statement&& state
 {
     m_result.decl_var_statements.push_back(std::move(statement));
 }
-
-

@@ -12,8 +12,7 @@ using log_node = std::variant<struct log_root_node,
                               struct log_ident_value_pair_node,
                               struct log_date_node,
                               struct log_attr_value_node,
-                              struct log_identifier_node
-                              >;
+                              struct log_identifier_node>;
 
 struct log_root_node : container_node<log_node>
 { };

@@ -19,18 +19,23 @@ public:
     auto release_result() -> typed_log_ast;
 
 private:
-
-        // wrapping primitives so that std::variant can distinguish between them
+    // wrapping primitives so that std::variant can distinguish between them
     struct string_u32
     {
         u32 val;
-        operator u32() const { return val; }
+        operator u32() const
+        {
+            return val;
+        }
     };
 
     struct date_u32
     {
         u32 val;
-        operator u32() const { return val; }
+        operator u32() const
+        {
+            return val;
+        }
     };
 
     void process(log_root_node const& node);

@@ -15,20 +15,20 @@ namespace fs = std::filesystem;
 void print_typed_header_ast(typed_header_ast const& ast, lexed_buffer const& lex)
 {
     fmt::print("Decl attr statements:\n");
-    for (auto const& statement : ast.decl_attr_statements)
+    for(auto const& statement : ast.decl_attr_statements)
     {
         fmt::print("    attribute: {}\n", lex.get_match_at(statement.attribute));
 
-        for (auto const& expression : statement.expressions)
+        for(auto const& expression : statement.expressions)
             fmt::print("        expression: {}\n", lex.get_match_at(expression));
     }
 
     fmt::print("\nDecl var statements:\n");
-    for (auto const& statement : ast.decl_var_statements)
+    for(auto const& statement : ast.decl_var_statements)
     {
         fmt::print("    variable: {}\n", lex.get_match_at(statement.variable));
 
-        for (auto const& attribute : statement.attributes)
+        for(auto const& attribute : statement.attributes)
             fmt::print("        attribute: {}\n", lex.get_match_at(attribute));
     }
 }

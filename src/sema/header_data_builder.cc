@@ -1,8 +1,8 @@
 #include "header_data_builder.h"
 
-#include "typed_header_ast.h"
 #include "../lexer/lexed_buffer.h"
 #include "../utility/utility.h"
+#include "typed_header_ast.h"
 
 #include <algorithm>
 
@@ -20,10 +20,10 @@ void header_data_builder::process()
 {
     m_result.filename = m_filename;
 
-    for (auto const& statement : m_header_ast.decl_attr_statements)
+    for(auto const& statement : m_header_ast.decl_attr_statements)
         process_decl_attr_statement(statement);
 
-    for (auto const& statement : m_header_ast.decl_var_statements)
+    for(auto const& statement : m_header_ast.decl_var_statements)
         process_decl_var_statement(statement);
 }
 
@@ -47,9 +47,9 @@ void header_data_builder::process_decl_attr_statement(decl_attr_statement const&
     attribute_data result;
     result.name = m_lex.get_match_at(statement.attribute);
 
-    for (auto expr_tok_rec_idx : statement.expressions)
+    for(auto expr_tok_rec_idx : statement.expressions)
         result.reg_exprs.push_back(to_string(m_lex.get_match_at(expr_tok_rec_idx)));
-    
+
     m_result.attrs.push_back(std::move(result));
 }
 
@@ -59,11 +59,11 @@ void header_data_builder::process_decl_var_statement(decl_var_statement const& s
     result.name = m_lex.get_match_at(statement.variable);
     result.attr_indices.resize(m_header_ast.decl_attr_statements.size(), false);
 
-    for (auto attr_tok_rec_idx : statement.attributes)
+    for(auto attr_tok_rec_idx : statement.attributes)
     {
         string_view const attr_name = m_lex.get_match_at(attr_tok_rec_idx);
         auto const attr_idx = get_attr_idx(attr_name);
-        if (attr_idx)
+        if(attr_idx)
             result.attr_indices[*attr_idx] = true;
         else
             push_error("Attribute '" + to_string(attr_name) + "' is not declared", m_lex.get_line_nr_at(attr_tok_rec_idx));
@@ -79,11 +79,13 @@ void header_data_builder::push_error(std::string const& msg, u32 line_nr)
 
 auto header_data_builder::get_attr_idx(string_view attr_name) -> optional<u32>
 {
-    auto const attr_itr = lower_bound(begin(m_header_ast.decl_attr_statements), end(m_header_ast.decl_attr_statements), attr_name,
+    auto const attr_itr = lower_bound(begin(m_header_ast.decl_attr_statements),
+                                      end(m_header_ast.decl_attr_statements),
+                                      attr_name,
                                       [this](u32 attr, string_view name) { return m_lex.get_match_at(attr) < name; });
-    
-    if (attr_itr == end(m_header_ast.decl_attr_statements) || m_lex.get_match_at(attr_itr->attribute) != attr_name)
+
+    if(attr_itr == end(m_header_ast.decl_attr_statements) || m_lex.get_match_at(attr_itr->attribute) != attr_name)
         return nullopt;
-    
+
     return distance(begin(m_header_ast.decl_attr_statements), attr_itr);
 }

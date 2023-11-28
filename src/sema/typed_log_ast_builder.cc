@@ -72,8 +72,7 @@ void typed_log_ast_builder::process(log_root_node const& node)
     }
 }
 
-auto typed_log_ast_builder::process(log_statement_node const& node)
-    -> std::variant<std::vector<std::pair<u32, u32>>, string_u32, date_u32>
+auto typed_log_ast_builder::process(log_statement_node const& node) -> std::variant<std::vector<std::pair<u32, u32>>, string_u32, date_u32>
 {
     if(holds_date(node))
         return process(get<log_date_node>(node.children[0]));

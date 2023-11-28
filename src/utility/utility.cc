@@ -9,8 +9,6 @@
 
 using namespace std;
 
-
-
 void erase_and_replace(string* target, string const& to_erase, string const& to_replace)
 {
     size_t pos = target->find(to_erase);

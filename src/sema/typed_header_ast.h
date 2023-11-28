@@ -2,10 +2,10 @@
 
 #include "../type_aliases.h"
 
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
-#include <optional>
 
 using typed_header_statement = std::variant<struct decl_attr_statement, struct decl_var_statement>;
 

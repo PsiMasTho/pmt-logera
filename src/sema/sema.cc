@@ -24,27 +24,12 @@ void typed_header_ast_builder::sort_decl_var_statements_by_name()
     sort(m_result.decl_var_statements.begin(), m_result.decl_var_statements.end(), name_cmp);
 }
 
-void typed_header_ast_builder::check_statements_for_duplicate_names()
-{
+void typed_header_ast_builder::check_statements_for_duplicate_names() { }
 
-}
+void typed_header_ast_builder::sort_statement_values() { }
 
-void typed_header_ast_builder::sort_statement_values()
-{
+void typed_header_ast_builder::sort_regexes() { }
 
-}
+void typed_header_ast_builder::sort_attrs() { }
 
-void typed_header_ast_builder::sort_regexes()
-{
-
-}
-
-void typed_header_ast_builder::sort_attrs()
-{
-
-}
-
-void typed_header_ast_builder::check_statements_for_duplicate_values()
-{
-
-}
+void typed_header_ast_builder::check_statements_for_duplicate_values() { }

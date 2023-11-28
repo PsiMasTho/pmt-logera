@@ -14,7 +14,7 @@ public:
     using lexer_base<log_lexer>::lexer_base;
 
 private:
-        // splits an ident_value_pair into an ident and a value
-        // and pushes them as two tokens
+    // splits an ident_value_pair into an ident and a value
+    // and pushes them as two tokens
     void push_ident_value_pair(char* start, char* end);
 };
