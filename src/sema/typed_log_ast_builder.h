@@ -19,35 +19,23 @@ public:
     auto release_result() -> typed_log_ast;
 
 private:
-    // wrapping primitives so that std::variant can distinguish between them
-    struct string_u32
-    {
-        u32 val;
-        operator u32() const
-        {
-            return val;
-        }
-    };
+    // wrapping annot_tok so that std::variant can distinguish between them
+    struct annot_str : annot_tok
+    {};
 
-    struct date_u32
-    {
-        u32 val;
-        operator u32() const
-        {
-            return val;
-        }
-    };
+    struct annot_date : annot_tok
+    {};
 
     void process(log_root_node const& node);
-    auto process(log_statement_node const& node) -> std::variant<std::vector<std::pair<u32, u32>>, string_u32, date_u32>;
-    auto process(log_variable_node const& node) -> string_u32;
-    auto process(log_ident_value_pair_list_node const& node) -> std::vector<std::pair<u32, u32>>;
-    auto process(log_ident_value_pair_node const& node) -> std::pair<u32, u32>;
-    auto process(log_date_node const& node) -> date_u32;
-    auto process(log_attr_value_node const& node) -> string_u32;
-    auto process(log_identifier_node const& node) -> string_u32;
+    auto process(log_statement_node const& node) -> std::variant<std::vector<std::pair<annot_tok, annot_tok>>, annot_str, annot_date>;
+    auto process(log_variable_node const& node) -> annot_str;
+    auto process(log_ident_value_pair_list_node const& node) -> std::vector<std::pair<annot_tok, annot_tok>>;
+    auto process(log_ident_value_pair_node const& node) -> std::pair<annot_tok, annot_tok>;
+    auto process(log_date_node const& node) -> annot_date;
+    auto process(log_attr_value_node const& node) -> annot_str;
+    auto process(log_identifier_node const& node) -> annot_str;
 
     // helpers
-    void set_date(date_u32 date);
-    void add_new_entry(string_u32 var, std::vector<std::pair<u32, u32>>&& pairs);
+    void set_date(annot_date date);
+    void add_new_entry(annot_str var, std::vector<std::pair<annot_tok, annot_tok>>&& pairs);
 };

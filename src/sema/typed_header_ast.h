@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../type_aliases.h"
+#include "../common_types.h"
 
 #include <optional>
 #include <string>
@@ -11,14 +11,14 @@ using typed_header_statement = std::variant<struct decl_attr_statement, struct d
 
 struct decl_attr_statement
 {
-    u32 attribute;
-    std::vector<u32> expressions;
+    tok_rec_idx_t attribute;
+    std::vector<tok_rec_idx_t> expressions;
 };
 
 struct decl_var_statement
 {
-    u32 variable;
-    std::vector<u32> attributes;
+    tok_rec_idx_t variable;
+    std::vector<tok_rec_idx_t> attributes;
 };
 
 struct typed_header_ast

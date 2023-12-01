@@ -79,12 +79,12 @@ auto typed_header_ast_builder::process(header_decl_attr_node const& node) -> dec
     return result;
 }
 
-auto typed_header_ast_builder::process(header_identifier_node const& node) -> u32
+auto typed_header_ast_builder::process(header_identifier_node const& node) -> tok_rec_idx_t
 {
     return node.token_rec_idx;
 }
 
-auto typed_header_ast_builder::process(header_regex_node const& node) -> u32
+auto typed_header_ast_builder::process(header_regex_node const& node) -> tok_rec_idx_t
 {
     return node.token_rec_idx;
 }

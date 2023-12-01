@@ -1,0 +1,180 @@
+//          Copyright (C) 2022 PsiMasTho (1cbb875@gmail.com)
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
+%scanner ../lexer/lexed_buffer.h
+%scanner-class-name lexed_buffer_walker
+%scanner-token-function m_walker.advance()
+%scanner-matched-text-function m_walker.get_cur_match()
+%parsefun-source parser_base.cc
+%token-class tokens
+%token-path ../lexer/tokens.h
+
+%baseclass-preinclude parser_base_preinclude.h
+
+%token  DECL_VAR
+        DECL_ATTR
+        DATE
+        ATTR_VALUE
+        IDENT
+        REGEX
+
+%polymorphic    STATEMENT_NODE:             statement_node;
+                DECL_VAR_NODE:              decl_var_node;
+                DECL_ATTR_NODE:             decl_attr_node;
+                IDENTIFIER_NODE:            identifier_node;
+                REGEX_NODE:                 regex_node;
+                IDENT_VALUE_PAIR_LIST_NODE: ident_value_pair_list_node;
+                IDENT_VALUE_PAIR_NODE:      ident_value_pair_node;
+                DATE_NODE:                  date_node;
+                ATTR_VALUE_NODE:            attr_value_node;
+
+%type <STATEMENT_NODE>             statement;
+%type <DECL_VAR_NODE>              declare_variable;
+%type <DECL_ATTR_NODE>             declare_attribute;
+%type <IDENTIFIER_NODE>            identifier;
+%type <REGEX_NODE>                 regex;
+%type <IDENT_VALUE_PAIR_LIST_NODE> ident_value_pair_list;
+%type <IDENT_VALUE_PAIR_NODE>      ident_value_pair;
+%type <DATE_NODE>                  date;
+%type <ATTR_VALUE_NODE>            attr_value;
+
+%%
+
+input:
+    // empty
+|
+    input '>' statement ';'
+    {
+        std::get<root_node>(m_ast).children.push_back($3);
+    }
+|
+    input EOF
+    {
+        ACCEPT();
+    }
+;
+
+statement:
+    declare_attribute
+    {
+        $$ = statement_node{};
+        $$.children.push_back($1);
+    }
+|
+    declare_variable
+    {
+        $$ = statement_node{};
+        $$.children.push_back($1);
+    }
+|
+    date
+    {
+        $$ = statement_node{};
+        $$.children.push_back($1);
+    }
+|
+    entry
+    {
+        $$ = statement_node{};
+        $$.children.push_back($1);
+    }
+;
+
+declare_attribute:
+    DECL_ATTR identifier
+    {
+        $$ = decl_attr_node{};
+        $$.children.push_back($2);
+    }
+|
+    declare_attribute '&' regex
+    {
+        $1.children.push_back($2);
+        $$ = $1;
+    }
+;
+
+declare_variable:
+    DECL_VAR identifier
+    {
+        $$ = decl_var_node{};
+        $$.children.push_back($2);
+    }
+|
+    declare_variable '&' identifier
+    {
+        $1.children.push_back($2);
+        $$ = $1;
+    }
+;
+
+regex:
+    REGEX
+    {
+        $$ = regex_node{};
+        $$.token_rec_idx = m_walker.get_cur_token_record_idx();
+    }
+;
+
+entry:
+    identifier ident_value_pair_list
+    {
+        $$ = variable_node{};
+        $$.children.push_back($1);
+    }
+|
+    entry '|' ident_value_pair_list
+    {
+        $1.children.push_back($3);
+        $$ = $1;
+    }
+;
+
+ident_value_pair_list:
+    ident_value_pair
+    {
+        $$ = ident_value_pair_list_node{};
+        $$.children.push_back($1);
+    }
+|
+    ident_value_pair_list '&' ident_value_pair
+    {
+        $1.children.push_back($2);
+        $$ = $1;
+    }
+;
+
+ident_value_pair:
+    identifier attr_value
+    {
+        $$ = ident_value_pair_node{};
+        $$.children.push_back($1);
+        $$.children.push_back($2);
+    }
+;
+
+attr_value:
+    ATTR_VALUE
+    {
+        $$ = attr_value_node{};
+        $$.token_rec_idx = m_walker.get_cur_token_record_idx();
+    }
+;
+
+date:
+    DATE
+    {
+        $$ = date_node{};
+        $$.token_rec_idx = m_walker.get_cur_token_record_idx();
+    }
+;
+
+identifier:
+    IDENT
+    {
+        $$ = identifier_node{};
+        $$.token_rec_idx = m_walker.get_cur_token_record_idx();
+    }
+;

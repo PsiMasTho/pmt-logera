@@ -13,7 +13,7 @@ struct parse_error
     {
         SEMANTIC,
         SYNTAX,
-        STD_LIB
+        EXCEPTION
     };
 
     int error_type;

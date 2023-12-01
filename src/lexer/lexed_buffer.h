@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../type_aliases.h"
+#include "../common_types.h"
 #include "tokens.h"
 
 #include <memory>
@@ -22,18 +22,18 @@ public:
     auto get_token_count() const -> u32;
 
     auto get_match_at(token_record tok) const -> std::string_view;
-    auto get_match_at(u32 idx) const -> std::string_view;
+    auto get_match_at(tok_rec_idx_t idx) const -> std::string_view;
 
-    auto get_token_record_at(u32 idx) const -> token_record;
+    auto get_token_record_at(tok_rec_idx_t idx) const -> token_record;
 
-    auto get_match_source_location(u32 idx) const -> source_location_t;
-    auto get_match_length_at(u32 idx) const -> u16;
-    auto get_token_at(u32 idx) const -> token_t;
+    auto get_match_source_location(tok_rec_idx_t idx) const -> source_location_t;
+    auto get_match_length_at(tok_rec_idx_t idx) const -> u16;
+    auto get_token_at(tok_rec_idx_t idx) const -> tok_t;
 
     auto get_line_nr_at(token_record tok) const -> u32;
-    auto get_line_nr_at(u32 idx) const -> u32;
+    auto get_line_nr_at(tok_rec_idx_t idx) const -> u32;
 
-    void push_token_record(token_t tok, u32 offset, u16 len);
+    void push_token_record(tok_t tok, tok_rec_idx_t idx, u16 len);
 };
 
 /*
@@ -42,7 +42,7 @@ public:
 class lexed_buffer_walker
 {
     lexed_buffer const* m_lex;
-    u32 m_index;
+    tok_rec_idx_t m_index;
 
 public:
     lexed_buffer_walker(lexed_buffer const& file);
@@ -50,9 +50,9 @@ public:
 
     void advance();
 
-    auto get_cur_token_record_idx() const -> u32;
-    auto get_cur_token_record_source_location() const -> u32;
-    auto get_cur_token_type() const -> token_t;
+    auto get_cur_token_record_idx() const -> tok_rec_idx_t;
+    auto get_cur_token_record_source_location() const -> source_location_t;
+    auto get_cur_token_type() const -> tok_t;
     auto get_cur_match() const -> std::string_view;
     auto get_cur_line_nr() const -> u32;
 };

@@ -3,10 +3,8 @@
     the tokens to the console.
 */
 
-#include "../src/lexer/log_lexer.h"
-#include "../src/utility/utility.h" // erase_and_replace
-
-#include "token_names.h"
+#include "../src/lexer/lexer.h"
+#include "../src/utility/utility.h"
 
 #include <fmt/format.h>
 
@@ -30,7 +28,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    auto l = log_lexer(read_file(argv[1]));
+    auto l = lexer(read_file(argv[1]));
 
     if(l.lex() != 0)
     {
@@ -62,7 +60,7 @@ int main(int argc, char** argv)
 
         erase_and_replace(&text, "\n", "*newline*");
 
-        auto tok_name = get_name(static_cast<log_tokens::Tokens_>(token));
+        auto tok_name = name_of_token(token);
         auto ln_nr = walker.get_cur_line_nr();
 
         // aligned print

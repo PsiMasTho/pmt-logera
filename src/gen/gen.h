@@ -4,12 +4,10 @@
 #include "../sema/regex_matcher.h"
 #include "../sema/typed_header_ast.h"
 #include "../sema/typed_log_ast.h"
-#include "../type_aliases.h"
+#include "../common_types.h"
 #include "archive_data.h"
 
 #include <string>
-
-auto read_file(char const* filename) -> buffer_t;
 
 auto lex_header(buffer_t const& buffer) -> lexed_buffer;
 

@@ -14,8 +14,10 @@ using u16 = uint16_t;
 using u32 = uint32_t;
 using u64 = uint64_t;
 
-using token_t = i16; // underlying token type
+using tok_t = i16; // underlying token type
 
 using buffer_t = std::pair<std::unique_ptr<char[]>, u32>; // buffer, size
 
 using source_location_t = u32; // offset into buffer
+
+using tok_rec_idx_t = u32; // index into token record array

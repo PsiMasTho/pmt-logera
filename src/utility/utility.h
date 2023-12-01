@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../type_aliases.h"
+#include "../common_types.h"
 
 #include <memory>
 #include <string>
@@ -39,3 +39,10 @@ auto count_line_nr(char const* buffer, u32 char_index) -> u32;
     Turns a string_view into a string.
 */
 auto to_string(std::string_view sv) -> std::string;
+
+/*
+    Returns the string representation of the given token id.
+*/
+auto name_of_token(tok_t tok) -> std::string;
+
+auto read_file(char const* filename) -> buffer_t;

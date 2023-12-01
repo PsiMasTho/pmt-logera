@@ -10,6 +10,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 struct attribute_data
 {
@@ -23,9 +24,8 @@ struct variable_data
     std::vector<bool> attr_indices;
 };
 
-struct header_data
+struct decl_data
 {
-    std::string filename;
     std::vector<attribute_data> attrs;
     std::vector<variable_data> vars;
 };
@@ -36,10 +36,8 @@ struct entry_data
     sparse_array<std::string> attr_values;
 };
 
-// class representing data of a single file
-struct log_data
+struct logera_data
 {
-    log_date date;
-    std::string filename;
-    std::vector<entry_data> entries;
+    std::map<log_date, std::pair<std::string, std::vector<entry_data>>> entries; // <date, <filename, entries>>
+    std::vector<decl_data> decls;
 };

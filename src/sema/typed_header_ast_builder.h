@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../ast/header_nodes.h"
+#include "../parser/header_nodes.h"
 #include "typed_header_ast.h"
 
 class lexed_buffer;
@@ -25,8 +25,8 @@ private:
     auto process(header_statement_node const& node) -> std::variant<decl_attr_statement, decl_var_statement>;
     auto process(header_decl_var_node const& node) -> decl_var_statement;
     auto process(header_decl_attr_node const& node) -> decl_attr_statement;
-    auto process(header_identifier_node const& node) -> u32;
-    auto process(header_regex_node const& node) -> u32;
+    auto process(header_identifier_node const& node) -> tok_rec_idx_t;
+    auto process(header_regex_node const& node) -> tok_rec_idx_t;
 
     // helpers
     void add_decl_attr_statement(decl_attr_statement&& statement);

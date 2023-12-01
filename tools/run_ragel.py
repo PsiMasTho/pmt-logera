@@ -22,19 +22,13 @@ def main(args):
 	input_dir = args.root_dir + "/src/lexer/"
 	output_dir = args.root_dir + "/src/lexer/"
 
-	# Run ragel for header grammar first
-	if run_ragel(input_dir + "header_lexer.rl", output_dir + "/header_lexer.cc") != 0:
-		print("Error running ragel for header.")
+	# Run ragel
+	if run_ragel(input_dir + "lexer.rl", output_dir + "/lexer.cc") != 0:
+		print("Error running ragel.")
 		exit(1)
 	else:
-		print("Successfully ran ragel for header.")
-	
-	# Run ragel for log grammar
-	if run_ragel(input_dir + "log_lexer.rl", output_dir + "/log_lexer.cc") != 0:
-		print("Error running ragel for log.")
-		exit(1)
-	else:
-		print("Successfully ran ragel for log.")
+		print("Successfully ran ragel.")
+
 	
 	print("Done.")
 	

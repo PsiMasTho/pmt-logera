@@ -3,7 +3,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "log_parser.h"
+#include "parser.h"
 
 #include "../utility/utility.h"
 
@@ -11,18 +11,18 @@
 
 using namespace std;
 
-log_parser::log_parser(lexed_buffer const& file)
+parser::parser(lexed_buffer const& file)
     : m_walker(file)
-    , m_ast{log_root_node{}}
+    , m_ast(root_node{})
 { }
 
-auto log_parser::release_result() -> log_node
+auto parser::release_result() -> ast_node
 {
     parse();
     return std::move(m_ast);
 }
 
-void log_parser::error()
+void parser::error()
 {
     // string match_txt{m_walker.get_cur_match().data(), m_walker.get_cur_match().size()};
 
@@ -33,11 +33,11 @@ void log_parser::error()
 
     // m_ctx.push_error(
     //     parse_error::SYNTAX, m_walker.get_file().get_filename(), fmt::format("Unexpected input: {} encountered.", match_txt), m_walker.get_cur_line_nr());
-    log_parser_base::ABORT();
+    parser_base::ABORT();
 }
 
-void log_parser::exceptionHandler(exception const& exc)
+void parser::exceptionHandler(exception const& exc)
 {
     // m_ctx.push_error(parse_error::EXCEPTION, m_walker.get_file().get_filename(), exc.what(), m_walker.get_cur_line_nr());
-    log_parser_base::ABORT();
+    parser_base::ABORT();
 }

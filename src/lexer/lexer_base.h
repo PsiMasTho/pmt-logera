@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../type_aliases.h"
+#include "../common_types.h"
 #include "lexed_buffer.h"
 
 #ifndef MAKE_RAGEL_STATE_AVAILABLE
