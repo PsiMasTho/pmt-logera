@@ -1,18 +1,20 @@
->2022-09-16;
+2022-09-15
 
->bw weight 71kg;
 
->dips
-    			 reps 2s10r & rpe 8 |
-    weight 5kg & reps 3s8r  &  rpe 10;
+bw:
+    weight 71kg;
 
->bench_press
-    weight 60kg  & reps 4s2r    & incline 15deg |
-    weight 100kg & reps 5,4,4,1 & incline 15deg;
+dips:
+			 reps 2s10r ;  rpe 8;
+    weight 5kg ; reps 3s8r  ;  rpe 10;
 
->btn_situps
-    weight 2.5kg & reps 10,10,10,10 |
-    weight 5kg   & reps 5s10r;
+bench_press:
+    weight 60kg  ; reps 4s2r    ; incline 15deg;
+    weight 100kg ; reps 5,4,4,1 ; incline 15deg;
 
->treadmill
+btn_situps:
+    weight 2.5kg ; reps 10,10,10,10;
+    weight 5kg   ; reps 5s10r;
+
+treadmill:
     time 10:00;

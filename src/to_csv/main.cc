@@ -3,7 +3,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "../external/argparse/argparse.hpp"
+#include <argparse/argparse.hpp>
 
 #include <fmt/color.h>
 #include <fmt/format.h>

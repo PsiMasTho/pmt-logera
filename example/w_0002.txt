@@ -1,16 +1,18 @@
->2022-09-17;
+2022-09-17
 
-#Hi there!
+# This is a comment
 
->bw weight 78kg;
+bw:
+    weight 78kg;
 
->kcal energy 3500kcal;
+kcal:
+    energy 3500kcal;
 
->leg_extension
-    weight 100kg & reps 5s10r & rpe 10;
+leg_extension:
+    weight 100kg ; reps 5s10r ; rpe 10;
 
->shoulder_press
-    weight 60kg & reps 5s10r & rpe 8; #comment
+shoulder_press:
+    weight 60kg ; reps 5s10r ; rpe 8; #comment
 
->leg_curl
-    weight 60kg & reps 4,4,4,5 & rpe 7;
+leg_curl:
+    weight 60kg ; reps 4,4,4,5 ; rpe 7;

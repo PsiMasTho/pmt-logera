@@ -107,7 +107,7 @@ vector<filesystem::path> set_log_files(argparse::ArgumentParser const& cmdl)
 {
     auto paths = path_vec_from_args(cmdl);
 
-    paths.erase(std::remove_if(begin(paths),
+    paths.erase(std::partition_if_not(begin(paths),
                                end(paths),
                                [](auto const& pth) {
                                    if(pth.extension() == ".lh")
