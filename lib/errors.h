@@ -2,6 +2,7 @@
 
 #include "tokens.h" // source_location
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -25,4 +26,13 @@ file_error_destroy(
 file_error
 file_error_move(
     file_error* self
+);
+
+void
+push_fmted_error(
+    int errfmt_idx
+,   char const** fmts
+,   opaque_vector* errors
+,   source_location location
+,   ...
 );

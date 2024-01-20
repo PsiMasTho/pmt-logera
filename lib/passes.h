@@ -6,6 +6,21 @@
 
 typedef struct ast_node ast_node;
 
+bool
+check_regex_match(
+    ast_node const* decl_attr_root // MULTIFILE_NODE
+,   opaque_vector const* matchers
+,   ast_node const* attr_node      // IDENTIFIER_NODE
+,   ast_node const* value_node     // ATTR_VALUE_NODE
+,   opaque_vector* errors
+);
+
+opaque_vector // -> vector of vectors of regex_t
+create_regex_matchers(
+    ast_node const* decl_attrs
+,   opaque_vector* errors
+);
+
 bool // -> if the given string is a valid date
 is_valid_date(
     char const* str // assumed to be a NTBS in the format "YYYY-MM-DD"
@@ -46,22 +61,6 @@ void
 pass_4(
     ast_node* in_decl_attrs
 ,   ast_node* in_decl_vars
-,   opaque_vector* errors
-);
-
-
-opaque_vector // -> vector of vectors of regex_t
-create_regex_matchers(
-    ast_node const* decl_attrs
-,   opaque_vector* errors
-);
-
-bool
-check_regex_match(
-    ast_node const* decl_attr_root // MULTIFILE_NODE
-,   opaque_vector const* matchers
-,   ast_node const* attr_node      // IDENTIFIER_NODE
-,   ast_node const* value_node     // ATTR_VALUE_NODE
 ,   opaque_vector* errors
 );
 

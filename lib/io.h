@@ -11,18 +11,18 @@ typedef struct terminated_reader
     bool wrote_eof;
 } terminated_reader;
 
+void
+basename_from_path(
+    char const* path
+,   char* dest // output buffer
+,   int bufsz  // size of output buffer, must be >= 1
+);
+
 terminated_reader
 terminated_reader_create(
     FILE* stream
 ,   char* terminator_seq   // not null-terminated
 ,   int terminator_seq_len // may be 0
-);
-
-int // -> number of bytes read
-terminated_reader_read( 
-    terminated_reader* reader
-,   char* buffer
-,   int bufsz
 );
 
 bool // -> if EOF or error
@@ -35,9 +35,9 @@ terminated_reader_error(
     terminated_reader const* reader
 );
 
-void
-basename_from_path(
-    char const* path
-,   char* dest // output buffer
-,   int bufsz  // size of output buffer, must be >= 1
+int // -> number of bytes read
+terminated_reader_read( 
+    terminated_reader* reader
+,   char* buffer
+,   int bufsz
 );

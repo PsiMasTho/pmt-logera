@@ -29,7 +29,7 @@
 
 */
 
-static token_record* peek(opaque_vector const* tokens, size_t n)
+static token_record* peek(opaque_vector const* tokens, int n)
 {
     assert(tokens != NULL);
     assert(opaque_vector_size(tokens) >= n);
@@ -37,7 +37,7 @@ static token_record* peek(opaque_vector const* tokens, size_t n)
     return opaque_vector_at(tokens, n);
 }
 
-static void advance(opaque_vector* tokens, size_t n)
+static void advance(opaque_vector* tokens, int n)
 {
     assert(tokens != NULL);
     assert(opaque_vector_size(tokens) >= n);
@@ -76,7 +76,7 @@ static ast_node* parse_ident_value_pair_list(opaque_vector* tokens, ast_node* de
 
     *dest = ast_node_create(IDENT_VALUE_PAIR_LIST_NODE);
 
-    size_t n_pairs = 0;
+    int n_pairs = 0;
     ast_node ivp;
     while (parse_ident_value_pair(tokens, &ivp))
     {
@@ -240,7 +240,7 @@ ast_node parse_file(char const* filename, opaque_vector tokens, opaque_vector* e
     assert(filename != NULL);
 
     ast_node root = ast_node_create(FILE_NODE);
-    root.str = filename;
+    root.unowned_str = filename;
 
     ast_node line;
     while (parse_line(&tokens, &line))

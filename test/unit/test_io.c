@@ -23,12 +23,11 @@ static void test_io_single_read(void)
     char terminator[] = "WOWO";
     terminated_reader reader = terminated_reader_create(file, terminator, sizeof(terminator));
     char buffer[1024];
-    terminated_reader_read(reader, buffer, 1024);
+    terminated_reader_read(&reader, buffer, 1024);
     assert(memcmp(buffer, "hello worldWOWO", (sizeof(test_text) - 1) + (sizeof(terminator)) - 1) == 0);
-    assert(terminated_reader_done(reader));
-    assert(!terminated_reader_error(reader));
+    assert(terminated_reader_done(&reader));
+    assert(!terminated_reader_error(&reader));
     fclose(file);
-    terminated_reader_destroy(reader);
 }
 
 static void test_io_multi_read(void)
@@ -42,9 +41,9 @@ static void test_io_multi_read(void)
     char* dest = malloc(1024);
     char buffer[16];
     size_t total_read = 0;
-    while (!terminated_reader_done(reader))
+    while (!terminated_reader_done(&reader))
     {
-        size_t read = terminated_reader_read(reader, buffer, 16);
+        size_t read = terminated_reader_read(&reader, buffer, 16);
         memcpy(dest + total_read, buffer, read);
         total_read += read;
     }
@@ -57,7 +56,6 @@ static void test_io_multi_read(void)
     assert(memcmp(dest, intended_result, sizeof(intended_result)) == 0);
     free(dest);
     fclose(file);
-    terminated_reader_destroy(reader);
 }
 
 void test_basename_from_path_unix(void)

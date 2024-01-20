@@ -75,23 +75,6 @@ static char const* pass_error_fmts[_PASS_ERROR_COUNT] =
     [PASS_ERROR_REGCOMP_FAILED]                = "failed to compile regex: \'%s\', for attr: \'%s\'"
 };
 
-static void push_pass_error(enum pass_error error, opaque_vector* errors, source_location location, ...)
-{
-    assert(error < _PASS_ERROR_COUNT);
-    assert(errors != NULL);
-
-    #define PASS_ERROR_MSG_LEN 128
-
-    char msg[PASS_ERROR_MSG_LEN];
-    
-    va_list args;
-    va_start(args, location);
-    vsnprintf(msg, PASS_ERROR_MSG_LEN, pass_error_fmts[error], args);
-    va_end(args);
-
-    opaque_vector_push(errors, &(file_error){.message = strdup(msg), .loc = location});
-}
-
     // copies ident, moves value_list
 static ast_node create_entry_node(ast_node* ident, ast_node* value_list)
 {
@@ -114,7 +97,7 @@ static void pass_1_file_node(ast_node* node, opaque_vector* errors)
     source_location prev_location = ast_node_get_source_location(node);
     ast_node cur_ident = ast_node_create(EMPTY_NODE);
     ast_node modified_node = ast_node_create(FILE_NODE);
-    modified_node.str = node->str;
+    modified_node.unowned_str = node->unowned_str;
     bool value_list_without_ident_reported = false;
     int n_dates_encountered = 0;
 
@@ -124,19 +107,19 @@ static void pass_1_file_node(ast_node* node, opaque_vector* errors)
         source_location const cur_location = ast_node_get_source_location(child);
 
         if (child->type != IDENT_VALUE_PAIR_LIST_NODE && prev_node == IDENTIFIER_NODE)
-            push_pass_error(PASS_ERROR_IDENT_WITHOUT_VALUE_LIST, errors, prev_location);
+            push_fmted_error(PASS_ERROR_IDENT_WITHOUT_VALUE_LIST, pass_error_fmts, errors, prev_location);
 
         switch (child->type)
         {
             case DATE_NODE:
                 ++n_dates_encountered;
                 if (prev_node != FILE_NODE)
-                    push_pass_error(PASS_ERROR_DATE_NOT_FIRST_IN_FILE, errors, cur_location);
+                    push_fmted_error(PASS_ERROR_DATE_NOT_FIRST_IN_FILE, pass_error_fmts, errors, cur_location);
                 if (!is_valid_date(child->tok.lexeme))
-                    push_pass_error(PASS_ERROR_INVALID_DATE, errors, cur_location, child->tok.lexeme);
+                    push_fmted_error(PASS_ERROR_INVALID_DATE, pass_error_fmts, errors, cur_location, child->tok.lexeme);
                 if (n_dates_encountered > 1)
                 {
-                    push_pass_error(PASS_ERROR_MULTIPLE_DATES, errors, cur_location);
+                    push_fmted_error(PASS_ERROR_MULTIPLE_DATES, pass_error_fmts, errors, cur_location);
                     break;
                 }
             case DECL_VAR_NODE:
@@ -147,7 +130,7 @@ static void pass_1_file_node(ast_node* node, opaque_vector* errors)
                 break;
             case IDENTIFIER_NODE:
                 if (n_dates_encountered == 0)
-                    push_pass_error(PASS_ERROR_NO_DATE_BEFORE_ENTRY, errors, cur_location);
+                    push_fmted_error(PASS_ERROR_NO_DATE_BEFORE_ENTRY, pass_error_fmts, errors, cur_location);
                 ast_node_destroy(&cur_ident);
                 cur_ident = ast_node_move(child);
                 break;
@@ -155,7 +138,7 @@ static void pass_1_file_node(ast_node* node, opaque_vector* errors)
                 if (cur_ident.type == EMPTY_NODE)
                 {
                     if (!value_list_without_ident_reported)
-                        push_pass_error(PASS_ERROR_VALUE_LIST_WITHOUT_IDENT, errors, ast_node_get_source_location(child));
+                        push_fmted_error(PASS_ERROR_VALUE_LIST_WITHOUT_IDENT, pass_error_fmts, errors, ast_node_get_source_location(child));
                     value_list_without_ident_reported = true;
                 }
                 else
@@ -184,7 +167,8 @@ void pass_1_multifile_node(ast_node* node, opaque_vector* errors)
     for (ast_node* child = node->children.begin; child != node->children.end; ++child)
     {
         assert(child->type == FILE_NODE);
-        pass_1_file_node(child, errors);
+        if (opaque_vector_size(&child->children) > 0)
+            pass_1_file_node(child, errors);
     }
 }
 
@@ -264,7 +248,7 @@ static void pass_2_file_node(ast_node* node, ast_node* out_decl_attrs, ast_node*
         if (ret_files[index].type == EMPTY_NODE)
         {
             ret_files[index] = ast_node_create(FILE_NODE);
-            ret_files[index].str = node->str;
+            ret_files[index].unowned_str = node->unowned_str;
         }
 
         ast_node_add_child(&ret_files[index], ast_node_move(child));
@@ -302,9 +286,9 @@ void pass_2(ast_node* node, ast_node* out_decl_attrs, ast_node* out_decl_vars, o
     pass_2_multifile_node(node, out_decl_attrs, out_decl_vars);
 
     if (opaque_vector_size(&out_decl_attrs->children) == 0)
-        push_pass_error(PASS_ERROR_NO_ATTRIBUTES_DECLARED, errors, source_location_create(NULL, 0, 0));
+        push_fmted_error(PASS_ERROR_NO_ATTRIBUTES_DECLARED, pass_error_fmts, errors, source_location_create(NULL, 0, 0));
     if (opaque_vector_size(&out_decl_vars->children) == 0)
-        push_pass_error(PASS_ERROR_NO_VARIABLES_DECLARED, errors, source_location_create(NULL, 0, 0));
+        push_fmted_error(PASS_ERROR_NO_VARIABLES_DECLARED, pass_error_fmts, errors, source_location_create(NULL, 0, 0));
 }
 
 // merges duplicate decl values, reports errors
@@ -330,7 +314,8 @@ void pass_3_multifile_node_2(ast_node* node, opaque_vector* errors)
             for (int i = 0; i < opaque_vector_size(&excess_dupes); ++i)
             {
                 ast_node* const dupe = *(ast_node**)opaque_vector_at(&excess_dupes, i);
-                push_pass_error(decl->type == DECL_ATTR_NODE ? PASS_ERROR_DUPLICATE_ATTR_VALUE : PASS_ERROR_DUPLICATE_VAR_VALUE,
+                push_fmted_error(decl->type == DECL_ATTR_NODE ? PASS_ERROR_DUPLICATE_ATTR_VALUE : PASS_ERROR_DUPLICATE_VAR_VALUE,
+                    pass_error_fmts,
                     errors,
                     ast_node_get_source_location(dupe),
                     dupe->tok.lexeme);
@@ -376,7 +361,8 @@ void pass_3_multifile_node_1(ast_node* node, opaque_vector* errors)
     for (int i = 0; i < opaque_vector_size(&excess_dupes); ++i)
     {
         ast_node* const dupe = **(ast_node***)opaque_vector_at(&excess_dupes, i);
-        push_pass_error(dupe->type == DECL_ATTR_NODE ? PASS_ERROR_DUPLICATE_ATTR : PASS_ERROR_DUPLICATE_VAR,
+        push_fmted_error(dupe->type == DECL_ATTR_NODE ? PASS_ERROR_DUPLICATE_ATTR : PASS_ERROR_DUPLICATE_VAR,
+            pass_error_fmts,
             errors,
             ast_node_get_source_location(dupe),
             ((ast_node*)dupe->children.begin)->tok.lexeme);
@@ -488,7 +474,7 @@ void pass_4(ast_node* in_decl_attrs, ast_node* in_decl_vars, opaque_vector* erro
                 ast_node* const attr = find_by_first_child_lexeme(in_decl_attrs, value->tok.lexeme);
                 if (attr == NULL)
                 {
-                    push_pass_error(PASS_ERROR_UNDECLARED_ATTR, errors, ast_node_get_source_location(value), value->tok.lexeme, var_name);
+                    push_fmted_error(PASS_ERROR_UNDECLARED_ATTR, pass_error_fmts, errors, ast_node_get_source_location(value), value->tok.lexeme, var_name);
                     ast_node_destroy(value);
                     *value = ast_node_create(EMPTY_NODE);
                 }
@@ -548,7 +534,7 @@ opaque_vector create_regex_matchers(ast_node const* decl_attrs, opaque_vector* e
                 if (!ret)
                 {
                     regex_ctx_free(&ctx);
-                    push_pass_error(PASS_ERROR_REGCOMP_FAILED, errors, ast_node_get_source_location(value), reg_expr, attr_name);
+                    push_fmted_error(PASS_ERROR_REGCOMP_FAILED, pass_error_fmts, errors, ast_node_get_source_location(value), reg_expr, attr_name);
                 }
                 else
                     opaque_vector_push(&reg_exprs, &ctx);

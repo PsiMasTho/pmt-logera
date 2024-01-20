@@ -102,15 +102,11 @@ static void test_reverse(void)
 
 static void test_reverse_empty(void)
 {
-    int arr_initial[]  = { };
-    int arr_expected[] = { };
+    opaque_vector empty = opaque_vector_create(sizeof(int), opaque_vector_destroy_trivial);
 
-    int* begin = arr_initial;
-    int* end   = arr_initial + sizeof(arr_initial) / sizeof(int);
+    reverse(empty.begin, empty.end, sizeof(int));
 
-    reverse(begin, end, sizeof(int));
-
-    assert(memcmp(arr_initial, arr_expected, sizeof(arr_expected)) == 0);
+    opaque_vector_destroy(&empty);
 }
 
 static void test_duplicates()
@@ -124,7 +120,7 @@ static void test_duplicates()
     
     assert(opaque_vector_size(&dup) == 8);
 
-    for (size_t i = 0; i < opaque_vector_size(&dup); ++i)
+    for (int i = 0; i < opaque_vector_size(&dup); ++i)
         assert(**(int**)opaque_vector_at(&dup, i) == expected_dup[i]);
 
     opaque_vector_destroy(&dup);
@@ -141,7 +137,7 @@ static void test_excess_duplicates(void)
     
     assert(opaque_vector_size(&excess) == 5);
 
-    for (size_t i = 0; i < opaque_vector_size(&excess); ++i)
+    for (int i = 0; i < opaque_vector_size(&excess); ++i)
         assert(**(int**)opaque_vector_at(&excess, i) == expected_excess[i]);
 
     opaque_vector_destroy(&excess);
@@ -158,7 +154,7 @@ static void test_unique(void)
     assert(opaque_vector_size(&unique_vals) == 5);
 
     // check that the unique ptrs point to the first occurence of the value
-    for (size_t i = 0; i < opaque_vector_size(&unique_vals); ++i)
+    for (int i = 0; i < opaque_vector_size(&unique_vals); ++i)
         assert(*(int**)opaque_vector_at(&unique_vals, i) == arr + expected_indices[i]);
     
     opaque_vector_destroy(&unique_vals);

@@ -41,10 +41,16 @@ void print_ast(ast_node* node)
         printf("- lexeme: %s, (l %d, c %d)\n", node->tok.lexeme, node->tok.loc.line, node->tok.loc.column);
     }
 
-    if (ast_node_type_properties_table[node->type].has_str)
+    if (ast_node_type_properties_table[node->type].has_unowned_str)
     {
         print_indent();
-        printf("- str: %s\n", node->str);
+        printf("- str: %s\n", node->unowned_str);
+    }
+
+    if (ast_node_type_properties_table[node->type].has_owned_str)
+    {
+        print_indent();
+        printf("- str: %s\n", node->owned_str);
     }
     
     if (ast_node_type_properties_table[node->type].has_children)
@@ -85,20 +91,16 @@ ast_node process_file(char const* filename)
     opaque_vector tokens = lex(filename, buffer, sizeof(buffer), &errors);
 
     if (opaque_vector_size(&errors) > 0)
-    {
         for (file_error* error = errors.begin; error != errors.end; ++error)
             print_error(error);
-    }
 
     opaque_vector_clear(&errors);
 
     ast_node root = parse_file(filename, tokens, &errors);
 
     if (opaque_vector_size(&errors) > 0)
-    {
         for (file_error* error = errors.begin; error != errors.end; ++error)
             print_error(error);
-    }
 
     opaque_vector_destroy(&errors);
     opaque_vector_destroy(&tokens);

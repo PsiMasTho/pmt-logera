@@ -19,16 +19,12 @@ enum token_type
 
 extern char const *const token_names[_TOKEN_COUNT];
 
-char const* token_name(int tok);
-
 typedef struct
 {
     char const* filename; // non-owning
     int line;
     int column;
 } source_location;
-
-source_location source_location_create(char const* filename, int line, int column);
 
 typedef struct
 {
@@ -37,7 +33,30 @@ typedef struct
     int             token;
 } token_record;
 
-// deletes the lexeme, sets it to NULL
-void         token_record_destroy(void* self);
-token_record token_record_move(token_record* self);
-token_record token_record_copy(token_record const* self);
+source_location
+source_location_create(
+    char const* filename
+,   int line
+,   int column
+);
+
+char const*
+token_name(
+    int tok
+);
+
+token_record
+token_record_copy(
+    token_record const* self
+);
+
+void
+token_record_destroy(
+    void* self
+);
+
+token_record
+token_record_move(
+    token_record* self
+);
+

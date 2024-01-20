@@ -50,7 +50,7 @@
 
     action unrecognised_ln{
         remove_tokens_w_line(current_line, &records);
-        push_lex_error(LEX_ERROR_UNRECOGNIZED_LINE, errors, filename, current_line);
+        push_fmted_error(LEX_ERROR_UNRECOGNIZED_LINE, lex_error_fmts, errors, source_location_create(filename, current_line, 0));
         fgoto skip_ln;
     }
 
@@ -75,51 +75,50 @@
 enum lex_error
 {
     LEX_ERROR_UNRECOGNIZED_LINE,
+    LEX_ERROR_CANNOT_OPEN_FILE,
     LEX_ERROR_FILE_IO,
     LEX_ERROR_BUFFER_OUT_OF_SPACE,
 
     _LEX_ERROR_COUNT
 };
 
-char const* lex_error_fmts[_LEX_ERROR_COUNT] =
+char const* lex_error_fmts
+[_LEX_ERROR_COUNT] =
 {
     "unrecognized line",
+    "cannot open file '%s'",
     "file io error",
     "buffer out of space"
 };
 
-static void push_lex_error(enum lex_error error, opaque_vector* errors, char const* filename, int line)
-{
-    assert(filename != NULL);
-    assert(error >= 0 && error < _LEX_ERROR_COUNT);
-    assert(errors != NULL);
+static void
+remove_tokens_w_line(
+    int const line
+,   opaque_vector* const records
+){
+    assert(records != NULL);
 
-    #define LEX_ERROR_MSG_LEN 128
-
-    char msg[LEX_ERROR_MSG_LEN];
-    snprintf(msg, LEX_ERROR_MSG_LEN, lex_error_fmts[error]);
-    opaque_vector_push(errors, &(file_error){.message = strdup(msg), .loc = source_location_create(filename, line, 0)});
-}
-
-static void remove_tokens_w_line(int line, opaque_vector* v_rec)
-{
-    assert(v_rec != NULL);
-
-    size_t size = opaque_vector_size(v_rec);
+    size_t size = opaque_vector_size(records);
     while (size > 0)
     {
-        token_record const* back = opaque_vector_at(v_rec, size - 1);
+        token_record const* back = opaque_vector_at(records, size - 1);
 
         if (back->loc.line != line)
             break;
 
-        opaque_vector_pop(v_rec);
-        size = opaque_vector_size(v_rec);
+        opaque_vector_pop(records);
+        size = opaque_vector_size(records);
     }
 }
 
-void push_token_w_lexeme(int tok, char* ts, char* te, source_location loc, opaque_vector* v_rec)
-{
+static void
+push_token_w_lexeme(
+    int tok
+,   char* ts
+,   char* te
+,   source_location loc
+,   opaque_vector* records
+){
     int const lexeme_len = te - ts;
     char* lexeme = (char*)malloc(lexeme_len + 1);
     memcpy(lexeme, ts, lexeme_len);
@@ -130,21 +129,29 @@ void push_token_w_lexeme(int tok, char* ts, char* te, source_location loc, opaqu
     rec.loc = loc;
     rec.lexeme = lexeme;
 
-    opaque_vector_push(v_rec, &rec);
+    opaque_vector_push(records, &rec);
 }
 
-void push_token_wo_lexeme(int tok, source_location loc, opaque_vector* v_rec)
-{
+void
+push_token_wo_lexeme(
+    int tok
+,   source_location loc
+,   opaque_vector* records
+){
     token_record rec;
     rec.token = tok;
     rec.loc = loc;
     rec.lexeme = NULL;
 
-    opaque_vector_push(v_rec, &rec);
+    opaque_vector_push(records, &rec);
 }
 
-opaque_vector lex(char const* filename, char* buffer, int bufsz, opaque_vector* errors)
-{
+opaque_vector
+lex(char const* filename
+,   char* buffer
+,   int bufsz
+,   opaque_vector* errors
+){
     assert(filename != NULL);
     assert(errors != NULL);
     assert(buffer != NULL);
@@ -167,18 +174,19 @@ opaque_vector lex(char const* filename, char* buffer, int bufsz, opaque_vector* 
     int len = 0;
     int current_line = 1;
 
-    int const errors_at_start = opaque_vector_size(errors);
-
     %% write init;
 
     opaque_vector records = opaque_vector_create(sizeof(token_record), token_record_destroy);
-    terminated_reader reader = terminated_reader_create(filename, "\n", 1);
 
-    if (!reader || terminated_reader_error(reader))
+    FILE* file = fopen(filename, "r");
+
+    if (!file)
     {
-        push_lex_error(LEX_ERROR_FILE_IO, errors, filename, current_line);
-        goto ret_stmt;
+        push_fmted_error(LEX_ERROR_CANNOT_OPEN_FILE, lex_error_fmts, errors, source_location_create(NULL, 0, 0), filename);
+        return records;
     }
+
+    terminated_reader reader = terminated_reader_create(file, "\n", 1);
 
     do
     {
@@ -186,16 +194,16 @@ opaque_vector lex(char const* filename, char* buffer, int bufsz, opaque_vector* 
 
         if (space == 0)
         {
-            push_lex_error(LEX_ERROR_BUFFER_OUT_OF_SPACE, errors, filename, current_line);
+            push_fmted_error(LEX_ERROR_BUFFER_OUT_OF_SPACE, lex_error_fmts, errors, source_location_create(filename, current_line, 0));
             break;
         }
 
         data = buffer + leftover;
-        len = terminated_reader_read(reader, data, space);
+        len = terminated_reader_read(&reader, data, space);
 
-        if (terminated_reader_error(reader))
+        if (terminated_reader_error(&reader))
         {
-            push_lex_error(LEX_ERROR_FILE_IO, errors, filename, current_line);
+            push_fmted_error(LEX_ERROR_FILE_IO, lex_error_fmts, errors, source_location_create(filename, current_line, 0));
             break;
         }
 
@@ -208,12 +216,12 @@ opaque_vector lex(char const* filename, char* buffer, int bufsz, opaque_vector* 
             // could not find a newline, the buffer is too small
         if (pe++ == buffer)
         {
-            push_lex_error(LEX_ERROR_BUFFER_OUT_OF_SPACE, errors, filename, current_line);
+            push_fmted_error(LEX_ERROR_BUFFER_OUT_OF_SPACE, lex_error_fmts, errors, source_location_create(filename, current_line, 0));
             break;
         }
 
             // inform ragel if we are at the final buffer block
-        eof = terminated_reader_done(reader) ? pe : NULL;
+        eof = terminated_reader_done(&reader) ? pe : NULL;
 
         %% write exec;
 
@@ -223,9 +231,7 @@ opaque_vector lex(char const* filename, char* buffer, int bufsz, opaque_vector* 
         // Move the leftovers to the beginning of the buffer.
         memmove(buffer, pe, leftover);
     }
-    while(!terminated_reader_done(reader));
+    while(!terminated_reader_done(&reader));
 
-ret_stmt:
-    terminated_reader_destroy(reader);
     return records;
 }
