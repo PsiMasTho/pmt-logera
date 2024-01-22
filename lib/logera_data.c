@@ -3,10 +3,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-void
-attribute_data_destroy(
-    void* data
-){
+void attribute_data_destroy(void* data)
+{
     assert(data != NULL);
 
     attribute_data* attr = (attribute_data*)data;
@@ -14,14 +12,12 @@ attribute_data_destroy(
     opaque_vector_destroy(&attr->reg_exprs);
 }
 
-void
-decl_data_destroy(
-    void* data
-){
+void decl_data_destroy(void* data)
+{
     assert(data != NULL);
 
     decl_data* decl = (decl_data*)data;
-    
+
     assert(decl->attrs.fn_destroy == attribute_data_destroy);
     opaque_vector_destroy(&decl->attrs);
 
@@ -29,10 +25,8 @@ decl_data_destroy(
     opaque_vector_destroy(&decl->vars);
 }
 
-void
-variable_data_destroy(
-    void* data
-){
+void variable_data_destroy(void* data)
+{
     assert(data != NULL);
 
     variable_data* var = (variable_data*)data;

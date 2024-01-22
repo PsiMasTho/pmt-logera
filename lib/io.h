@@ -3,41 +3,23 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-typedef struct terminated_reader
-{
-    FILE* stream;         // not owning
-    char* terminator_seq; // not owning, not null terminated
-    int terminator_seq_len;
-    bool wrote_eof;
-} terminated_reader;
+typedef struct opaque_vector opaque_vector;
 
-void
-basename_from_path(
-    char const* path
-,   char* dest // output buffer
-,   int bufsz  // size of output buffer, must be >= 1
-);
+/**
+ * @brief Extracts the basename from a given path.
+ *
+ * @param path The input path.
+ * @param dest The output buffer to store the basename.
+ * @param bufsz The size of the output buffer, must be >= 1.
+ */
+void basename_from_path(char const* path, char* dest, int bufsz);
 
-terminated_reader
-terminated_reader_create(
-    FILE* stream
-,   char* terminator_seq   // not null-terminated
-,   int terminator_seq_len // may be 0
-);
-
-bool // -> if EOF or error
-terminated_reader_done(
-    terminated_reader const* reader
-);
-
-bool // -> if error
-terminated_reader_error(
-    terminated_reader const* reader
-);
-
-int // -> number of bytes read
-terminated_reader_read( 
-    terminated_reader* reader
-,   char* buffer
-,   int bufsz
-);
+/**
+ * @brief Reads the entire file into a buffer.
+ *
+ * @param path The path to the file.
+ * @param buffer The buffer to store the file contents, resized as needed and null-terminated.
+ * @param errors Any errors encountered during reading.
+ * @return true if the file was read successfully, false otherwise.
+ */
+bool readallf(char const* path, opaque_vector* buffer, opaque_vector* errors);

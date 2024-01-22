@@ -1,8 +1,9 @@
-#include "../lib/io.h"
+#include "../lib/algo.h"
 #include "../lib/ast.h"
+#include "../lib/errors.h"
+#include "../lib/io.h"
 #include "../lib/lexer.h"
 #include "../lib/parser.h"
-#include "../lib/errors.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -38,7 +39,7 @@ void print_ast(ast_node* node)
     if (ast_node_type_properties_table[node->type].has_tok)
     {
         print_indent();
-        printf("- lexeme: %s, (l %d, c %d)\n", node->tok.lexeme, node->tok.loc.line, node->tok.loc.column);
+        printf("- lexeme: %s, (l %d, c %d)\n", node->tok.lexeme, node->tok.location.line, node->tok.location.column);
     }
 
     if (ast_node_type_properties_table[node->type].has_unowned_str)
@@ -52,7 +53,7 @@ void print_ast(ast_node* node)
         print_indent();
         printf("- str: %s\n", node->owned_str);
     }
-    
+
     if (ast_node_type_properties_table[node->type].has_children)
     {
         print_indent();
@@ -83,27 +84,35 @@ void print_error(file_error* error)
         printf("Error: %s\n", error->message);
 }
 
-ast_node process_file(char const* filename)
+ast_node process_file(char const* filename, lexer_handle lexer)
 {
-    char buffer[1024];
-
     opaque_vector errors = opaque_vector_create(sizeof(file_error), file_error_destroy);
-    opaque_vector tokens = lex(filename, buffer, sizeof(buffer), &errors);
+    opaque_vector buffer = opaque_vector_create(sizeof(char), opaque_vector_destroy_trivial);
 
-    if (opaque_vector_size(&errors) > 0)
+    if (!readallf(filename, &buffer, &errors))
+    {
         for (file_error* error = errors.begin; error != errors.end; ++error)
             print_error(error);
+        opaque_vector_destroy(&errors);
+        opaque_vector_destroy(&buffer);
+        return ast_node_create(EMPTY_NODE);
+    }
+
+    // add a newline before the nullterm
+    opaque_vector_insert_one(&buffer, advance(buffer.end, -1, 1), &(char){ '\n' });
+
+    lexer_set_buffer(lexer, filename, buffer.begin, opaque_vector_size(&buffer));
 
     opaque_vector_clear(&errors);
 
-    ast_node root = parse_file(filename, tokens, &errors);
+    ast_node root = parse_file(lexer, &errors);
 
     if (opaque_vector_size(&errors) > 0)
         for (file_error* error = errors.begin; error != errors.end; ++error)
             print_error(error);
 
     opaque_vector_destroy(&errors);
-    opaque_vector_destroy(&tokens);
+    opaque_vector_destroy(&buffer);
 
     return root;
 }
@@ -112,13 +121,18 @@ ast_node process_file(char const* filename)
 
 void process_files(char** filenames, int num_files)
 {
+    lexer_handle lexer = lexer_create();
     ast_node multifile = ast_node_create(MULTIFILE_NODE);
     for (int i = 0; i < num_files; ++i)
     {
-        ast_node file = process_file(filenames[i]);
+        ast_node file = process_file(filenames[i], lexer);
         if (file.type != EMPTY_NODE)
             ast_node_add_child(&multifile, file);
     }
+
+    printf("After parsing:\n");
+    if (opaque_vector_size(&multifile.children) > 0)
+        print_ast(&multifile);
 
     opaque_vector errors = opaque_vector_create(sizeof(file_error), file_error_destroy);
 
@@ -130,37 +144,40 @@ void process_files(char** filenames, int num_files)
 
     opaque_vector_clear(&errors);
 
-    //printf("Pass 1:\n");
-    //if (opaque_vector_size(&multifile.children) > 0)
-        //print_ast(&multifile);
+    /*
+        printf("Pass 1:\n");
+        if (opaque_vector_size(&multifile.children) > 0)
+            print_ast(&multifile);
 
-    ast_node mf_decl_attrs, mf_decl_vars;
-    pass_2(&multifile, &mf_decl_attrs, &mf_decl_vars, &errors);
-    pass_3(&mf_decl_attrs, &mf_decl_vars, &errors);
-    pass_4(&mf_decl_attrs, &mf_decl_vars, &errors);
-    opaque_vector matchers = create_regex_matchers(&mf_decl_attrs, &errors);
+        ast_node mf_decl_attrs, mf_decl_vars;
+        pass_2(&multifile, &mf_decl_attrs, &mf_decl_vars, &errors);
+        pass_3(&mf_decl_attrs, &mf_decl_vars, &errors);
+        pass_4(&mf_decl_attrs, &mf_decl_vars, &errors);
+        opaque_vector matchers = create_regex_matchers(&mf_decl_attrs, &errors);
 
-    if (opaque_vector_size(&errors) > 0)
-        for (file_error* error = errors.begin; error != errors.end; ++error)
-            print_error(error);
-        
-    printf("Pass 2, decl attrs:\n");
-    if (opaque_vector_size(&mf_decl_attrs.children) > 0)
-        print_ast(&mf_decl_attrs);
-    
-    printf("Pass 2, decl vars:\n");
-    if (opaque_vector_size(&mf_decl_vars.children) > 0)
-        print_ast(&mf_decl_vars);
-    
-    printf("Pass 2, main ast:\n");
-    if (opaque_vector_size(&multifile.children) > 0)
-        print_ast(&multifile);
+        if (opaque_vector_size(&errors) > 0)
+            for (file_error* error = errors.begin; error != errors.end; ++error)
+                print_error(error);
 
+        printf("Pass 2, decl attrs:\n");
+        if (opaque_vector_size(&mf_decl_attrs.children) > 0)
+            print_ast(&mf_decl_attrs);
+
+        printf("Pass 2, decl vars:\n");
+        if (opaque_vector_size(&mf_decl_vars.children) > 0)
+            print_ast(&mf_decl_vars);
+
+        printf("Pass 2, main ast:\n");
+        if (opaque_vector_size(&multifile.children) > 0)
+            print_ast(&multifile);
+    */
+
+    lexer_destroy(lexer);
     opaque_vector_destroy(&errors);
     ast_node_destroy(&multifile);
-    ast_node_destroy(&mf_decl_attrs);
-    ast_node_destroy(&mf_decl_vars);
-    opaque_vector_destroy(&matchers);
+    // ast_node_destroy(&mf_decl_attrs);
+    // ast_node_destroy(&mf_decl_vars);
+    // opaque_vector_destroy(&matchers);
 }
 
 int compare_strings(const void* a, const void* b)
@@ -179,7 +196,7 @@ int main(int argc, char** argv)
     ++argv;
     --argc;
 
-            // make the output easier to look through
+    // make the output easier to look through
     qsort(argv, argc, sizeof(char*), compare_strings);
 
     process_files(argv, argc);

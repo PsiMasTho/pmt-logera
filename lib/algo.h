@@ -4,111 +4,85 @@
 
 #include <stdbool.h>
 
-void*
-advance(
-    void const* it
-,   int n // negative is allowed
-,   int stride
-);
+/**
+ * @brief Advance the pointer by a given number of strides.
+ *
+ * @param p         Pointer to advance.
+ * @param n         Number of strides to advance. Negative values are allowed.
+ * @param stride    Size of each stride (element).
+ * @return          Pointer that has been advanced.
+ */
+void* advance(void const* p, int n, int stride);
 
-bool // -> if target is in [first, last)
-between(
-    void const* first // must be <= last
-,   void const* last
-,   void const* target
-);
+/**
+ * @brief Check if the target is in the range [first, last).
+ *
+ * @param first     Pointer to the beginning of the range.
+ * @param last      Pointer to the end of the range.
+ * @param target    Pointer to the target element.
+ * @return          True if the target is in the range, false otherwise.
+ */
+bool between(void const* first, void const* last, void const* target);
 
-int // -> how many strides from first to last, negative is allowed
-distance(
-    void const* first
-,   void const* last
-,   int stride
-);
+/**
+ * @brief Calculate the number of strides between two pointers. May be negative.
+ *
+ * @param first     First pointer.
+ * @param last      Second pointer.
+ * @param stride    Size of each stride (element).
+ * @return          The number of strides between the pointers.
+ */
+int distance(void const* first, void const* last, int stride);
 
-opaque_vector // -> vector of void* of elements that appear more than once in a sorted range in ascending order, including the first ones
-duplicates(
-    void const* first
-,   void const* last
-,   int stride
-,   int (*cmp)(void const*, void const*)
-);
+/**
+ * @brief  Find duplicate elements in a sorted range in ascending order.
+ * @return Vector of void* containing elements that appear more than once, including the first ones.
+ */
+opaque_vector duplicates(void const* first, void const* last, int stride, int (*cmp)(void const*, void const*));
 
-opaque_vector // -> vector of void* of elements that appear more than once in a sorted range in ascending order, excluding the first ones
-excess_duplicates(
-    void const* first
-,   void const* last
-,   int stride
-,   int (*cmp)(void const*, void const*)
-);
+/**
+ * @brief  Find excess duplicate elements in a sorted range in ascending order.
+ * @return Vector of void* containing elements that appear more than once, excluding the first ones.
+ */
+opaque_vector excess_duplicates(void const* first, void const* last, int stride, int (*cmp)(void const*, void const*));
 
-void*
-find_cmp(
-    void const* first
-,   void const* last
-,   int stride
-,   void const* value
-,   int (*cmp)(void const*, void const*)
-);
+/**
+ * @brief  Find the first element in the range [first, last) that satisfies the given comparison function.
+ * @return Pointer to the first element that satisfies the comparison function, or last if not found.
+ */
+void* find_cmp(void const* first, void const* last, int stride, void const* value, int (*cmp)(void const*, void const*));
 
-void*
-find_if_not(
-    void const* first
-,   void const* last
-,   int stride,
-    bool (*pred)(void const*)
-);
+/**
+ * @brief Find the first element in the range [first, last) that does not satisfy the given predicate function.
+ */
+void* find_if_not(void const* first, void const* last, int stride, bool (*pred)(void const*));
 
-void*
-find_if(
-    void const* first
-,   void const* last
-,   int stride
-,   bool (*pred)(void const*)
-);
+/**
+ * @brief Find the first element in the range [first, last) that satisfies the given predicate function.
+ */
+void* find_if(void const* first, void const* last, int stride, bool (*pred)(void const*));
 
-void*
-find_not_cmp(
-    void const* first
-,   void const* last
-,   int stride
-,   void const* value
-,   int (*cmp)(void const*, void const*)
-);
+/**
+ * @brief Find the first element in the range [first, last) that does not satisfy the given comparison function.
+ */
+void* find_not_cmp(void const* first, void const* last, int stride, void const* value, int (*cmp)(void const*, void const*));
 
-void*
-find_not_val(
-    void const* first
-,   void const* last
-,   void const* value
-,   int stride
-);
+/**
+ * @brief Find the first element in the range [first, last) that is not equal to the given value.
+ */
+void* find_not_val(void const* first, void const* last, void const* value, int stride);
 
-void*
-find_val( // -> first element in [first, last) that is equal to value, or last if not found
-    void const* first
-,   void const* last
-,   void const* value
-,   int stride
-);
+/**
+ * @brief Find the first element in the range [first, last) that is equal to the given value.
+ */
+void* find_val(void const* first, void const* last, void const* value, int stride);
 
-void
-reverse(
-    void* first
-,   void* last
-,   int stride
-);
+void reverse(void* first, void* last, int stride);
 
-void
-swap( // lhs == rhs will do nothing
-    void* lhs
-,   void* rhs
-,   int stride
-);
+void swap(void* lhs, void* rhs, int stride);
 
-opaque_vector // -> vector of void* to first unique elements in a sorted range in ascending order
-unique(
-    void const* first
-,   void const* last
-,   int stride
-,   int (*cmp)(void const*, void const*)
-);
+/**
+ * @brief Get a vector of unique elements from a sorted range in ascending order.
+ * @return          Vector of unique elements.
+ */
+opaque_vector unique(void const* first, void const* last, int stride, int (*cmp)(void const*, void const*));

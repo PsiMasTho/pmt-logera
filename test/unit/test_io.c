@@ -1,66 +1,36 @@
+#include "../../lib/errors.h"
 #include "../../lib/io.h"
+#include "../../lib/opaque_vector.h"
 
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
-static FILE* write_to_tmpfile(const char* contents)
+static void test_basename_from_path_unix(void);
+
+static void test_basename_from_path_windows(void);
+
+static void test_readallf_big(void);
+
+static void test_readallf(void);
+
+static void write_file(char const* path, char const* contents);
+
+// ----------------------------------------------------------------------------
+
+void test_io(void)
 {
-    FILE* file = tmpfile();
-    assert(file != NULL);
-    size_t len = strlen(contents);
-    size_t written = fwrite(contents, 1, len, file);
-    assert(written == len);
-    rewind(file);
-    assert(file != NULL);
-    return file;
+    test_basename_from_path_unix();
+    test_basename_from_path_windows();
+    test_readallf_big();
+    test_readallf();
 }
 
-static void test_io_single_read(void)
-{
-    char test_text[] = "hello world";
-    FILE* file = write_to_tmpfile(test_text);
-    char terminator[] = "WOWO";
-    terminated_reader reader = terminated_reader_create(file, terminator, sizeof(terminator));
-    char buffer[1024];
-    terminated_reader_read(&reader, buffer, 1024);
-    assert(memcmp(buffer, "hello worldWOWO", (sizeof(test_text) - 1) + (sizeof(terminator)) - 1) == 0);
-    assert(terminated_reader_done(&reader));
-    assert(!terminated_reader_error(&reader));
-    fclose(file);
-}
+// ----------------------------------------------------------------------------
 
-static void test_io_multi_read(void)
+static void test_basename_from_path_unix(void)
 {
-    char test_text[] = "hello. how are you? i am fine. thank you. and you? i am fine too. goodbye. have a nice day. goodbye."\
-                       "hello. how are you? i am fine. thank you. and you? i am fine too. goodbye. have a nice day. goodbye."\
-                       "hello. how are you? i am fine. thank you. and you? i am fine too. goodbye. have a nice day. goodbye.";
-    FILE* file = write_to_tmpfile(test_text);
-    char terminator[] = "TERM";
-    terminated_reader reader = terminated_reader_create(file, terminator, sizeof(terminator));
-    char* dest = malloc(1024);
-    char buffer[16];
-    size_t total_read = 0;
-    while (!terminated_reader_done(&reader))
-    {
-        size_t read = terminated_reader_read(&reader, buffer, 16);
-        memcpy(dest + total_read, buffer, read);
-        total_read += read;
-    }
-
-    char intended_result[] = "hello. how are you? i am fine. thank you. and you? i am fine too. goodbye. have a nice day. goodbye."\
-                            "hello. how are you? i am fine. thank you. and you? i am fine too. goodbye. have a nice day. goodbye."\
-                            "hello. how are you? i am fine. thank you. and you? i am fine too. goodbye. have a nice day. goodbye."\
-                            "TERM";
-    
-    assert(memcmp(dest, intended_result, sizeof(intended_result)) == 0);
-    free(dest);
-    fclose(file);
-}
-
-void test_basename_from_path_unix(void)
-{
-    #define BUFFER_SIZE 1024
+#define BUFFER_SIZE 1024
     char buffer[BUFFER_SIZE];
     basename_from_path("/home/username/test.txt", buffer, BUFFER_SIZE);
     assert(strcmp(buffer, "test.txt") == 0);
@@ -78,9 +48,9 @@ void test_basename_from_path_unix(void)
     assert(strcmp(buffer, "") == 0);
 }
 
-void test_basename_from_path_windows(void)
+static void test_basename_from_path_windows(void)
 {
-    #define BUFFER_SIZE 1024
+#define BUFFER_SIZE 1024
     char buffer[BUFFER_SIZE];
     basename_from_path("C:\\Users\\username\\test.txt", buffer, BUFFER_SIZE);
     assert(strcmp(buffer, "test.txt") == 0);
@@ -98,10 +68,54 @@ void test_basename_from_path_windows(void)
     assert(strcmp(buffer, "") == 0);
 }
 
-void test_io(void)
+static void test_readallf_big(void)
 {
-    test_io_single_read();
-    test_io_multi_read();
-    test_basename_from_path_unix();
-    test_basename_from_path_windows();
+    char const* path = "test_readallf_big.txt";
+    char const outchars[] = "abcdefghijklmnopqrstuvwxyz\n";
+    int const outchars_count = sizeof(outchars) - 1;
+
+    opaque_vector orig_contents = opaque_vector_create(sizeof(char), opaque_vector_destroy_trivial);
+    for (int i = 0; i < outchars_count * 10000; ++i)
+        opaque_vector_push(&orig_contents, &outchars[i % outchars_count]);
+    opaque_vector_push(&orig_contents, &(char){ '\0' });
+    write_file(path, orig_contents.begin);
+
+    opaque_vector buffer = opaque_vector_create(sizeof(char), opaque_vector_destroy_trivial);
+    opaque_vector errors = opaque_vector_create(sizeof(file_error), file_error_destroy);
+
+    assert(readallf(path, &buffer, &errors));
+    assert(opaque_vector_size(&buffer) == opaque_vector_size(&orig_contents));
+    assert(opaque_vector_size(&errors) == 0);
+    assert(memcmp(buffer.begin, orig_contents.begin, opaque_vector_size(&buffer)) == 0);
+
+    opaque_vector_destroy(&orig_contents);
+    opaque_vector_destroy(&buffer);
+    opaque_vector_destroy(&errors);
+    remove(path);
+}
+
+static void test_readallf(void)
+{
+    char const orig_contents[] = "Hello, world! 1234567890";
+    char const* path = "test_readallf.txt";
+    write_file(path, orig_contents);
+
+    opaque_vector buffer = opaque_vector_create(sizeof(char), opaque_vector_destroy_trivial);
+    opaque_vector errors = opaque_vector_create(sizeof(file_error), file_error_destroy);
+
+    assert(readallf(path, &buffer, &errors));
+    assert(opaque_vector_size(&buffer) == sizeof(orig_contents));
+    assert(opaque_vector_size(&errors) == 0);
+
+    opaque_vector_destroy(&buffer);
+    opaque_vector_destroy(&errors);
+    remove(path);
+}
+
+static void write_file(char const* path, char const* contents)
+{
+    FILE* fp = fopen(path, "wb");
+    assert(fp != NULL);
+    fwrite(contents, 1, strlen(contents), fp);
+    fclose(fp);
 }
