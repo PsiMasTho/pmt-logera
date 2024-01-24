@@ -31,6 +31,10 @@ static void test_swap(void);
 
 static void test_unique(void);
 
+static void test_upper_bound(void);
+
+static void test_lower_bound(void);
+
 // ----------------------------------------------------------------------------
 
 void test_algo(void)
@@ -47,6 +51,8 @@ void test_algo(void)
     test_swap_same_ptr();
     test_swap();
     test_unique();
+    test_upper_bound();
+    test_lower_bound();
 }
 
 // ----------------------------------------------------------------------------
@@ -206,4 +212,54 @@ static void test_unique(void)
         assert(*(int**)opaque_vector_at(&unique_vals, i) == arr + expected_indices[i]);
 
     opaque_vector_destroy(&unique_vals);
+}
+
+static void test_upper_bound(void)
+{
+    int arr[] = { 1, 2, 3, 4, 4, 4, 5, 7, 7, 8, 9, 10, 13, 30 };
+
+    int* begin = arr;
+    int* end = arr + sizeof(arr) / sizeof(int);
+
+    int value = 4;
+
+    int* it = upper_bound(begin, end, sizeof(int), &value, int_cmp);
+    assert(it == begin + 6);
+
+    value = 6;
+    it = upper_bound(begin, end, sizeof(int), &value, int_cmp);
+    assert(it == begin + 7);
+
+    value = 7;
+    it = upper_bound(begin, end, sizeof(int), &value, int_cmp);
+    assert(it == begin + 9);
+
+    value = 900;
+    it = upper_bound(begin, end, sizeof(int), &value, int_cmp);
+    assert(it == end);
+
+    value = 16;
+    it = upper_bound(begin, end, sizeof(int), &value, int_cmp);
+    assert(it == begin + 13);
+}
+
+static void test_lower_bound(void)
+{
+    int arr[] = { 1, 2, 3, 4, 4, 4, 5, 7, 7, 8, 9, 10, 13, 30 };
+
+    int* begin = arr;
+    int* end = arr + sizeof(arr) / sizeof(int);
+
+    int value = 4;
+
+    int* it = lower_bound(begin, end, sizeof(int), &value, int_cmp);
+    assert(it == begin + 3);
+
+    value = 6;
+    it = lower_bound(begin, end, sizeof(int), &value, int_cmp);
+    assert(it == begin + 7);
+
+    value = 16;
+    it = lower_bound(begin, end, sizeof(int), &value, int_cmp);
+    assert(it == begin + 13);
 }

@@ -13,7 +13,9 @@ static void test_lexer_lex_token_idents(void);
 
 static void test_lexer_lex_token_dates(void);
 
-static void test_lexer_rewind(void);
+static void test_lexer_set_cursor(void);
+
+static void test_lexer_get_line_nr_and_column_nr(void);
 
 static void test_strdup_token(void);
 
@@ -25,7 +27,8 @@ void test_lexer(void)
     test_lexer_lex_token_colons();
     test_lexer_lex_token_idents();
     test_lexer_lex_token_dates();
-    test_lexer_rewind();
+    test_lexer_set_cursor();
+    test_lexer_get_line_nr_and_column_nr();
     test_strdup_token();
 }
 
@@ -43,7 +46,7 @@ static void test_lexer_lex_token_colons(void)
     char const input[] = ": :: ; ;: :; : :";
 
     lexer_handle lexer = lexer_create();
-    lexer_set_buffer(lexer, "test_name", input, sizeof(input));
+    lexer_set_buffer(lexer, "test_name", input, sizeof(input) - 1);
 
     char const* ts = NULL;
     char const* te = NULL;
@@ -133,7 +136,7 @@ static void test_lexer_lex_token_dates(void)
     lexer_destroy(lexer);
 }
 
-static void test_lexer_rewind(void)
+static void test_lexer_set_cursor(void)
 {
     char const input[] = "foo\nbar\nbaz";
 
@@ -149,11 +152,64 @@ static void test_lexer_rewind(void)
     assert(lex_token(lexer, TOKEN_NEWLINE, &ts, &te));
     assert(lex_token(lexer, TOKEN_IDENT, &ts, &te));
 
-    assert(lexer_get_location(lexer, lexer_get_cursor(lexer)).line == 2);
+    assert(lexer_get_line_nr(lexer, lexer_get_cursor(lexer)) == 2);
 
-    lexer_rewind(lexer, initial);
+    lexer_set_cursor(lexer, initial);
 
     assert(lexer_get_location(lexer, lexer_get_cursor(lexer)).line == 1);
+
+    assert(lex_token(lexer, TOKEN_IDENT, &ts, &te));
+    assert(lex_token(lexer, TOKEN_NEWLINE, &ts, &te));
+    assert(lex_token(lexer, TOKEN_IDENT, &ts, &te));
+    assert(lex_token(lexer, TOKEN_NEWLINE, &ts, &te));
+    assert(lex_token(lexer, TOKEN_IDENT, &ts, &te));
+
+    assert(lexer_get_line_nr(lexer, lexer_get_cursor(lexer)) == 3);
+
+    lexer_destroy(lexer);
+}
+
+static void test_lexer_get_line_nr_and_column_nr(void)
+{
+    char const input[] = "2022-09-15\n"
+                         "\n"
+                         "\n"
+                         "bw:\n"
+                         "    weight 71kg;\n"
+                         "\n"
+                         "dips:\n"
+                         "            reps 2s10r ;  rpe 8;\n"
+                         "    weight 5kg ; reps 3s8r  ;  rpe 10;\n"
+                         "\n"
+                         "bench_press:\n"
+                         "    weight 60kg  ; reps 4s2r    ; incline 15deg;\n"
+                         "    weight 100kg ; reps 5,4,4,1 ; incline 15deg;\n"
+                         "\n"
+                         "btn_situps:\n"
+                         "    weight 2.5kg ; reps 10,10,10,10;\n"
+                         "    weight 5kg   ; reps 5s10r;\n"
+                         "\n"
+                         "treadmill:\n"
+                         "    time 10:00;\n";
+
+    lexer_handle lexer = lexer_create();
+    lexer_set_buffer(lexer, "test_name", input, sizeof(input));
+
+    char const* p = input;
+    int expected_ln = 1;
+    int expected_col = 0;
+    while (*p)
+    {
+        assert(lexer_get_line_nr(lexer, p) == expected_ln);
+        assert(lexer_get_column_nr(lexer, p) == expected_col);
+        if (*p++ == '\n')
+        {
+            ++expected_ln;
+            expected_col = 0;
+        }
+        else
+            ++expected_col;
+    }
 
     lexer_destroy(lexer);
 }

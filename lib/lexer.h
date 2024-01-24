@@ -25,23 +25,38 @@ void lexer_set_buffer(lexer_handle self, char const* filename, char const* buffe
 
 void lexer_destroy(lexer_handle self);
 
-source_location lexer_get_location(lexer_handle self, char const* cursor);
-
 char const* lexer_get_cursor(lexer_handle self);
 
+source_location lexer_get_location(lexer_handle self, char const* cursor);
+
 char const* lexer_get_filename(lexer_handle self);
+
+/**
+ * @brief Returns the line number of the given cursor. Starts at 1
+ */
+int lexer_get_line_nr(lexer_handle self, char const* cursor);
+
+/**
+ * @brief Returns the column number of the given cursor. Starts at 0
+ */
+int lexer_get_column_nr(lexer_handle self, char const* cursor);
 
 /**
  * @brief Returns the number of bytes remaining in the input buffer, excluding the null terminator.
  */
 int lexer_remaining(lexer_handle self);
 
-void lexer_rewind(lexer_handle self, char const* cursor);
+void lexer_set_cursor(lexer_handle self, char const* cursor);
 
 /**
  * @brief Skips leading whitespace and comments.
  */
 void lexer_skipws(lexer_handle self);
+
+/**
+ * @brief Skips current line. Cursor is set to the first character of the next line.
+ */
+void lexer_skipline(lexer_handle self);
 
 /**
  * @brief Tries to lex the next token. On success, returns true and sets ts and te to the token's

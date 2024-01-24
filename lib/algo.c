@@ -196,3 +196,33 @@ opaque_vector unique(void const* first, void const* last, int const stride, int 
 
     return ret;
 }
+
+void* upper_bound(void const* first, void const* last, int stride, void const* value, int (*cmp)(void const*, void const*))
+{
+    void const* l = first;
+    void const* h = last;
+    while (l < h)
+    {
+        void const* mid = advance(l, distance(l, h, stride) / 2, stride);
+        if (cmp(value, mid) >= 0)
+            l = advance(mid, 1, stride);
+        else
+            h = mid;
+    }
+    return VOID_PTR_FROM(l);
+}
+
+void* lower_bound(void const* first, void const* last, int stride, void const* value, int (*cmp)(void const*, void const*))
+{
+    void const* l = first;
+    void const* h = last;
+    while (l < h)
+    {
+        void const* mid = advance(l, distance(l, h, stride) / 2, stride);
+        if (cmp(value, mid) <= 0)
+            h = mid;
+        else
+            l = advance(mid, 1, stride);
+    }
+    return VOID_PTR_FROM(l);
+}

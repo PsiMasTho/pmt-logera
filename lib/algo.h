@@ -86,3 +86,19 @@ void swap(void* lhs, void* rhs, int stride);
  * @return          Vector of unique elements.
  */
 opaque_vector unique(void const* first, void const* last, int stride, int (*cmp)(void const*, void const*));
+
+/**
+ * @brief Get first element in the range [first, last) that is not greater than value.
+ * @param cmp Comparison function: negative if lhs < rhs, zero if lhs == rhs, positive if lhs > rhs.
+ * @return Pointer to the first element that is not greater than value, or last if not found.
+ * @note   The range must be sorted as if by qsort using cmp
+ */
+void* upper_bound(void const* first, void const* last, int stride, void const* value, int (*cmp)(void const*, void const*));
+
+/**
+ * @brief Get first element in the range [first, last) that is not less than value.
+ * @param cmp Comparison function: negative if lhs < rhs, zero if lhs == rhs, positive if lhs > rhs.
+ * @return Pointer to the first element that is not less than value, or last if not found.
+ * @note   The range must be sorted as if by qsort using cmp
+ */
+void* lower_bound(void const* first, void const* last, int stride, void const* value, int (*cmp)(void const*, void const*));

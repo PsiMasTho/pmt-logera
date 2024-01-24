@@ -98,8 +98,9 @@ ast_node process_file(char const* filename, lexer_handle lexer)
         return ast_node_create(EMPTY_NODE);
     }
 
-    // add a newline before the nullterm
+    // add an extra newline for the lexer and parser
     opaque_vector_insert_one(&buffer, advance(buffer.end, -1, 1), &(char){ '\n' });
+    ;
 
     lexer_set_buffer(lexer, filename, buffer.begin, opaque_vector_size(&buffer));
 
@@ -134,6 +135,7 @@ void process_files(char** filenames, int num_files)
     if (opaque_vector_size(&multifile.children) > 0)
         print_ast(&multifile);
 
+    /*
     opaque_vector errors = opaque_vector_create(sizeof(file_error), file_error_destroy);
 
     pass_1(&multifile, &errors);
@@ -144,7 +146,7 @@ void process_files(char** filenames, int num_files)
 
     opaque_vector_clear(&errors);
 
-    /*
+
         printf("Pass 1:\n");
         if (opaque_vector_size(&multifile.children) > 0)
             print_ast(&multifile);
@@ -173,7 +175,7 @@ void process_files(char** filenames, int num_files)
     */
 
     lexer_destroy(lexer);
-    opaque_vector_destroy(&errors);
+    // opaque_vector_destroy(&errors);
     ast_node_destroy(&multifile);
     // ast_node_destroy(&mf_decl_attrs);
     // ast_node_destroy(&mf_decl_vars);
