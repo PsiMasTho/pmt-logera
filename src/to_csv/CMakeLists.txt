@@ -1,4 +1,4 @@
-file(GLOB SOURCES "*.c")
+file(GLOB SOURCES "*.cpp")
 
 add_executable(${PROJECT_NAME}-to-csv ${SOURCES})
 

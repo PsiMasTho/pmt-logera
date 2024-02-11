@@ -25,12 +25,12 @@ vector<filesystem::path> path_vec_from_args(argparse::ArgumentParser const& cmdl
     bool const specified_d = cmdl.present("--directory").has_value();
     bool const specified_m = cmdl.present("--manual").has_value();
 
-    if(specified_m + specified_d != 1)
+    if (specified_m + specified_d != 1)
         throw cmdl_exception("Specify either -m or -d");
 
     vector<filesystem::path> ret;
 
-    if(specified_m)
+    if (specified_m)
     {
         auto paths_as_strings = cmdl.get<vector<string>>("--manual");
         move(begin(paths_as_strings), end(paths_as_strings), back_inserter(ret));
@@ -38,10 +38,10 @@ vector<filesystem::path> path_vec_from_args(argparse::ArgumentParser const& cmdl
     else
     {
         // check if path is indeed a directory
-        if(!filesystem::is_directory(cmdl.get<string>("--directory")))
+        if (!filesystem::is_directory(cmdl.get<string>("--directory")))
             throw cmdl_exception("Provided path is not a directory: " + cmdl.get<string>("--directory"));
         // iterate through the directory
-        for(auto const& entry : filesystem::directory_iterator(cmdl.get<string>("--directory")))
+        for (auto const& entry : filesystem::directory_iterator(cmdl.get<string>("--directory")))
             ret.push_back(entry.path());
     }
 
@@ -75,13 +75,13 @@ filesystem::path set_header_file(argparse::ArgumentParser const& cmdl)
     // check that there is a single file with a '.lh' extension
     auto const itr = find_if(begin(paths), end(paths), [](auto const& pth) { return filesystem::path(pth).extension() == ".lh"; });
 
-    if(itr == end(paths))
+    if (itr == end(paths))
         throw cmdl_exception("No header file provided");
 
-    size_t const extraHeaders =
-        count_if(next(itr, 1), end(paths), [](auto const& pth) { return filesystem::path(pth).extension() == ".lh"; });
+    size_t const extraHeaders
+        = count_if(next(itr, 1), end(paths), [](auto const& pth) { return filesystem::path(pth).extension() == ".lh"; });
 
-    if(extraHeaders)
+    if (extraHeaders)
         throw cmdl_exception("Multiple header files provided");
 
     return *itr;
@@ -89,7 +89,7 @@ filesystem::path set_header_file(argparse::ArgumentParser const& cmdl)
 
 unique_ptr<ostream, void (*)(ostream*)> set_output_stream(argparse::ArgumentParser const& cmdl)
 {
-    if(cmdl.present("--output").has_value())
+    if (cmdl.present("--output").has_value())
         return unique_ptr<ostream, void (*)(ostream*)>(new ofstream(cmdl.get<string>("--output")), [](ostream* ptr) { delete ptr; });
     else
         return unique_ptr<ostream, void (*)(ostream*)>(&cout, [](ostream*) { /* do nothing */ });
@@ -97,7 +97,7 @@ unique_ptr<ostream, void (*)(ostream*)> set_output_stream(argparse::ArgumentPars
 
 string set_output_name(argparse::ArgumentParser const& cmdl)
 {
-    if(cmdl.present("--output").has_value())
+    if (cmdl.present("--output").has_value())
         return cmdl.get<string>("--output");
     else
         return "stdout";
@@ -107,19 +107,22 @@ vector<filesystem::path> set_log_files(argparse::ArgumentParser const& cmdl)
 {
     auto paths = path_vec_from_args(cmdl);
 
-    paths.erase(std::partition_if_not(begin(paths),
-                               end(paths),
-                               [](auto const& pth) {
-                                   if(pth.extension() == ".lh")
-                                       return true;
-                                   else if(pth.extension() == ".txt")
-                                       return false;
-                                   else
-                                       throw cmdl_exception("Invalid file extension");
-                               }),
-                end(paths));
+    paths.erase(
+        std::partition_if_not(
+            begin(paths),
+            end(paths),
+            [](auto const& pth)
+            {
+                if (pth.extension() == ".lh")
+                    return true;
+                else if (pth.extension() == ".txt")
+                    return false;
+                else
+                    throw cmdl_exception("Invalid file extension");
+            }),
+        end(paths));
 
-    if(paths.empty())
+    if (paths.empty())
         throw cmdl_exception("No log files provided");
 
     return paths;
@@ -128,26 +131,28 @@ vector<filesystem::path> set_log_files(argparse::ArgumentParser const& cmdl)
 } // namespace
 
 program_opts::program_opts(argparse::ArgumentParser const& cmdl)
-    : align{set_align(cmdl)}
-    , verbose{set_verbose(cmdl)}
-    , color{set_color(cmdl)}
-    , sort_cols_by_width{set_sort_cols_by_width(cmdl)}
-    , header_file{set_header_file(cmdl)}
-    , output_stream{set_output_stream(cmdl)}
-    , output_name{set_output_name(cmdl)}
-    , log_files{set_log_files(cmdl)}
-{ }
+    : align{ set_align(cmdl) }
+    , verbose{ set_verbose(cmdl) }
+    , color{ set_color(cmdl) }
+    , sort_cols_by_width{ set_sort_cols_by_width(cmdl) }
+    , header_file{ set_header_file(cmdl) }
+    , output_stream{ set_output_stream(cmdl) }
+    , output_name{ set_output_name(cmdl) }
+    , log_files{ set_log_files(cmdl) }
+{
+}
 
 program_opts::program_opts()
-    : align{false}
-    , verbose{false}
-    , color{false}
-    , sort_cols_by_width{false}
+    : align{ false }
+    , verbose{ false }
+    , color{ false }
+    , sort_cols_by_width{ false }
     , header_file{}
-    , output_stream{&cout, [](ostream*) { /* do nothing */ }}
-    , output_name{"stdout"}
+    , output_stream{ &cout, [](ostream*) { /* do nothing */ } }
+    , output_name{ "stdout" }
     , log_files{}
-{ }
+{
+}
 
 void print_program_opts(program_opts const& cfg, std::ostream& os)
 {
@@ -160,7 +165,7 @@ void print_program_opts(program_opts const& cfg, std::ostream& os)
     os << "\tOutput: " << cfg.output_name << '\n';
     os << "\tLog file count: " << cfg.log_files.size() << '\n';
     os << "\tLog files:\n";
-    for(auto const& log_file : cfg.log_files)
+    for (auto const& log_file : cfg.log_files)
         os << "\t\t" << log_file << '\n';
     os << '\n';
 }

@@ -1,0 +1,7 @@
+2019-09-02
+
+bench:
+	weight 130kg; reps 1;
+	weight 125kg; reps 1;
+	weight 115kg; reps 3;
+	weight 110kg; reps 3;

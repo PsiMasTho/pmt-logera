@@ -59,7 +59,7 @@ auto parse_args(int argc, char** argv) -> program_opts
     {
         cmdl.parse_args(argc, argv); // may throw
     }
-    catch(std::exception const& e)
+    catch (std::exception const& e)
     {
         throw cmdl_exception(e.what());
     }
@@ -69,12 +69,12 @@ auto parse_args(int argc, char** argv) -> program_opts
 
 vector<string> get_header_line(header_data const& header)
 {
-    static string const s_date = "date";
+    static string const s_date     = "date";
     static string const s_filename = "filename";
-    static string const s_var = "var";
+    static string const s_var      = "var";
 
-    vector<string> ret{s_date, s_filename, s_var};
-    for(size_t idx = 0; idx < header.attrs.size(); ++idx)
+    vector<string>      ret{ s_date, s_filename, s_var };
+    for (size_t idx = 0; idx < header.attrs.size(); ++idx)
         ret.push_back(header.attrs[idx].name);
 
     return ret;
@@ -86,13 +86,11 @@ auto get_log_line(log_date const& date, string const& filename, entry_data const
     ret.push_back(date.to_string());
     ret.push_back(filename);
     ret.push_back(entry.var_name);
-    for(size_t idx = 0; idx < entry.attr_values.capacity(); ++idx)
-    {
-        if(entry.attr_values.exists(idx))
+    for (size_t idx = 0; idx < entry.attr_values.capacity(); ++idx)
+        if (entry.attr_values.exists(idx))
             ret.push_back(entry.attr_values.get(idx));
         else
             ret.push_back("");
-    }
 
     return ret;
 }
@@ -109,8 +107,8 @@ auto get_csv_emitter_flags(program_opts const& opts) -> csv_emitter::flags
 
 void print_error(parse_error const& error, bool color)
 {
-    char const* const err_types[] = {"Semantic error", "Syntax error", "Exception"};
-    if(color)
+    char const* const err_types[] = { "Semantic error", "Syntax error", "Exception" };
+    if (color)
     {
         print(stderr, fg(fmt::color::red), "  Error parsing file\n");
         print(stderr, fg(fmt::color::yellow), "    Type:          {}\n", err_types[static_cast<int>(error.error_type)]);
@@ -132,11 +130,11 @@ void print_error(parse_error const& error, bool color)
 void print_errors(program_opts const& opts, span<parse_error const> errors)
 {
     bool const color = opts.color;
-    if(color)
+    if (color)
         print(stderr, fg(fmt::color::red), "{} errors encountered:\n", errors.size());
     else
         print(stderr, "{} errors encountered:\n", errors.size());
-    for(auto const& error : errors)
+    for (auto const& error : errors)
         print_error(error, color);
 }
 
@@ -147,8 +145,8 @@ void generate_csv(archive const& ar, program_opts const& opts)
     csv.add_row(get_header_line(ar.get_header_data()));
 
     // write all other lines
-    for(auto const& log_data_ptr : ar.get_log_data())
-        for(auto const& entry : log_data_ptr->entries)
+    for (auto const& log_data_ptr : ar.get_log_data())
+        for (auto const& entry : log_data_ptr->entries)
             csv.add_row(get_log_line(log_data_ptr->date, log_data_ptr->filename, entry));
 
     // write
@@ -160,12 +158,12 @@ try
 {
     program_opts const opts = parse_args(argc, argv);
 
-    if(opts.verbose)
+    if (opts.verbose)
         print_program_opts(opts, cout);
 
     archive const ar = parse(opts.header_file, opts.log_files, archive::ordering::BY_DATE);
 
-    if(ar.has_errors())
+    if (ar.has_errors())
     {
         print_errors(opts, ar.get_errors());
         return EXIT_FAILURE;
@@ -173,18 +171,18 @@ try
 
     generate_csv(ar, opts);
 }
-catch(cmdl_exception const& exc)
+catch (cmdl_exception const& exc)
 {
     print(stderr, "Error parsing commandline arguments:\n\t{}\n", exc.what());
     print(stderr, "Try '{} --help' for more information.\n", argv[0]);
     return EXIT_FAILURE;
 }
-catch(std::exception const& exc)
+catch (std::exception const& exc)
 {
     print(stderr, "Unhandled std::exception encountered:\n  {}\n", exc.what());
     return EXIT_FAILURE;
 }
-catch(...)
+catch (...)
 {
     print(stderr, "Terminating due to unknown exception.\n");
     return EXIT_FAILURE;

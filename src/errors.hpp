@@ -1,0 +1,65 @@
+#pragma once
+
+#include <cstdarg>
+#include <string>
+
+namespace error
+{
+
+enum code
+{
+    IO_CANNOT_OPEN_FILE,
+    IO_CANNOT_READ_FILE,
+
+    PARSER_UNEXPECTED_TOKEN,
+
+    SEMA_INVALID_DATE,
+    SEMA_VALUE_LIST_WITHOUT_IDENT,
+    SEMA_MULTIPLE_DATES,
+    SEMA_DATE_NOT_FIRST_IN_FILE,
+    SEMA_NO_DATE_BEFORE_ENTRY,
+    SEMA_IDENT_WITHOUT_VALUE_LIST,
+    SEMA_UNDECLARED_ATTR,
+    SEMA_UNDECLARED_ATTR_W_HINT,
+    SEMA_DUPLICATE_ATTR,
+    SEMA_DUPLICATE_VAR,
+    SEMA_DUPLICATE_ATTR_VALUE,
+    SEMA_DUPLICATE_VAR_VALUE,
+    SEMA_NO_ATTRIBUTES_DECLARED,
+    SEMA_NO_VARIABLES_DECLARED,
+    SEMA_REGCOMP_FAILED,
+
+    _CODE_COUNT
+};
+
+inline char const* const fmts[_CODE_COUNT]
+    = { "cannot open file \'%s\'",
+        "error reading file \'%s\'",
+
+        "[%s] (l:%d, c:%d) unexpected token",
+
+        "[%s] (l:%d, c:%d) invalid date encountered \'%s\'",
+        "[%s] (l:%d, c:%d) value list encountered without identifier",
+        "[%s] (l:%d, c:%d) multiple dates encountered",
+        "[%s] (l:%d, c:%d) date not first in file",
+        "[%s] (l:%d, c:%d) no date encountered before entry",
+        "[%s] (l:%d, c:%d) identifier encountered without value list",
+        "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered for variable \'%s\'",
+        "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered for variable \'%s\', did you mean \'%s\'?",
+        "[%s] (l:%d, c:%d) duplicate attribute \'%s\' encountered",
+        "[%s] (l:%d, c:%d) duplicate variable \'%s\' encountered",
+        "[%s] (l:%d, c:%d) duplicate attribute value \'%s\' encountered",
+        "[%s] (l:%d, c:%d) duplicate variable value \'%s\' encountered",
+        "no attributes declared",
+        "no variables declared",
+        "[%s] (l:%d, c:%d) failed to compile regex: \'%s\', for attr: \'%s\'" };
+
+struct record
+{
+    std::string msg;
+    int         code;
+
+    record(int code, ...);
+};
+
+}

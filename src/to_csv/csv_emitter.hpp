@@ -16,16 +16,16 @@ class csv_emitter
 public:
     enum flags
     {
-        NONE = 1u << 0,
-        ALIGN = 1u << 1,
+        NONE               = 1u << 0,
+        ALIGN              = 1u << 1,
         SORT_COLS_BY_WIDTH = 1u << 2,
     };
 
     using row_t = std::vector<std::string>;
 
 private:
-    flags m_flags;
-    std::vector<int> m_col_max_width; // used for alignment
+    flags              m_flags;
+    std::vector<int>   m_col_max_width; // used for alignment
     std::vector<row_t> m_rows;
 
 public:
