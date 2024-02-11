@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CMAKE_CXX_STANDARD 20)
 
 if(NOT DEFINED PROJECT_NAME)
     set(LOGERA_IS_TOP_LEVEL ON)
@@ -8,10 +8,9 @@ else()
     set(LOGERA_IS_TOP_LEVEL OFF)
 endif()
 
-project(logera VERSION 1.0.0 LANGUAGES C)
+project(logera VERSION 1.0.0 LANGUAGES CXX)
 
-#add_subdirectory(src)
-add_subdirectory(lib)
+add_subdirectory(src)
 
 option(BUILD_TESTS "Build test programs" OFF)
 
