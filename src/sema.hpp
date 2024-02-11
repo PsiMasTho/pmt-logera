@@ -67,6 +67,11 @@ private:
      * sorted according to filename and first in the file.
      */
     void pass_7();
+
+    /**
+     * @brief Checks that all 'ENTRY_NODE's have a valid identifier, attrs and attr_values.
+    */
+    void pass_8();
 };
 
 /**

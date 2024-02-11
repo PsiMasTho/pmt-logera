@@ -4,6 +4,7 @@
 #include "errors.hpp"
 #include "lexer.hpp"
 #include "tokens.hpp"
+#include "overloaded.hpp"
 
 #include <cassert>
 
@@ -41,26 +42,15 @@ parser::parser(lexer& lexer, flyweight_string::storage_type& storage, vector<err
 
 auto parser::parser::parse() -> ast::file_node
 {
-    ast::file_node root{ .filename = m_lexer.get_filename() };
+    ast::file_node root{ .filename = m_lexer.get_filename(), .children = {} };
 
     parsed_line    line;
     while (parse_line(&line))
     {
-        if (!holds_alternative<std::monostate>(line))
-        {
-            if (ast::date_node* n = get_if<ast::date_node>(&line))
-                root.children.push_back(*n);
-            else if (ast::decl_attr_node* n = get_if<ast::decl_attr_node>(&line))
-                root.children.push_back(*n);
-            else if (ast::decl_var_node* n = get_if<ast::decl_var_node>(&line))
-                root.children.push_back(*n);
-            else if (ast::ident_value_pair_list_node* n = get_if<ast::ident_value_pair_list_node>(&line))
-                root.children.push_back(*n);
-            else if (ast::identifier_node* n = get_if<ast::identifier_node>(&line))
-                root.children.push_back(*n);
-            else if (ast::entry_node* n = get_if<ast::entry_node>(&line))
-                root.children.push_back(*n);
-        }
+        visit(overloaded{
+            [&](auto&& n) { root.children.push_back(std::move(n));},
+            [&](std::monostate&&) {}
+        }, std::move(line));
     }
 
     return root;

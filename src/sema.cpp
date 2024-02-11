@@ -562,9 +562,9 @@ void checker::pass_7()
                                 {
                                     m_errors.emplace_back(
                                         error::code::SEMA_NO_DATE_BEFORE_ENTRY,
-                                        ast::get_source_location(n).filename,
-                                        ast::get_source_location(n).line,
-                                        ast::get_source_location(n).column);
+                                        cur_location.filename,
+                                        cur_location.line,
+                                        cur_location.column);
                                     no_date_before_entry_reported = true;
                                 }
                             },
