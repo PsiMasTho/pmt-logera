@@ -34,7 +34,8 @@ constexpr auto get_width(string const& str) -> int
 auto pad(string& str, int width) -> string&
 {
     str.insert(0, " ");
-    str.append(width - str.size() + 2, ' '); // +2 instead of + 1 to account for the initial space
+    str.append(width - str.size() + 2,
+               ' '); // +2 instead of + 1 to account for the initial space
     return str;
 }
 
@@ -64,7 +65,10 @@ void sort_cols_by_width(vector<csv_emitter::row_t>& rows, vector<int>& col_max_w
     // sort once to get the indices
     vector<int> indices(distance(width_beg, col_max_width.end()));
     iota(indices.begin(), indices.end(), 0);
-    sort(indices.begin(), indices.end(), [&width_beg](size_t lhs, size_t rhs) { return width_beg[lhs] < width_beg[rhs]; });
+    sort(
+        indices.begin(),
+        indices.end(),
+        [&width_beg](size_t lhs, size_t rhs) { return width_beg[lhs] < width_beg[rhs]; });
 
     // apply indices to col_max_width
     auto cache = indirect_rearrange(width_beg, col_max_width.end(), indices.begin(), nullptr);

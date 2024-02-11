@@ -81,7 +81,8 @@ auto parser::parser::parse_line(parsed_line* dest) -> parsed_line*
     m_lexer.set_cursor(initial); // failure, rewind
 
     // <DATE> <NEWLINE>
-    if (m_lexer.lex_tokens<lexer::SKIPWS, token::DATE, lexer::SKIPWS, token::NEWLINE>(make_tuple(nullptr, &tok, nullptr, nullptr)))
+    if (m_lexer.lex_tokens<lexer::SKIPWS, token::DATE, lexer::SKIPWS, token::NEWLINE>(
+            make_tuple(nullptr, &tok, nullptr, nullptr)))
     {
         *dest = ast::date_node{
             .record = token::record{.location = m_lexer.get_location(tok.data()),
@@ -164,19 +165,27 @@ auto parser::parser::parse_declare_attribute(ast::decl_attr_node* dest) -> ast::
     string_view tok;
 
     // <KW_ATTR> <COLON> <IDENT> <SEMICOLON>
-    if (!m_lexer.lex_tokens<lexer::SKIPWS, token::KW_ATTR, token::COLON, lexer::SKIPWS, token::IDENT, lexer::SKIPWS, token::SEMICOLON>(
-            make_tuple(nullptr, nullptr, nullptr, nullptr, &tok, nullptr, nullptr)))
+    if (!m_lexer.lex_tokens<
+            lexer::SKIPWS,
+            token::KW_ATTR,
+            token::COLON,
+            lexer::SKIPWS,
+            token::IDENT,
+            lexer::SKIPWS,
+            token::SEMICOLON>(make_tuple(nullptr, nullptr, nullptr, nullptr, &tok, nullptr, nullptr)))
         return nullptr;
 
     dest->identifier = ast::identifier_node{
-        .record
-        = token::record{.location = m_lexer.get_location(tok.data()), .lexeme = flyweight_string{ tok, m_storage }, .token = token::IDENT}
+        .record = token::record{.location = m_lexer.get_location(tok.data()),
+                                .lexeme   = flyweight_string{ tok, m_storage },
+                                .token    = token::IDENT}
     };
 
     // (<REGEX> <SEMICOLON>)*
     while (1)
     {
-        if (!m_lexer.lex_tokens<lexer::SKIPWS, token::REGEX, lexer::SKIPWS, token::SEMICOLON>(make_tuple(nullptr, &tok, nullptr, nullptr)))
+        if (!m_lexer.lex_tokens<lexer::SKIPWS, token::REGEX, lexer::SKIPWS, token::SEMICOLON>(
+                make_tuple(nullptr, &tok, nullptr, nullptr)))
             break;
 
         dest->children.push_back(ast::regex_node{
@@ -195,19 +204,27 @@ auto parser::parse_declare_variable(ast::decl_var_node* dest) -> ast::decl_var_n
     string_view tok;
 
     // <KW_VAR> <COLON> <IDENT> <SEMICOLON>
-    if (!m_lexer.lex_tokens<lexer::SKIPWS, token::KW_VAR, token::COLON, lexer::SKIPWS, token::IDENT, lexer::SKIPWS, token::SEMICOLON>(
-            make_tuple(nullptr, nullptr, nullptr, nullptr, &tok, nullptr, nullptr)))
+    if (!m_lexer.lex_tokens<
+            lexer::SKIPWS,
+            token::KW_VAR,
+            token::COLON,
+            lexer::SKIPWS,
+            token::IDENT,
+            lexer::SKIPWS,
+            token::SEMICOLON>(make_tuple(nullptr, nullptr, nullptr, nullptr, &tok, nullptr, nullptr)))
         return nullptr;
 
     dest->identifier = ast::identifier_node{
-        .record
-        = token::record{.location = m_lexer.get_location(tok.data()), .lexeme = flyweight_string{ tok, m_storage }, .token = token::IDENT}
+        .record = token::record{.location = m_lexer.get_location(tok.data()),
+                                .lexeme   = flyweight_string{ tok, m_storage },
+                                .token    = token::IDENT}
     };
 
     // (<IDENT> <SEMICOLON>)*
     while (1)
     {
-        if (!m_lexer.lex_tokens<lexer::SKIPWS, token::IDENT, lexer::SKIPWS, token::SEMICOLON>(make_tuple(nullptr, &tok, nullptr, nullptr)))
+        if (!m_lexer.lex_tokens<lexer::SKIPWS, token::IDENT, lexer::SKIPWS, token::SEMICOLON>(
+                make_tuple(nullptr, &tok, nullptr, nullptr)))
             break;
 
         dest->children.push_back(ast::identifier_node{

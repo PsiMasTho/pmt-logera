@@ -20,7 +20,8 @@ auto basename_from_path(std::string_view const path) -> std::string_view;
  * @brief Reads the entire file into a buffer.
  *
  * @param path The path to the file.
- * @param buffer The buffer to store the file contents in. Will replace the existing contents.
+ * @param buffer The buffer to store the file contents in. Will replace the
+ * existing contents.
  * @param errors Any errors encountered during reading.
  * @return reference to the buffer.
  */

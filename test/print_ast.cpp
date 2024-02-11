@@ -4,7 +4,7 @@
 #include "../src/lexer.hpp"
 #include "../src/overloaded.hpp"
 #include "../src/parser.hpp"
-#include "../src/passes.hpp"
+#include "../src/sema.hpp"
 
 #include <algorithm>
 #include <cstdio>
@@ -184,7 +184,8 @@ void print_error(error::record const& e)
     printf("Error: %s\n", e.msg.c_str());
 }
 
-auto process_file(char const* filename, lexer& l, string& buffer, flyweight_string::storage_type& storage) -> ast::file_node
+auto process_file(char const* filename, lexer& l, string& buffer, flyweight_string::storage_type& storage)
+    -> ast::file_node
 {
     vector<error::record> errors;
 
@@ -225,21 +226,8 @@ void process_files(char** filenames, int num_files)
     }
 
     vector<error::record> errors;
-    sema::pass_1(&multifile, errors);
-
-    if (!errors.empty())
-        for (auto const& e : errors)
-            print_error(e);
-    errors.clear();
-
-    auto decls = sema::pass_2(&multifile, errors);
-
-    if (!errors.empty())
-        for (auto const& e : errors)
-            print_error(e);
-    errors.clear();
-
-    sema::pass_3(decls, errors);
+    sema::checker         checker(std::move(multifile), errors);
+    checker.check();
 
     if (!errors.empty())
         for (auto const& e : errors)
@@ -248,18 +236,18 @@ void process_files(char** filenames, int num_files)
 
     printf("Attributes:\n");
     printf("-----------\n");
-    if (!decls.first.children.empty())
-        print_ast(decls.first);
+    if (!checker.get_decl_attr_root().children.empty())
+        print_ast(checker.get_decl_attr_root());
 
     printf("Variables:\n");
     printf("-----------\n");
-    if (!decls.second.children.empty())
-        print_ast(decls.second);
+    if (!checker.get_decl_var_root().children.empty())
+        print_ast(checker.get_decl_var_root());
 
     printf("Main tree:\n");
     printf("-----------\n");
-    if (!multifile.children.empty())
-        print_ast(multifile);
+    if (!checker.get_entry_root().children.empty())
+        print_ast(checker.get_entry_root());
 }
 
 int main(int argc, char** argv)

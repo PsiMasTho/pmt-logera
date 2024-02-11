@@ -21,7 +21,8 @@ class lexer
 public:
     enum // for use with lex_token(s)
     {
-        SKIPWS = token::_TYPE_COUNT, // effectively calls skipws() from lex_token(s) and always returns true
+        SKIPWS = token::_TYPE_COUNT, // effectively calls skipws() from
+                                     // lex_token(s) and always returns true
     };
 
     lexer();
@@ -30,22 +31,28 @@ public:
     void skipln();
 
     /**
-     * @brief Tries to lex the next token. On success, sets dest to the token and returns true.
-     * Also advances the state. On failure, returns false, does not advance state and doesn't modify dest.
-     * @param dest Non-owning pointer to the destination string_view. Will be ignored if nullptr.
+     * @brief Tries to lex the next token. On success, sets dest to the token
+     * and returns true. Also advances the state. On failure, returns false,
+     * does not advance state and doesn't modify dest.
+     * @param dest Non-owning pointer to the destination string_view. Will be
+     * ignored if nullptr.
      */
     template <int tok> auto lex_token(std::string_view* dest) -> bool;
 
     /**
      * @brief Tries to lex a sequence of tokens.
-     * @param dests Tuple of non-owning pointers to the destination string_views. Will be ignored if nullptr.
+     * @param dests Tuple of non-owning pointers to the destination
+     * string_views. Will be ignored if nullptr.
      */
-    template <int... toks> auto lex_tokens(typename meta::repeat_tuple<sizeof...(toks), std::string_view*>::type dests) -> bool;
+    template <int... toks>
+    auto lex_tokens(typename meta::repeat_tuple<sizeof...(toks), std::string_view*>::type dests) -> bool;
 
     /**
      * @brief Changes the lexer's input buffer.
-     * @param buffer Non-owning pointer to the input buffer. Must be null-terminated.
-     * @param bufsz Size of the input buffer, in bytes including the null terminator.
+     * @param buffer Non-owning pointer to the input buffer. Must be
+     * null-terminated.
+     * @param bufsz Size of the input buffer, in bytes including the null
+     * terminator.
      *
      * @note May be called multiple times. Resets the lexer's state.
      */
@@ -59,7 +66,8 @@ public:
     auto get_column_nr(char const* cursor) const -> int;
 
     /**
-     * @brief Returns the number of bytes remaining in the input buffer, excluding the null terminator.
+     * @brief Returns the number of bytes remaining in the input buffer,
+     * excluding the null terminator.
      */
     auto get_remaining() const -> std::size_t;
 

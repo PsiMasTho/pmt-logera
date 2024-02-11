@@ -29,7 +29,8 @@ template <typename> struct tag
 template <typename T, typename V> struct get_index;
 
 template <typename T, typename... Ts>
-struct get_index<T, std::variant<Ts...>> : std::integral_constant<std::size_t, std::variant<tag<Ts>...>(tag<T>()).index()>
+struct get_index<T, std::variant<Ts...>>
+    : std::integral_constant<std::size_t, std::variant<tag<Ts>...>(tag<T>()).index()>
 {
 };
 

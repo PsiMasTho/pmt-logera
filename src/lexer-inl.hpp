@@ -27,7 +27,12 @@ template <> inline auto lexer::lex_token<token::KW_VAR>(std::string_view* dest) 
 template <> inline auto lexer::lex_token<token::IDENT>(std::string_view* dest) -> bool
 {
     std::cmatch match;
-    if (!std::regex_search(m_cursor, m_buffer + m_buffer_size, match, m_regexes[token::IDENT], std::regex_constants::match_continuous))
+    if (!std::regex_search(
+            m_cursor,
+            m_buffer + m_buffer_size,
+            match,
+            m_regexes[token::IDENT],
+            std::regex_constants::match_continuous))
         return false;
 
     if (match.str() == "attr" || match.str() == "var")
@@ -49,7 +54,12 @@ template <> inline auto lexer::lex_token<lexer::SKIPWS>(std::string_view*) -> bo
 template <int tok> auto lexer::lex_token(std::string_view* dest) -> bool
 {
     std::cmatch match;
-    if (!std::regex_search(m_cursor, m_buffer + m_buffer_size, match, m_regexes[tok], std::regex_constants::match_continuous))
+    if (!std::regex_search(
+            m_cursor,
+            m_buffer + m_buffer_size,
+            match,
+            m_regexes[tok],
+            std::regex_constants::match_continuous))
         return false;
 
     m_cursor += match.length();
@@ -59,7 +69,8 @@ template <int tok> auto lexer::lex_token(std::string_view* dest) -> bool
     return true;
 }
 
-template <int... toks> auto lexer::lex_tokens(typename meta::repeat_tuple<sizeof...(toks), std::string_view*>::type dests) -> bool
+template <int... toks>
+auto lexer::lex_tokens(typename meta::repeat_tuple<sizeof...(toks), std::string_view*>::type dests) -> bool
 {
     return [&]<std::size_t... indices>(std::index_sequence<indices...>) -> bool
     { return (lex_token<toks>(std::get<indices>(dests)) && ...); }(std::make_index_sequence<sizeof...(toks)>{});

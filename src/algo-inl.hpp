@@ -46,7 +46,8 @@ template <typename T, typename Pred> auto duplicates(T first, T last, Pred&& pre
 
     while (first != last)
     {
-        T const next = std::find_if(first, last, [first, &pred](auto const& x) { return !std::forward<Pred>(pred)(*first, x); });
+        T const next
+            = std::find_if(first, last, [first, &pred](auto const& x) { return !std::forward<Pred>(pred)(*first, x); });
 
         if (std::distance(first, next) > 1)
             for (auto i = first; i != next; std::advance(i, 1))
@@ -58,7 +59,8 @@ template <typename T, typename Pred> auto duplicates(T first, T last, Pred&& pre
     return ret;
 }
 
-template <typename T, typename Pred> auto duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value_type>
+template <typename T, typename Pred>
+auto duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value_type>
 {
     auto const                          dup = duplicates(first, last, std::forward<Pred>(pred));
     std::vector<typename T::value_type> ret;
@@ -87,7 +89,8 @@ template <typename T, typename Pred> auto excess_duplicates(T first, T last, Pre
     return ret;
 }
 
-template <typename T, typename Pred> auto excess_duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value_type>
+template <typename T, typename Pred>
+auto excess_duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value_type>
 {
     auto const                          excess_dup = excess_duplicates(first, last, std::forward<Pred>(pred));
     std::vector<typename T::value_type> ret;

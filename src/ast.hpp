@@ -62,19 +62,22 @@ struct entry_node
 
 struct file_node
 {
-    std::string                                                                                                                  filename;
+    using children_type = std::
+        variant<date_node, ident_value_pair_list_node, decl_var_node, decl_attr_node, identifier_node, entry_node>;
 
-    std::vector<std::variant<date_node, ident_value_pair_list_node, decl_var_node, decl_attr_node, identifier_node, entry_node>> children;
+    template <typename T> static constexpr auto child_index_v = meta::get_index<T, children_type>::value;
 
-    template <typename T> static constexpr auto child_index_v = meta::get_index<T, decltype(children)::value_type>::value;
+    std::string                                 filename;
+    std::vector<children_type>                  children;
 };
-
-// meta::get_index<ast::ident_value_pair_list_node, decltype(ast::file_node::children)::value_type>::value
 
 struct multifile_node
 {
     std::vector<file_node> children;
 };
+
+template <typename T>
+concept decl_node = std::is_same_v<T, decl_attr_node> || std::is_same_v<T, decl_var_node>;
 
 auto get_source_location(multifile_node const&) -> token::source_location;
 auto get_source_location(file_node const&) -> token::source_location;

@@ -8,8 +8,11 @@ using namespace std;
 flyweight_string::flyweight_string(string_view const str, storage_type& storage)
     : data{ nullptr }
 {
-    auto const it
-        = lower_bound(begin(storage), end(storage), str, [](auto const& a, auto const& b) { return strcmp(a.get(), b.data()) < 0; });
+    auto const it = lower_bound(
+        begin(storage),
+        end(storage),
+        str,
+        [](auto const& a, auto const& b) { return strcmp(a.get(), b.data()) < 0; });
 
     if (it != end(storage) && it->get() == str)
         data = it->get();

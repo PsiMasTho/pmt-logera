@@ -73,13 +73,16 @@ filesystem::path set_header_file(argparse::ArgumentParser const& cmdl)
     auto const paths = path_vec_from_args(cmdl);
 
     // check that there is a single file with a '.lh' extension
-    auto const itr = find_if(begin(paths), end(paths), [](auto const& pth) { return filesystem::path(pth).extension() == ".lh"; });
+    auto const itr
+        = find_if(begin(paths), end(paths), [](auto const& pth) { return filesystem::path(pth).extension() == ".lh"; });
 
     if (itr == end(paths))
         throw cmdl_exception("No header file provided");
 
-    size_t const extraHeaders
-        = count_if(next(itr, 1), end(paths), [](auto const& pth) { return filesystem::path(pth).extension() == ".lh"; });
+    size_t const extraHeaders = count_if(
+        next(itr, 1),
+        end(paths),
+        [](auto const& pth) { return filesystem::path(pth).extension() == ".lh"; });
 
     if (extraHeaders)
         throw cmdl_exception("Multiple header files provided");
@@ -90,7 +93,9 @@ filesystem::path set_header_file(argparse::ArgumentParser const& cmdl)
 unique_ptr<ostream, void (*)(ostream*)> set_output_stream(argparse::ArgumentParser const& cmdl)
 {
     if (cmdl.present("--output").has_value())
-        return unique_ptr<ostream, void (*)(ostream*)>(new ofstream(cmdl.get<string>("--output")), [](ostream* ptr) { delete ptr; });
+        return unique_ptr<ostream, void (*)(ostream*)>(
+            new ofstream(cmdl.get<string>("--output")),
+            [](ostream* ptr) { delete ptr; });
     else
         return unique_ptr<ostream, void (*)(ostream*)>(&cout, [](ostream*) { /* do nothing */ });
 }

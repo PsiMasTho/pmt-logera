@@ -31,7 +31,11 @@ argparse::ArgumentParser get_arg_parser()
 
     ret.set_assign_chars("=");
 
-    ret.add_argument("-a", "--align").help("align generated csv columns").implicit_value(true).default_value(false).nargs(0);
+    ret.add_argument("-a", "--align")
+        .help("align generated csv columns")
+        .implicit_value(true)
+        .default_value(false)
+        .nargs(0);
 
     ret.add_argument("-v", "--verbose").help("verbose output").implicit_value(true).default_value(false).nargs(0);
 
@@ -45,7 +49,9 @@ argparse::ArgumentParser get_arg_parser()
 
     ret.add_argument("-d", "--directory").nargs(1).help("directory containing log files");
 
-    ret.add_argument("-m", "--manual").nargs(argparse::nargs_pattern::at_least_one).help("manually select files (e.g. glob)");
+    ret.add_argument("-m", "--manual")
+        .nargs(argparse::nargs_pattern::at_least_one)
+        .help("manually select files (e.g. glob)");
 
     ret.add_argument("-o", "--output").nargs(1).help("output file. stdout if not specified");
 

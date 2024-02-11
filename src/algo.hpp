@@ -12,30 +12,36 @@ namespace algo
 /**
  * @brief  Find duplicate elements in a sorted range in ascending order.
  * @param  pred  Binary predicate that returns true if the elements are equal.
- * @return Vector of pointers to elements that appear more than once, including the first ones.
+ * @return Vector of pointers to elements that appear more than once, including
+ * the first ones.
  */
 template <typename T, typename Pred> auto duplicates(T first, T last, Pred&& pred) -> std::vector<T>;
 
 /**
  * @brief Find duplicate elements in a sorted range in ascending order.
  * @param  pred  Binary predicate that returns true if the elements are equal.
- * @return Vector of copied elements that appear more than once, including the first ones.
+ * @return Vector of copied elements that appear more than once, including the
+ * first ones.
  */
-template <typename T, typename Pred> auto duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value_type>;
+template <typename T, typename Pred>
+auto duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value_type>;
 
 /**
  * @brief  Find excess duplicate elements in a sorted range in ascending order.
  * @param  pred  Binary predicate that returns true if the elements are equal.
- * @return Vector of pointers to elements that appear more than once, excluding the first ones.
+ * @return Vector of pointers to elements that appear more than once, excluding
+ * the first ones.
  */
 template <typename T, typename Pred> auto excess_duplicates(T first, T last, Pred&& pred) -> std::vector<T>;
 
 /**
  * @brief  Find excess duplicate elements in a sorted range in ascending order.
  * @param  pred  Binary predicate that returns true if the elements are equal.
- * @return Vector of copied elements that appear more than once, excluding the first ones.
+ * @return Vector of copied elements that appear more than once, excluding the
+ * first ones.
  */
-template <typename T, typename Pred> auto excess_duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value_type>;
+template <typename T, typename Pred>
+auto excess_duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value_type>;
 
 /*
     This function shuffles the elements of the range [data_begin, data_end)

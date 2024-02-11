@@ -13,6 +13,8 @@ enum code
 
     PARSER_UNEXPECTED_TOKEN,
 
+    SEMA_DUPLICATE_FILENAME,
+    SEMA_DATE_NOT_IN_FILENAME_ORDER,
     SEMA_INVALID_DATE,
     SEMA_VALUE_LIST_WITHOUT_IDENT,
     SEMA_MULTIPLE_DATES,
@@ -32,27 +34,32 @@ enum code
     _CODE_COUNT
 };
 
-inline char const* const fmts[_CODE_COUNT]
-    = { "cannot open file \'%s\'",
-        "error reading file \'%s\'",
+// clang-format off
+inline char const* const fmts[_CODE_COUNT] = {
+    "cannot open file \'%s\'",
+    "error reading file \'%s\'",
 
-        "[%s] (l:%d, c:%d) unexpected token",
+    "[%s] (l:%d, c:%d) unexpected token",
 
-        "[%s] (l:%d, c:%d) invalid date encountered \'%s\'",
-        "[%s] (l:%d, c:%d) value list encountered without identifier",
-        "[%s] (l:%d, c:%d) multiple dates encountered",
-        "[%s] (l:%d, c:%d) date not first in file",
-        "[%s] (l:%d, c:%d) no date encountered before entry",
-        "[%s] (l:%d, c:%d) identifier encountered without value list",
-        "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered for variable \'%s\'",
-        "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered for variable \'%s\', did you mean \'%s\'?",
-        "[%s] (l:%d, c:%d) duplicate attribute \'%s\' encountered",
-        "[%s] (l:%d, c:%d) duplicate variable \'%s\' encountered",
-        "[%s] (l:%d, c:%d) duplicate attribute value \'%s\' encountered",
-        "[%s] (l:%d, c:%d) duplicate variable value \'%s\' encountered",
-        "no attributes declared",
-        "no variables declared",
-        "[%s] (l:%d, c:%d) failed to compile regex: \'%s\', for attr: \'%s\'" };
+    "duplicate filename \'%s\' encountered",
+    "[%s] (l:%d, c:%d) date not in filename order",
+    "[%s] (l:%d, c:%d) invalid date encountered \'%s\'",
+    "[%s] (l:%d, c:%d) value list encountered without identifier",
+    "[%s] (l:%d, c:%d) multiple dates encountered",
+    "[%s] (l:%d, c:%d) date not first in file",
+    "[%s] (l:%d, c:%d) no date encountered before entry",
+    "[%s] (l:%d, c:%d) identifier encountered without value list",
+    "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered for variable \'%s\'",
+    "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered for variable \'%s\', did you mean \'%s\'?",
+    "[%s] (l:%d, c:%d) duplicate attribute \'%s\' encountered",
+    "[%s] (l:%d, c:%d) duplicate variable \'%s\' encountered",
+    "[%s] (l:%d, c:%d) duplicate attribute value \'%s\' encountered",
+    "[%s] (l:%d, c:%d) duplicate variable value \'%s\' encountered",
+    "no attributes declared",
+    "no variables declared",
+    "[%s] (l:%d, c:%d) failed to compile regex: \'%s\', for attr: \'%s\'"
+};
+// clang-format on
 
 struct record
 {
