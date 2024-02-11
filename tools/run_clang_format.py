@@ -7,7 +7,7 @@ import os
 
 directories = ["test/", "include/", "src/", "lib/"]
 
-extensions = ["c", "h"]
+extensions = ["cpp", "hpp"]
 
 file_list = []
 

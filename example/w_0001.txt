@@ -1,4 +1,4 @@
-2022-09-15
+2022-99-15
 
 
 bw:
@@ -7,6 +7,7 @@ bw:
 dips:
 			 reps 2s10r ;  rpe 8;
     weight 5kg ; reps 3s8r  ;  rpe 10;
+
 
 bench_press:
     weight 60kg  ; reps 4s2r    ; incline 15deg;

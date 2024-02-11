@@ -4,7 +4,7 @@ AccessModifierOffset: -4
 AlignAfterOpenBracket: AlwaysBreak
 AlignArrayOfStructures: Left
 AlignConsecutiveAssignments:
-  Enabled: false
+  Enabled: true
   AcrossEmptyLines: false
   AcrossComments: false
   AlignCompound: false
@@ -16,7 +16,7 @@ AlignConsecutiveBitFields:
   AlignCompound: false
   PadOperators: false
 AlignConsecutiveDeclarations:
-  Enabled: false
+  Enabled: true
   AcrossEmptyLines: true
   AcrossComments: false
   AlignCompound: false
@@ -80,7 +80,7 @@ BreakBeforeBraces: Allman
 BreakBeforeConceptDeclarations: Always
 BreakBeforeInlineASMColon: OnlyMultiline
 BreakBeforeTernaryOperators: true
-BreakConstructorInitializers: BeforeColon
+BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeColon
 BreakStringLiterals: true
 ColumnLimit: 140
@@ -203,7 +203,7 @@ SpacesInParensOptions:
   InEmptyParentheses: false
   Other: false
 SpacesInSquareBrackets: false
-Standard: c++03
+Standard: c++20
 TabWidth: 4
 UseTab: Never
 VerilogBreakBetweenInstancePorts: true
