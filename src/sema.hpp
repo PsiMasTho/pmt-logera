@@ -10,6 +10,11 @@
 namespace sema
 {
 
+/**
+ * @brief The maximum Levenshtein distance between two strings for them to be considered similar.
+ */
+inline constexpr int const similar_lev = 3;
+
 class checker
 {
     template <ast::decl_node T>
@@ -70,8 +75,20 @@ private:
 
     /**
      * @brief Checks that all 'ENTRY_NODE's have a valid identifier, attrs and attr_values.
-    */
+     */
     void pass_8();
+};
+
+class attr_matcher
+{
+    std::vector<std::regex> m_regexes;
+
+public:
+    /**
+     * @note May throw std::regex_error.
+    */
+    void add_regex(char const* expr);
+    auto operator()(char const* str) const -> bool;
 };
 
 /**
@@ -83,25 +100,3 @@ auto is_valid_date(char const* str) -> bool;
 
 }
 
-#if 0
-
-/**
- * @brief Check if the given ATTR_VALUE_NODE matches its corresponding REGEX_NODE.
- * @param decl_attr_root The root of the decl_attr ast. Must be a MULTIFILE_NODE.
- * @param matchers A vector of vectors of regex matchers.
- * @param attr_node The IDENTIFIER_NODE of the attribute.
- * @param value_node The ATTR_VALUE_NODE to check.
- */
-bool check_regex_match(
-    ast::node const&               decl_attr_root,
-    std::vector<std::regex> const& matchers,
-    ast::node const&               attr_node,
-    ast::node const&               value_node,
-    std::vector<error::record>&    errors);
-
-/**
- * @brief Creates a vector of vectors of regex matchers from the given ast.
- */
-auto create_regex_matchers(ast::node const* decl_attrs, std::vector<error::record>& errors) -> std::vector<std::regex>;
-
-#endif

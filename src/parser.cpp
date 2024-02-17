@@ -3,8 +3,8 @@
 #include "ast.hpp"
 #include "errors.hpp"
 #include "lexer.hpp"
-#include "tokens.hpp"
 #include "overloaded.hpp"
+#include "tokens.hpp"
 
 #include <cassert>
 
@@ -47,10 +47,9 @@ auto parser::parser::parse() -> ast::file_node
     parsed_line    line;
     while (parse_line(&line))
     {
-        visit(overloaded{
-            [&](auto&& n) { root.children.push_back(std::move(n));},
-            [&](std::monostate&&) {}
-        }, std::move(line));
+        visit(
+            overloaded{ [&](auto&& n) { root.children.push_back(std::move(n)); }, [&](std::monostate&&) {} },
+            std::move(line));
     }
 
     return root;

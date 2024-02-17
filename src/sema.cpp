@@ -34,6 +34,31 @@ create_entry_node(ast::identifier_node const* ident, ast::ident_value_pair_list_
     return { .identifier = *ident, .ident_value_pair_list = std::move(*value_list) };
 }
 
+static auto get_flattened_decls(ast::multifile_node& decl_multifile) -> vector<ast::file_node::children_type*>
+{
+    vector<ast::file_node::children_type*> flattened_decls;
+
+    for (ast::file_node& file : decl_multifile.children)
+    {
+        for (auto& decl : file.children)
+        {
+            if (decl.index() == ast::file_node::child_index_v<ast::decl_attr_node>
+                || decl.index() == ast::file_node::child_index_v<ast::decl_var_node>)
+                flattened_decls.push_back(&decl);
+        }
+    }
+
+    sort(
+        begin(flattened_decls),
+        end(flattened_decls),
+        [](auto const& lhs, auto const& rhs)
+        {
+            return strcmp(visit(get_decl_node_ident{}, *lhs), visit(get_decl_node_ident{}, *rhs)) < 0;
+        });
+
+    return flattened_decls;
+}
+
 namespace sema
 {
 
@@ -95,6 +120,7 @@ auto checker::check() -> bool
     pass_5();
     pass_6();
     pass_7();
+    pass_8();
 
     return m_errors.size() == initial_errors;
 }
@@ -253,17 +279,7 @@ void checker::pass_4()
         if (decl_multifile.children.empty())
             return;
 
-        std::vector<ast::file_node::children_type*> flattened_decls;
-
-        for (ast::file_node& file : decl_multifile.children)
-            for (auto& decl : file.children)
-                flattened_decls.push_back(&decl);
-
-        sort(
-            begin(flattened_decls),
-            end(flattened_decls),
-            [](auto const& lhs, auto const& rhs)
-            { return strcmp(visit(get_decl_node_ident{}, *lhs), visit(get_decl_node_ident{}, *rhs)) < 0; });
+        auto flattened_decls = get_flattened_decls(decl_multifile);
 
         auto excess_dupes = algo::excess_duplicates_v(
             begin(flattened_decls),
@@ -389,26 +405,8 @@ void checker::pass_5()
 
 void checker::pass_6()
 {
-    vector<ast::file_node::children_type*> flattened_decl_attrs;
-    for (ast::file_node& file : m_decl_roots[decl_root_index<ast::decl_attr_node>].children)
-        for (auto& decl : file.children)
-            flattened_decl_attrs.push_back(&decl);
-
-    sort(
-        begin(flattened_decl_attrs),
-        end(flattened_decl_attrs),
-        [](auto const& lhs, auto const& rhs)
-        {
-            return strcmp(
-                       get<ast::decl_attr_node>(*lhs).identifier.record.lexeme.data,
-                       get<ast::decl_attr_node>(*rhs).identifier.record.lexeme.data)
-                   < 0;
-        });
-
-    vector<ast::file_node::children_type*> flattened_decl_vars;
-    for (ast::file_node& file : m_decl_roots[decl_root_index<ast::decl_var_node>].children)
-        for (auto& decl : file.children)
-            flattened_decl_vars.push_back(&decl);
+    auto flattened_decl_attrs = get_flattened_decls(m_decl_roots[decl_root_index<ast::decl_attr_node>]);
+    auto flattened_decl_vars  = get_flattened_decls(m_decl_roots[decl_root_index<ast::decl_var_node>]);
 
     levenshtein lev;
     vector<int> distances;
@@ -468,10 +466,10 @@ void checker::pass_6()
 
             auto const loc = ast::get_source_location(get<ast::decl_var_node>(*var_decl).children[i]);
 
-            if (*min_lev > 3)
+            if (*min_lev > similar_lev)
             {
                 m_errors.emplace_back(
-                    error::code::SEMA_UNDECLARED_ATTR,
+                    error::code::SEMA_UNDECLARED_ATTR_IN_DECL,
                     loc.filename,
                     loc.line,
                     loc.column,
@@ -481,7 +479,7 @@ void checker::pass_6()
             else
             {
                 m_errors.emplace_back(
-                    error::code::SEMA_UNDECLARED_ATTR_W_HINT,
+                    error::code::SEMA_UNDECLARED_ATTR_IN_DECL_W_HINT,
                     loc.filename,
                     loc.line,
                     loc.column,
@@ -582,37 +580,194 @@ void checker::pass_7()
     }
 }
 
-#if 0
-opaque_vector create_regex_matchers(ast_node const* decl_attrs, opaque_vector* errors)
+void checker::pass_8()
 {
-    assert(decl_attrs != NULL);
-    assert(decl_attrs->type == MULTIFILE_NODE);
-    assert(errors != NULL);
+    auto flattened_attrs = get_flattened_decls(m_decl_roots[decl_root_index<ast::decl_attr_node>]);
+    
+    // construct matchers
+    vector<attr_matcher> matchers;
+    matchers.reserve(flattened_attrs.size());
+
+    for (auto const* attr : flattened_attrs)
+    {
+        matchers.emplace_back();
+        for (auto const& value : get<ast::decl_attr_node>(*attr).children)
+        {
+            try
+            {
+                matchers.back().add_regex(value.record.lexeme.data);
+            }
+            catch (regex_error const& e)
+            {
+                auto const location = ast::get_source_location(value);
+                m_errors.emplace_back(
+                    error::code::SEMA_REGCOMP_FAILED,
+                    location.filename,
+                    location.line,
+                    location.column,
+                    value.record.lexeme.data,
+                    get<ast::decl_attr_node>(*attr).identifier.record.lexeme.data,
+                    e.what());
+            }
+        }
+    }
+
+    auto flattened_vars = get_flattened_decls(m_decl_roots[decl_root_index<ast::decl_var_node>]);
+
+    levenshtein lev;
+    vector<int> distances;
+
+    for (ast::file_node& file : m_entry_root.children)
+    {
+        for (size_t i = 0; i < file.children.size(); ++i)
+        {
+            ast::entry_node* entry = get_if<ast::entry_node>(&file.children[i]);
+            if (!entry)
+                continue;
+            
+            // check if the identifier is declared
+            auto entry_var = lower_bound(
+                begin(flattened_vars),
+                end(flattened_vars),
+                entry->identifier.record.lexeme.data,
+                overloaded{
+                    [](char const* lhs, ast::file_node::children_type* rhs)
+                    {
+                        return strcmp(lhs, get<ast::decl_var_node>(*rhs).identifier.record.lexeme.data) < 0;
+                    },
+                    [](ast::file_node::children_type* lhs, char const* rhs)
+                    {
+                        return strcmp(get<ast::decl_var_node>(*lhs).identifier.record.lexeme.data, rhs) < 0;
+                    },
+                });
+            
+            if (entry_var == end(flattened_vars) ||
+                strcmp(entry->identifier.record.lexeme.data, get<ast::decl_var_node>(**entry_var).identifier.record.lexeme.data)
+                    != 0)
+            {
+                distances.clear();
+                distances.resize(flattened_vars.size());
+
+                transform(
+                    begin(flattened_vars),
+                    end(flattened_vars),
+                    begin(distances),
+                    [&entry, &lev](auto const& var_decl)
+                    {
+                        return lev.distance(
+                            entry->identifier.record.lexeme.data,
+                            get<ast::decl_var_node>(*var_decl).identifier.record.lexeme.data);
+                    });
+                
+                auto const min_lev = min_element(begin(distances), end(distances));
+
+                auto const location = ast::get_source_location(entry->identifier);
+
+                if (*min_lev > similar_lev)
+                {
+                    m_errors.emplace_back(
+                        error::code::SEMA_UNDECLARED_VAR,
+                        location.filename,
+                        location.line,
+                        location.column,
+                        entry->identifier.record.lexeme.data);
+                }
+                else
+                {
+                    m_errors.emplace_back(
+                        error::code::SEMA_UNDECLARED_VAR_W_HINT,
+                        location.filename,
+                        location.line,
+                        location.column,
+                        entry->identifier.record.lexeme.data,
+                        get<ast::decl_var_node>(*flattened_vars[distance(begin(distances), min_lev)])
+                            .identifier.record.lexeme.data);
+                }
+            }
+
+            // check for undeclared attributes
+            for (auto const& ivp : entry->ident_value_pair_list.children)
+            {
+                if (!binary_search(
+                        begin(flattened_attrs),
+                        end(flattened_attrs),
+                        ivp.identifier.record.lexeme.data,
+                        overloaded{
+                            [](char const* lhs, ast::file_node::children_type* rhs)
+                            {
+                                return strcmp(lhs, get<ast::decl_attr_node>(*rhs).identifier.record.lexeme.data) < 0;
+                            },
+                            [](ast::file_node::children_type* lhs, char const* rhs)
+                            {
+                                return strcmp(get<ast::decl_attr_node>(*lhs).identifier.record.lexeme.data, rhs) < 0;
+                            },
+                        }))
+                {
+                    distances.clear();
+                    distances.resize(flattened_attrs.size());
+
+                    transform(
+                        begin(flattened_attrs),
+                        end(flattened_attrs),
+                        begin(distances),
+                        [&ivp, &lev](auto const& attr_decl)
+                        {
+                            return lev.distance(
+                                ivp.identifier.record.lexeme.data,
+                                get<ast::decl_attr_node>(*attr_decl).identifier.record.lexeme.data);
+                        });
+                    
+                    auto const min_lev = min_element(begin(distances), end(distances));
+
+                    auto const location = ast::get_source_location(ivp.identifier);
+
+                    if (*min_lev > similar_lev)
+                    {
+                        m_errors.emplace_back(
+                            error::code::SEMA_UNDECLARED_ATTR_IN_ENTRY,
+                            location.filename,
+                            location.line,
+                            location.column,
+                            ivp.identifier.record.lexeme.data,
+                            entry->identifier.record.lexeme.data);
+                    }
+                    else
+                    {
+                        m_errors.emplace_back(
+                            error::code::SEMA_UNDECLARED_ATTR_IN_ENTRY_W_HINT,
+                            location.filename,
+                            location.line,
+                            location.column,
+                            ivp.identifier.record.lexeme.data,
+                            entry->identifier.record.lexeme.data,
+                            get<ast::decl_attr_node>(*flattened_attrs[distance(begin(distances), min_lev)])
+                                .identifier.record.lexeme.data);
+                    }
+                }
+                else
+                {
+                    ;// ...
+                }
+            }
+        }
+    }
 }
 
-int cmp_attr_data_by_name(void const* lhs, void const* rhs)
+void attr_matcher::add_regex(char const* expr)
 {
-    assert(lhs != NULL);
-    assert(rhs != NULL);
+    m_regexes.emplace_back(expr, regex::optimize);
 }
 
-bool check_regex_match(
-    ast_node const*      decl_attr_root,
-    opaque_vector const* matchers,
-    ast_node const*      attr_node,
-    ast_node const*      value_node,
-    opaque_vector*       errors)
+auto attr_matcher::operator()(char const* str) const -> bool
 {
-    assert(decl_attr_root != NULL);
-    assert(decl_attr_root->type == MULTIFILE_NODE);
-    assert(matchers != NULL);
-    assert(attr_node != NULL);
-    assert(attr_node->type == IDENTIFIER_NODE);
-    assert(value_node != NULL);
-    assert(value_node->type == ATTR_VALUE_NODE);
-    assert(errors != NULL);
+    // if no regex is defined, then assume it's a match
+    if (m_regexes.empty())
+        return true;
+    
+    // does any regex match?
+    return any_of(begin(m_regexes), end(m_regexes), [&str](auto const& rexpr) {
+        return regex_match(str, rexpr);
+    });
 }
-
-#endif
 
 } // namespace sema
