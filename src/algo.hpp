@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <vector>
@@ -55,6 +53,6 @@ template <typename T, typename U>
     requires(std::is_integral_v<typename U::value_type>)
 auto indirect_rearrange(T data_begin, T data_end, U indices_begin, std::unique_ptr<typename U::value_type[]> buf);
 
-#include "algo-inl.hpp"
-
 }
+
+#include "algo-inl.hpp"

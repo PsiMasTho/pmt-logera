@@ -1,12 +1,11 @@
 #pragma once
 
+#include "meta.hpp"
 #include "tokens.hpp"
 
 #include <string>
 #include <variant>
 #include <vector>
-
-#include "meta.hpp"
 
 namespace ast
 {
@@ -79,16 +78,14 @@ struct multifile_node
 template <typename T>
 concept decl_node = std::is_same_v<T, decl_attr_node> || std::is_same_v<T, decl_var_node>;
 
-auto get_source_location(multifile_node const&) -> token::source_location;
-auto get_source_location(file_node const&) -> token::source_location;
-auto get_source_location(entry_node const&) -> token::source_location;
-auto get_source_location(ident_value_pair_list_node const&) -> token::source_location;
-auto get_source_location(ident_value_pair_node const&) -> token::source_location;
-auto get_source_location(decl_var_node const&) -> token::source_location;
-auto get_source_location(decl_attr_node const&) -> token::source_location;
-auto get_source_location(date_node const&) -> token::source_location;
-auto get_source_location(attr_value_node const&) -> token::source_location;
-auto get_source_location(identifier_node const&) -> token::source_location;
-auto get_source_location(regex_node const&) -> token::source_location;
+template <typename T>
+concept node = std::is_same_v<T, regex_node> || std::is_same_v<T, identifier_node> || std::is_same_v<T, attr_value_node>
+               || std::is_same_v<T, date_node> || std::is_same_v<T, decl_attr_node> || std::is_same_v<T, decl_var_node>
+               || std::is_same_v<T, ident_value_pair_node> || std::is_same_v<T, ident_value_pair_list_node>
+               || std::is_same_v<T, entry_node> || std::is_same_v<T, file_node> || std::is_same_v<T, multifile_node>;
+
+template <node T> auto get_source_location(T const&) -> token::source_location;
 
 } // namespace ast
+
+#include "ast-inl.hpp"

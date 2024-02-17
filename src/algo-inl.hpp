@@ -1,11 +1,14 @@
-#include "algo.hpp"
-
 // clang-format off
 #ifdef __INTELLISENSE__
     #include "algo.hpp"
-    namespace algo{
 #endif
 // clang-format on
+
+#include <algorithm>
+#include <iterator>
+
+namespace algo
+{
 
 template <typename T, typename U>
     requires(std::is_integral_v<typename U::value_type>)
@@ -100,8 +103,5 @@ auto excess_duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T
     return ret;
 }
 
-// clang-format off
-#ifdef __INTELLISENSE__
-    }
-#endif
-// clang-format on
+
+}
