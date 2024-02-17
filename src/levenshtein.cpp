@@ -6,28 +6,29 @@ using namespace std;
 
 auto levenshtein::distance(string_view const lhs, string_view const rhs) -> int
 {
-    int const sizes[2] = { static_cast<int>(lhs.size()), static_cast<int>(rhs.size()) };
+    if (lhs.size() > rhs.size())
+        return distance(rhs, lhs);
 
-    if (!sizes[0] || !sizes[1])
-        return max(sizes[0], sizes[1]);
+    int const min_size = lhs.size(), max_size = rhs.size();
+    m_matrix.resize(min_size + 1);
 
-    m_matrix.resize((sizes[0] + 1) * (sizes[1] + 1));
+    for (int i = 0; i <= min_size; ++i)
+        m_matrix[i] = i;
 
-    auto const mat2d = [x_max = sizes[0], this](int x, int y) -> int& { return m_matrix[x * x_max + y]; };
+    for (int j = 1; j <= max_size; ++j) {
+        int previous_diagonal = m_matrix[0], previous_diagonal_save;
+        ++m_matrix[0];
 
-    for (int x = 0; x <= sizes[0]; ++x)
-        mat2d(x, 0) = x;
-    for (int y = 0; y <= sizes[1]; ++y)
-        mat2d(0, y) = y;
-
-    for (int x = 1; x <= sizes[0]; ++x)
-    {
-        for (int y = 1; y <= sizes[1]; ++y)
-        {
-            int const cost = (lhs[x - 1] != rhs[y - 1]);
-            mat2d(x, y)    = min(min(mat2d(x - 1, y) + 1, mat2d(x, y - 1) + 1), mat2d(x - 1, y - 1) + cost);
+        for (int i = 1; i <= min_size; ++i) {
+            previous_diagonal_save = m_matrix[i];
+            if (lhs[i - 1] == rhs[j - 1])
+                m_matrix[i] = previous_diagonal;
+            else
+                m_matrix[i] = std::min(std::min(m_matrix[i - 1], m_matrix[i]), previous_diagonal) + 1;
+            
+            previous_diagonal = previous_diagonal_save;
         }
     }
 
-    return mat2d(sizes[0], sizes[1]);
+    return m_matrix[min_size];
 }
