@@ -18,4 +18,4 @@ for dir in directories:
                 if file.endswith("." + ext):
                     file_list.append(os.path.join(root, file))
 
-os.system("clang-format-17 -i -style=file --verbose " + " ".join(file_list))
+os.system("clang-format-16 -i -style=file --verbose " + " ".join(file_list))
