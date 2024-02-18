@@ -1,4 +1,4 @@
-#include "../../src/lexer.hpp"
+#include "logera/lexer.hpp"
 
 #include <cassert>
 #include <string>

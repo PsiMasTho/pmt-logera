@@ -1,5 +1,5 @@
-#include "../../src/errors.hpp"
-#include "../../src/io.hpp"
+#include "logera/errors.hpp"
+#include "logera/io.hpp"
 
 #include <cassert>
 #include <string>

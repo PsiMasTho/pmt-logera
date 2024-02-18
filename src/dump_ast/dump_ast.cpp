@@ -1,10 +1,10 @@
-#include "../src/ast.hpp"
-#include "../src/errors.hpp"
-#include "../src/io.hpp"
-#include "../src/lexer.hpp"
-#include "../src/overloaded.hpp"
-#include "../src/parser.hpp"
-#include "../src/sema.hpp"
+#include "logera/ast.hpp"
+#include "logera/errors.hpp"
+#include "logera/io.hpp"
+#include "logera/lexer.hpp"
+#include "logera/overloaded.hpp"
+#include "logera/parser.hpp"
+#include "logera/sema.hpp"
 
 #include <algorithm>
 #include <cstdio>
@@ -75,7 +75,7 @@ void print_ast(ast::multifile_node const& multifile)
             printf("decl_attr_node:\n");
             indent();
             print_indent();
-            printf("- identifier: %s\n", n.identifier.record.lexeme.data);
+            printf("- identifier: %s\n", n.identifier.record.lexeme.data());
             print_indent();
             printf("- children [\n");
             indent();
@@ -92,7 +92,7 @@ void print_ast(ast::multifile_node const& multifile)
             printf("decl_var_node:\n");
             indent();
             print_indent();
-            printf("- identifier: %s\n", n.identifier.record.lexeme.data);
+            printf("- identifier: %s\n", n.identifier.record.lexeme.data());
             print_indent();
             printf("- children [\n");
             indent();
@@ -109,9 +109,9 @@ void print_ast(ast::multifile_node const& multifile)
             printf("ident_value_pair_node:\n");
             indent();
             print_indent();
-            printf("- identifier: %s\n", n.identifier.record.lexeme.data);
+            printf("- identifier: %s\n", n.identifier.record.lexeme.data());
             print_indent();
-            printf("- attr_value: %s\n", n.attr_value.record.lexeme.data);
+            printf("- attr_value: %s\n", n.attr_value.record.lexeme.data());
             dedent();
         },
         [](auto const* self, ident_value_pair_list_node const& n)
@@ -135,7 +135,7 @@ void print_ast(ast::multifile_node const& multifile)
             printf("entry_node:\n");
             indent();
             print_indent();
-            printf("- identifier: %s\n", n.identifier.record.lexeme.data);
+            printf("- identifier: %s\n", n.identifier.record.lexeme.data());
             print_indent();
             printf("- ident_value_pair_list:\n");
             invoke(*self, self, n.ident_value_pair_list);
@@ -147,7 +147,7 @@ void print_ast(ast::multifile_node const& multifile)
             printf("date_node:\n");
             indent();
             print_indent();
-            printf("- record: %s\n", n.record.lexeme.data);
+            printf("- record: %s\n", n.record.lexeme.data());
             print_indent();
             printf("- location: (l:%d, c:%d)\n", n.record.location.line, n.record.location.column);
             dedent();
@@ -158,7 +158,7 @@ void print_ast(ast::multifile_node const& multifile)
             printf("regex_node:\n");
             indent();
             print_indent();
-            printf("- record: %s\n", n.record.lexeme.data);
+            printf("- record: %s\n", n.record.lexeme.data());
             print_indent();
             printf("- location: (l:%d, c:%d)\n", n.record.location.line, n.record.location.column);
             dedent();
@@ -169,7 +169,7 @@ void print_ast(ast::multifile_node const& multifile)
             printf("identifier_node:\n");
             indent();
             print_indent();
-            printf("- record: %s\n", n.record.lexeme.data);
+            printf("- record: %s\n", n.record.lexeme.data());
             print_indent();
             printf("- location: (l:%d, c:%d)\n", n.record.location.line, n.record.location.column);
             dedent();
