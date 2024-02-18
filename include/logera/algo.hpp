@@ -53,6 +53,6 @@ template <typename T, typename U>
     requires(std::is_integral_v<typename U::value_type>)
 auto indirect_rearrange(T data_begin, T data_end, U indices_begin, std::unique_ptr<typename U::value_type[]> buf);
 
-}
+} // namespace algo
 
 #include "algo-inl.hpp"

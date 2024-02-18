@@ -26,10 +26,9 @@ struct program_opts
     bool                                                   verbose;
     bool                                                   color;
     bool                                                   sort_cols_by_width;
-    std::filesystem::path                                  header_file;
     std::unique_ptr<std::ostream, void (*)(std::ostream*)> output_stream; // stdout or file
     std::string                                            output_name;   // name of output file or "stdout"
-    std::vector<std::filesystem::path>                     log_files;
+    std::vector<std::filesystem::path>                     input_files;
 };
 
 void print_program_opts(program_opts const& cfg, std::ostream& os);

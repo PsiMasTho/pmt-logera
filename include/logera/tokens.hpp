@@ -20,9 +20,6 @@ enum type
     _TYPE_COUNT
 };
 
-inline char const* const type_names[_TYPE_COUNT]
-    = { "COLON", "SEMICOLON", "NEWLINE", "KW_ATTR", "KW_VAR", "IDENT", "REGEX", "ATTR_VALUE", "DATE" };
-
 struct source_location
 {
     char const* filename; // non-owning, todo: remove this redundancy
@@ -37,4 +34,4 @@ struct record
     int              token;
 };
 
-}
+} // namespace token

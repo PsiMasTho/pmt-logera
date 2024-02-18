@@ -3,8 +3,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "csv_emitter.h"
-#include "../utility/utility.h"
+#include "csv_emitter.hpp"
+#include "logera/algo.hpp"
 
 #include <algorithm>
 #include <numeric> // iota
@@ -71,11 +71,11 @@ void sort_cols_by_width(vector<csv_emitter::row_t>& rows, vector<int>& col_max_w
         [&width_beg](size_t lhs, size_t rhs) { return width_beg[lhs] < width_beg[rhs]; });
 
     // apply indices to col_max_width
-    auto cache = indirect_rearrange(width_beg, col_max_width.end(), indices.begin(), nullptr);
+    auto cache = algo::indirect_rearrange(width_beg, col_max_width.end(), indices.begin(), nullptr);
 
     // apply indices to rows
     for (auto& row : rows)
-        cache = indirect_rearrange(row.begin() + skip, row.end(), indices.begin(), move(cache));
+        cache = algo::indirect_rearrange(row.begin() + skip, row.end(), indices.begin(), move(cache));
 }
 
 } // namespace

@@ -1,10 +1,10 @@
-#include "parser.hpp"
+#include "logera/parser.hpp"
 
-#include "ast.hpp"
-#include "errors.hpp"
-#include "lexer.hpp"
-#include "overloaded.hpp"
-#include "tokens.hpp"
+#include "logera/ast.hpp"
+#include "logera/errors.hpp"
+#include "logera/lexer.hpp"
+#include "logera/overloaded.hpp"
+#include "logera/tokens.hpp"
 
 #include <cassert>
 

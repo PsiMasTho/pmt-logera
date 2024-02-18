@@ -27,4 +27,4 @@ auto basename_from_path(std::string_view const path) -> std::string_view;
  */
 auto readallf(char const* path, std::string& buffer, std::vector<error::record>& errors) -> std::string&;
 
-}
+} // namespace io

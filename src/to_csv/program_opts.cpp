@@ -3,11 +3,11 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "program_opts.h"
+#include "program_opts.hpp"
 
-#include "../external/argparse/argparse.hpp"
+#include "argparse/argparse.hpp"
 
-#include "cmdl_exception.h"
+#include "cmdl_exception.hpp"
 
 #include <algorithm>
 #include <exception>
@@ -68,28 +68,6 @@ bool set_sort_cols_by_width(argparse::ArgumentParser const& cmdl)
     return cmdl.get<bool>("--sort-cols-by-width");
 }
 
-filesystem::path set_header_file(argparse::ArgumentParser const& cmdl)
-{
-    auto const paths = path_vec_from_args(cmdl);
-
-    // check that there is a single file with a '.lh' extension
-    auto const itr
-        = find_if(begin(paths), end(paths), [](auto const& pth) { return filesystem::path(pth).extension() == ".lh"; });
-
-    if (itr == end(paths))
-        throw cmdl_exception("No header file provided");
-
-    size_t const extraHeaders = count_if(
-        next(itr, 1),
-        end(paths),
-        [](auto const& pth) { return filesystem::path(pth).extension() == ".lh"; });
-
-    if (extraHeaders)
-        throw cmdl_exception("Multiple header files provided");
-
-    return *itr;
-}
-
 unique_ptr<ostream, void (*)(ostream*)> set_output_stream(argparse::ArgumentParser const& cmdl)
 {
     if (cmdl.present("--output").has_value())
@@ -108,24 +86,9 @@ string set_output_name(argparse::ArgumentParser const& cmdl)
         return "stdout";
 }
 
-vector<filesystem::path> set_log_files(argparse::ArgumentParser const& cmdl)
+auto set_input_files(argparse::ArgumentParser const& cmdl) -> vector<filesystem::path>
 {
     auto paths = path_vec_from_args(cmdl);
-
-    paths.erase(
-        std::partition_if_not(
-            begin(paths),
-            end(paths),
-            [](auto const& pth)
-            {
-                if (pth.extension() == ".lh")
-                    return true;
-                else if (pth.extension() == ".txt")
-                    return false;
-                else
-                    throw cmdl_exception("Invalid file extension");
-            }),
-        end(paths));
 
     if (paths.empty())
         throw cmdl_exception("No log files provided");
@@ -140,10 +103,9 @@ program_opts::program_opts(argparse::ArgumentParser const& cmdl)
     , verbose{ set_verbose(cmdl) }
     , color{ set_color(cmdl) }
     , sort_cols_by_width{ set_sort_cols_by_width(cmdl) }
-    , header_file{ set_header_file(cmdl) }
     , output_stream{ set_output_stream(cmdl) }
     , output_name{ set_output_name(cmdl) }
-    , log_files{ set_log_files(cmdl) }
+    , input_files{ set_input_files(cmdl) }
 {
 }
 
@@ -152,10 +114,9 @@ program_opts::program_opts()
     , verbose{ false }
     , color{ false }
     , sort_cols_by_width{ false }
-    , header_file{}
     , output_stream{ &cout, [](ostream*) { /* do nothing */ } }
     , output_name{ "stdout" }
-    , log_files{}
+    , input_files{}
 {
 }
 
@@ -166,11 +127,10 @@ void print_program_opts(program_opts const& cfg, std::ostream& os)
     os << "\tVerbose: " << boolalpha << cfg.verbose << '\n';
     os << "\tColor: " << boolalpha << cfg.color << '\n';
     os << "\tSort columns by width: " << boolalpha << cfg.sort_cols_by_width << '\n';
-    os << "\tHeader file: " << cfg.header_file << '\n';
     os << "\tOutput: " << cfg.output_name << '\n';
-    os << "\tLog file count: " << cfg.log_files.size() << '\n';
-    os << "\tLog files:\n";
-    for (auto const& log_file : cfg.log_files)
+    os << "\tInput file count: " << cfg.input_files.size() << '\n';
+    os << "\tInput files:\n";
+    for (auto const& log_file : cfg.input_files)
         os << "\t\t" << log_file << '\n';
     os << '\n';
 }

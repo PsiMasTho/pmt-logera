@@ -103,5 +103,4 @@ auto excess_duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T
     return ret;
 }
 
-
-}
+} // namespace algo

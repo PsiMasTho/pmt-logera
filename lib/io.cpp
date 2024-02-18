@@ -1,4 +1,4 @@
-#include "io.hpp"
+#include "logera/io.hpp"
 
 #include <fstream>
 
@@ -39,4 +39,4 @@ auto readallf(char const* path, string& buffer, vector<error::record>& errors) -
     return buffer;
 }
 
-}
+} // namespace io

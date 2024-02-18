@@ -1,4 +1,4 @@
-#include "errors.hpp"
+#include "logera/errors.hpp"
 
 #include <cassert>
 
@@ -19,4 +19,4 @@ record::record(int code, ...)
     va_end(args);
 }
 
-}
+} // namespace error

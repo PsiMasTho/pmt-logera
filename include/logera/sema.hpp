@@ -3,26 +3,39 @@
 #include "ast.hpp"
 #include "errors.hpp"
 
+#include <array>
 #include <regex>
+#include <tuple>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace sema
 {
 
-/**
- * @brief The maximum Levenshtein distance between two strings for them to be considered similar.
- */
-inline constexpr int const similar_lev = 3;
+enum
+{
+    ENTRY_ROOT_INDEX = 0,
+    DECL_ROOT_INDEX,
+    VAR_ROOT_INDEX
+};
+
+enum
+{
+    SIMILAR_LEV = 3 // The maximum Levenshtein distance between two strings for them to be considered similar.
+};
+
+using split_trees = std::tuple<ast::multifile_node, ast::multifile_node, ast::multifile_node>;
+
+template <typename T>
+concept pass = std::is_invocable_r_v<void, T, split_trees&, std::vector<error::record>&>;
+
+template <pass... T> auto apply_passes(ast::multifile_node&& mf_node, std::vector<error::record>& errors) -> bool;
 
 class checker
 {
-    template <ast::decl_node T>
-    static constexpr std::size_t decl_root_index = std::is_same_v<T, ast::decl_attr_node> ? 0 : 1;
-
-    ast::multifile_node          m_entry_root; // Contains all 'FILE_NODE's with 'ENTRY_NODE's or 'DATE_NODE's.
-    ast::multifile_node          m_decl_roots[2];
-    std::vector<error::record>&  m_errors;
+    ast::multifile_node         m_roots[3];
+    std::vector<error::record>& m_errors;
 
 public:
     checker(ast::multifile_node&& mf_node, std::vector<error::record>& errors);
@@ -86,7 +99,7 @@ class attr_matcher
 public:
     /**
      * @note May throw std::regex_error.
-    */
+     */
     void add_regex(char const* expr);
     auto operator()(char const* str) const -> bool;
 };
@@ -98,5 +111,6 @@ public:
  */
 auto is_valid_date(char const* str) -> bool;
 
-}
+} // namespace sema
 
+#include "sema-inl.hpp"

@@ -77,4 +77,4 @@ struct record
     record(int code, ...);
 };
 
-}
+} // namespace error

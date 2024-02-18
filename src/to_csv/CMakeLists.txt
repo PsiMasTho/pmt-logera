@@ -2,6 +2,9 @@ file(GLOB SOURCES "*.cpp")
 
 add_executable(${PROJECT_NAME}-to-csv ${SOURCES})
 
+target_include_directories(${PROJECT_NAME} PUBLIC
+$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+
 target_include_directories(${PROJECT_NAME}-to-csv PUBLIC
 $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external>)
 

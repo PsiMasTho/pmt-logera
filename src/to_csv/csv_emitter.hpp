@@ -21,7 +21,7 @@ public:
         SORT_COLS_BY_WIDTH = 1u << 2,
     };
 
-    using row_t = std::vector<std::string>;
+    using row_t = std::vector<char const*>;
 
 private:
     flags              m_flags;

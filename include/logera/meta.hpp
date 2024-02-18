@@ -34,4 +34,4 @@ struct get_index<T, std::variant<Ts...>>
 {
 };
 
-}
+} // namespace meta

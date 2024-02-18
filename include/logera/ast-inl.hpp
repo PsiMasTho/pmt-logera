@@ -6,7 +6,8 @@
 
 #include "overloaded.hpp"
 
-namespace ast{
+namespace ast
+{
 
 template <node T> auto get_source_location(T const& target) -> token::source_location
 {
@@ -29,4 +30,4 @@ template <node T> auto get_source_location(T const& target) -> token::source_loc
     return impl.operator()(target);
 }
 
-}
+} // namespace ast
