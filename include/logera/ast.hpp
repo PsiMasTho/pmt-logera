@@ -64,10 +64,11 @@ struct file_node
     using children_type = std::
         variant<date_node, ident_value_pair_list_node, decl_var_node, decl_attr_node, identifier_node, entry_node>;
 
-    template <typename T> static constexpr auto child_index_v = meta::get_index<T, children_type>::value;
+    template <typename T>
+    static constexpr auto child_index_v = meta::get_index<T, children_type>::value;
 
-    std::string                                 filename;
-    std::vector<children_type>                  children;
+    std::string                filename;
+    std::vector<children_type> children;
 };
 
 struct multifile_node
@@ -84,7 +85,8 @@ concept node = std::is_same_v<T, regex_node> || std::is_same_v<T, identifier_nod
                || std::is_same_v<T, ident_value_pair_node> || std::is_same_v<T, ident_value_pair_list_node>
                || std::is_same_v<T, entry_node> || std::is_same_v<T, file_node> || std::is_same_v<T, multifile_node>;
 
-template <node T> auto get_source_location(T const&) -> token::source_location;
+template <node T>
+auto get_source_location(T const&) -> token::source_location;
 
 } // namespace ast
 

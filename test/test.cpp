@@ -8,7 +8,7 @@ void test_io();
 
 void test_lexer();
 
-int  main()
+int main()
 {
     ;
     test_io();

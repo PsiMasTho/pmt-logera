@@ -12,6 +12,8 @@ $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external>)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
+add_subdirectory(passes)
+
 if (LOGERA_INSTALL AND LOGERA_IS_TOP_LEVEL)
         install(TARGETS ${PROJECT_NAME}
                 EXPORT ${PROJECT_NAME}-config

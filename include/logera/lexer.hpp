@@ -37,7 +37,8 @@ public:
      * @param dest Non-owning pointer to the destination string_view. Will be
      * ignored if nullptr.
      */
-    template <int tok> auto lex_token(std::string_view* dest) -> bool;
+    template <int tok>
+    auto lex_token(std::string_view* dest) -> bool;
 
     /**
      * @brief Tries to lex a sequence of tokens.

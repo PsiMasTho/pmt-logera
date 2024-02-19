@@ -16,7 +16,7 @@ static void test_readallf();
 
 static void write_file(char const* path, string const& contents);
 
-void        test_io()
+void test_io()
 {
     test_basename_from_path_unix();
     test_basename_from_path_windows();
@@ -68,7 +68,7 @@ static void test_readallf_big()
     char const  outchars[]     = "abcdefghijklmnopqrstuvwxyz\n";
     int const   outchars_count = sizeof(outchars) - 1;
 
-    string      orig_contents;
+    string orig_contents;
     for (int i = 0; i < outchars_count * 10000; ++i)
         orig_contents.push_back(outchars[i % outchars_count]);
     write_file(path, orig_contents.c_str());

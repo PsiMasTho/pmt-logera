@@ -17,7 +17,7 @@ using namespace std;
 int       cur_indent  = 0;
 int const indent_incr = 4;
 
-void      indent()
+void indent()
 {
     cur_indent += indent_incr;
 }
@@ -225,32 +225,34 @@ void process_files(char** filenames, int num_files)
             multifile.children.push_back(std::move(file));
     }
 
-    vector<error::record> errors;
-    sema::checker         checker(std::move(multifile), errors);
-    checker.check();
+    storage.shrink_to_fit();
 
-    if (!errors.empty())
+    vector<error::record> errors;
+    ast::multifile_node   decl_attrs;
+    ast::multifile_node   decl_vars;
+
+    if (!sema::apply_all_passes({ &multifile, &decl_attrs, &decl_vars }, errors))
         for (auto const& e : errors)
             print_error(e);
     errors.clear();
 
     printf("Attributes:\n");
     printf("-----------\n");
-    if (!checker.get_decl_attr_root().children.empty())
-        print_ast(checker.get_decl_attr_root());
+    if (!decl_attrs.children.empty())
+        print_ast(decl_attrs);
 
     printf("Variables:\n");
     printf("-----------\n");
-    if (!checker.get_decl_var_root().children.empty())
-        print_ast(checker.get_decl_var_root());
+    if (!decl_vars.children.empty())
+        print_ast(decl_vars);
 
     printf("Main tree:\n");
     printf("-----------\n");
-    if (!checker.get_entry_root().children.empty())
-        print_ast(checker.get_entry_root());
+    if (!multifile.children.empty())
+        print_ast(multifile);
 }
 
-int main(int argc, char** argv)
+auto main(int argc, char** argv) -> int
 {
     if (argc == 1)
     {

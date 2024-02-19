@@ -44,7 +44,7 @@ auto parser::parser::parse() -> ast::file_node
 {
     ast::file_node root{ .filename = m_lexer.get_filename(), .children = {} };
 
-    parsed_line    line;
+    parsed_line line;
     while (parse_line(&line))
     {
         visit(
@@ -232,8 +232,8 @@ auto parser::parse_ident_value_pair_list(ast::ident_value_pair_list_node* dest) 
 
     ast::ident_value_pair_list_node tmp;
 
-    int                             n_pairs = 0;
-    ast::ident_value_pair_node      ivp;
+    int                        n_pairs = 0;
+    ast::ident_value_pair_node ivp;
     while (1)
     {
         char const* initial = m_lexer.get_cursor();
@@ -242,7 +242,7 @@ auto parser::parse_ident_value_pair_list(ast::ident_value_pair_list_node* dest) 
             m_lexer.set_cursor(initial);
             break;
         }
-        tmp.children.push_back(std::move(ivp));
+        tmp.children.push_back(ivp);
 
         if (!m_lexer.lex_tokens<lexer::SKIPWS, token::SEMICOLON>(make_tuple(nullptr, nullptr)))
         {

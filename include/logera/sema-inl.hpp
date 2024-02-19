@@ -4,16 +4,58 @@
 #endif
 // clang-format on
 
+#include <cassert>
+#include <type_traits>
+
 namespace sema
 {
 
-template <pass... T> auto apply_passes(ast::multifile_node&& mf_node, std::vector<error::record>& errors) -> bool
+template <typename Derived>
+pass_base<Derived>::pass_base(split_trees trees, std::vector<error::record>& errors)
+    : m_trees{ trees }
+    , m_errors{ errors }
 {
-    auto       trees         = std::make_tuple(std::move(mf_node), ast::multifile_node{}, ast::multifile_node{});
-    auto       args          = std::tuple_cat(trees, std::make_tuple(std::ref(errors)));
-    auto const errors_before = errors.size();
-    (std::apply(T{}, args), ...);
+    static_assert(std::is_base_of_v<pass_base<Derived>, Derived>);
+    assert(std::get<ENTRY_ROOT_INDEX>(m_trees));
+    assert(std::get<DECL_ATTR_ROOT_INDEX>(m_trees));
+    assert(std::get<DECL_VAR_ROOT_INDEX>(m_trees));
+}
 
+template <typename Derived>
+void pass_base<Derived>::operator()()
+{
+    static_cast<Derived*>(this)->run();
+}
+
+template <typename Derived>
+auto pass_base<Derived>::entry_root() -> ast::multifile_node&
+{
+    return *std::get<ENTRY_ROOT_INDEX>(m_trees);
+}
+
+template <typename Derived>
+auto pass_base<Derived>::decl_attr_root() -> ast::multifile_node&
+{
+    return *std::get<DECL_ATTR_ROOT_INDEX>(m_trees);
+}
+
+template <typename Derived>
+auto pass_base<Derived>::decl_var_root() -> ast::multifile_node&
+{
+    return *std::get<DECL_VAR_ROOT_INDEX>(m_trees);
+}
+
+template <typename Derived>
+auto pass_base<Derived>::errors() -> std::vector<error::record>&
+{
+    return m_errors;
+}
+
+template <typename... Ts>
+auto apply_passes(split_trees trees, std::vector<error::record>& errors) -> bool
+{
+    auto const errors_before = errors.size();
+    (Ts{ trees, errors }(), ...);
     return errors_before >= errors.size();
 }
 

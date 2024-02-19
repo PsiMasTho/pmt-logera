@@ -17,7 +17,7 @@ static void test_lexer_get_line_nr_and_column_nr();
 
 static void test_strdup_token();
 
-void        test_lexer()
+void test_lexer()
 {
     test_lexer_lex_token_colons();
     test_lexer_lex_token_idents();
@@ -31,7 +31,7 @@ static void test_lexer_lex_token_colons()
 {
     string input = ": :: ; ;: :; : :";
 
-    lexer  l;
+    lexer l;
     l.set_buffer("test_name", input.c_str(), input.size());
 
     string_view tok;
@@ -92,7 +92,7 @@ static void test_lexer_lex_token_dates()
     string      input            = "2020-01-01 2023-04-05 1998-02-01 foo-01-01";
     string_view expected_dates[] = { "2020-01-01", "2023-04-05", "1998-02-01" };
 
-    lexer       l;
+    lexer l;
     l.set_buffer("test_name", input.c_str(), input.size());
 
     string_view tok;
@@ -112,7 +112,7 @@ static void test_lexer_set_cursor()
 {
     string input = "foo\nbar\nbaz";
 
-    lexer  l;
+    lexer l;
     l.set_buffer("test_name", input.c_str(), input.size());
 
     string_view tok;
@@ -161,7 +161,7 @@ static void test_lexer_get_line_nr_and_column_nr()
                    "treadmill:\n"
                    "    time 10:00;\n";
 
-    lexer  l;
+    lexer l;
     l.set_buffer("test_name", input.c_str(), input.size());
 
     char const* p            = input.c_str();
@@ -188,7 +188,7 @@ static void test_strdup_token()
     char const* expected_results[] = { "foo", "bar", "baz" };
     string_view actual_results[n_items];
 
-    lexer       l;
+    lexer l;
     l.set_buffer("test_name", input.c_str(), input.size());
 
     string_view tok;

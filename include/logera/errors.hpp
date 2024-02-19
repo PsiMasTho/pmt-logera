@@ -23,10 +23,12 @@ enum code
     SEMA_IDENT_WITHOUT_VALUE_LIST,
     SEMA_UNDECLARED_ATTR_IN_DECL,
     SEMA_UNDECLARED_ATTR_IN_DECL_W_HINT,
-    SEMA_UNDECLARED_ATTR_IN_ENTRY,
-    SEMA_UNDECLARED_ATTR_IN_ENTRY_W_HINT,
-    SEMA_UNDECLARED_VAR,
-    SEMA_UNDECLARED_VAR_W_HINT,
+    SEMA_UNDECLARED_ATTR_IN_ENTRY_LOCAL,
+    SEMA_UNDECLARED_ATTR_IN_ENTRY_LOCAL_W_HINT,
+    SEMA_UNDECLARED_ATTR_IN_ENTRY_GLOBAL,
+    SEMA_UNDECLARED_ATTR_IN_ENTRY_GLOBAL_W_HINT,
+    SEMA_UNDECLARED_VAR_IN_ENTRY,
+    SEMA_UNDECLARED_VAR_IN_ENTRY_W_HINT,
     SEMA_DUPLICATE_ATTR,
     SEMA_DUPLICATE_VAR,
     SEMA_DUPLICATE_ATTR_VALUE,
@@ -34,6 +36,7 @@ enum code
     SEMA_NO_ATTRIBUTES_DECLARED,
     SEMA_NO_VARIABLES_DECLARED,
     SEMA_REGCOMP_FAILED,
+    SEMA_REGEX_MISMATCH,
 
     _CODE_COUNT
 };
@@ -55,17 +58,20 @@ inline char const* const fmts[_CODE_COUNT] = {
     "[%s] (l:%d, c:%d) identifier encountered without value list",
     "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered in declaration for variable \'%s\'",
     "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered in declaration for variable \'%s\', did you mean \'%s\'?",
-    "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered in entry for variable \'%s\'",
-    "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered in entry for variable \'%s\', did you mean \'%s\'?",
-    "[%s] (l:%d, c:%d) undeclared variable \'%s\' encountered",
-    "[%s] (l:%d, c:%d) undeclared variable \'%s\' encountered, did you mean \'%s\'?",
+    "[%s] (l:%d, c:%d) attribute \'%s\' has not been declared for variable \'%s\'",
+    "[%s] (l:%d, c:%d) attribute \'%s\' has not been declared for variable \'%s\', did you mean \'%s\'?",
+    "[%s] (l:%d, c:%d) no declaration exists for attribute \'%s\'",
+    "[%s] (l:%d, c:%d) no declaration exists for attribute \'%s\', did you mean \'%s\'?",
+    "[%s] (l:%d, c:%d) undeclared variable \'%s\' encountered in entry",
+    "[%s] (l:%d, c:%d) undeclared variable \'%s\' encountered in entry, did you mean \'%s\'?",
     "[%s] (l:%d, c:%d) duplicate attribute \'%s\' encountered",
     "[%s] (l:%d, c:%d) duplicate variable \'%s\' encountered",
     "[%s] (l:%d, c:%d) duplicate attribute value \'%s\' encountered",
     "[%s] (l:%d, c:%d) duplicate variable value \'%s\' encountered",
     "no attributes declared",
     "no variables declared",
-    "[%s] (l:%d, c:%d) failed to compile regex: \'%s\', for attr: \'%s\'. %s"
+    "[%s] (l:%d, c:%d) failed to compile regex: \'%s\', for attr: \'%s\'. %s",
+    "[%s] (l:%d, c:%d) regex mismatch for attribute: \'%s\', value: \'%s\'"
 };
 // clang-format on
 

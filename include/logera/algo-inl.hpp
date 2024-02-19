@@ -43,7 +43,8 @@ auto indirect_rearrange(T data_begin, T data_end, U indices_begin, std::unique_p
     return buf;
 }
 
-template <typename T, typename Pred> auto duplicates(T first, T last, Pred&& pred) -> std::vector<T>
+template <typename T, typename Pred>
+auto duplicates(T first, T last, Pred&& pred) -> std::vector<T>
 {
     std::vector<T> ret;
 
@@ -73,7 +74,8 @@ auto duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value
     return ret;
 }
 
-template <typename T, typename Pred> auto excess_duplicates(T first, T last, Pred&& pred) -> std::vector<T>
+template <typename T, typename Pred>
+auto excess_duplicates(T first, T last, Pred&& pred) -> std::vector<T>
 {
     std::vector<T> ret;
 

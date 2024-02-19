@@ -11,7 +11,10 @@ kcal:
 
 
 leg_extension:
-    weight 100kg ; reps 5s10r ; rpe 10;
+    weight 100kg ; reps 5s10r ; rpe 10; distance brown;
+   
+neck_bridge:
+	reps 2s10r; reps 50s10r; weight 100g;
 
 shoulder_press:
     weight 60kg ; reps 5s10r ; rpe 8; #comment

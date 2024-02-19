@@ -13,7 +13,8 @@ namespace algo
  * @return Vector of pointers to elements that appear more than once, including
  * the first ones.
  */
-template <typename T, typename Pred> auto duplicates(T first, T last, Pred&& pred) -> std::vector<T>;
+template <typename T, typename Pred>
+auto duplicates(T first, T last, Pred&& pred) -> std::vector<T>;
 
 /**
  * @brief Find duplicate elements in a sorted range in ascending order.
@@ -30,7 +31,8 @@ auto duplicates_v(T first, T last, Pred&& pred) -> std::vector<typename T::value
  * @return Vector of pointers to elements that appear more than once, excluding
  * the first ones.
  */
-template <typename T, typename Pred> auto excess_duplicates(T first, T last, Pred&& pred) -> std::vector<T>;
+template <typename T, typename Pred>
+auto excess_duplicates(T first, T last, Pred&& pred) -> std::vector<T>;
 
 /**
  * @brief  Find excess duplicate elements in a sorted range in ascending order.

@@ -4,27 +4,32 @@
 #endif
 // clang-format on
 
-template <> inline auto lexer::lex_token<token::COLON>(std::string_view* dest) -> bool
+template <>
+inline auto lexer::lex_token<token::COLON>(std::string_view* dest) -> bool
 {
     return match_literal(":", dest);
 }
 
-template <> inline auto lexer::lex_token<token::SEMICOLON>(std::string_view* dest) -> bool
+template <>
+inline auto lexer::lex_token<token::SEMICOLON>(std::string_view* dest) -> bool
 {
     return match_literal(";", dest);
 }
 
-template <> inline auto lexer::lex_token<token::KW_ATTR>(std::string_view* dest) -> bool
+template <>
+inline auto lexer::lex_token<token::KW_ATTR>(std::string_view* dest) -> bool
 {
     return match_literal("attr", dest);
 }
 
-template <> inline auto lexer::lex_token<token::KW_VAR>(std::string_view* dest) -> bool
+template <>
+inline auto lexer::lex_token<token::KW_VAR>(std::string_view* dest) -> bool
 {
     return match_literal("var", dest);
 }
 
-template <> inline auto lexer::lex_token<token::IDENT>(std::string_view* dest) -> bool
+template <>
+inline auto lexer::lex_token<token::IDENT>(std::string_view* dest) -> bool
 {
     std::cmatch match;
     if (!std::regex_search(
@@ -45,13 +50,15 @@ template <> inline auto lexer::lex_token<token::IDENT>(std::string_view* dest) -
     return true;
 }
 
-template <> inline auto lexer::lex_token<lexer::SKIPWS>(std::string_view*) -> bool
+template <>
+inline auto lexer::lex_token<lexer::SKIPWS>(std::string_view*) -> bool
 {
     skipws();
     return true;
 }
 
-template <int tok> auto lexer::lex_token(std::string_view* dest) -> bool
+template <int tok>
+auto lexer::lex_token(std::string_view* dest) -> bool
 {
     std::cmatch match;
     if (!std::regex_search(

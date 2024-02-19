@@ -2,12 +2,12 @@
 
 #include "logera/sema.hpp"
 
-#include <vector>
-
 /**
- * @brief Sorts the files by name and removes duplicates.
+ * @brief Checks that all 'DATE_NODE's are unique, valid, once per file,
+ * sorted according to filename and first in the file.
  */
-struct date_pass
+struct date_pass : sema::pass_base<date_pass>
 {
-    void operator()(sema::split_trees& trees, std::vector<error::record>& errors) const;
+    using sema::pass_base<date_pass>::pass_base;
+    void run(); // 7
 };

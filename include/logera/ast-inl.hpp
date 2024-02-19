@@ -9,7 +9,8 @@
 namespace ast
 {
 
-template <node T> auto get_source_location(T const& target) -> token::source_location
+template <node T>
+auto get_source_location(T const& target) -> token::source_location
 {
     auto const& impl = overloaded{
         [](multifile_node const& tgt) -> token::source_location { return get_source_location(tgt.children.front()); },
