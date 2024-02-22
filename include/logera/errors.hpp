@@ -37,6 +37,7 @@ enum code
     SEMA_NO_VARIABLES_DECLARED,
     SEMA_REGCOMP_FAILED,
     SEMA_REGEX_MISMATCH,
+    SEMA_DUPLICATE_ATTR_NAME_IN_ENTRY,
 
     _CODE_COUNT
 };
@@ -71,7 +72,8 @@ inline char const* const fmts[_CODE_COUNT] = {
     "no attributes declared",
     "no variables declared",
     "[%s] (l:%d, c:%d) failed to compile regex: \'%s\', for attr: \'%s\'. %s",
-    "[%s] (l:%d, c:%d) regex mismatch for attribute: \'%s\', value: \'%s\'"
+    "[%s] (l:%d, c:%d) regex mismatch for attribute: \'%s\', value: \'%s\'",
+    "[%s] (l:%d, c:%d) duplicate attribute name \'%s\' encountered in entry"
 };
 // clang-format on
 

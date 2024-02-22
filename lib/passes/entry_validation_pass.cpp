@@ -230,15 +230,15 @@ void entry_validation_pass::report_undeclared_attr_for_var(
 
 void entry_validation_pass::report_regex_mismatch(ast::ident_value_pair_node const& ivp)
 {
-    auto const location = ast::get_source_location(ivp);
+    auto const location = ivp.attr_value.record.location;
 
     errors().emplace_back(
         error::code::SEMA_REGEX_MISMATCH,
         location.filename,
         location.line,
         location.column,
-        ivp.attr_value.record.lexeme.data(),
-        ivp.identifier.record.lexeme.data());
+        ivp.identifier.record.lexeme.data(),
+        ivp.attr_value.record.lexeme.data());
 }
 
 void entry_validation_pass::report_undeclared_attr_globally(ast::identifier_node const& attr)
