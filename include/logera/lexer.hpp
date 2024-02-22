@@ -64,7 +64,7 @@ public:
     auto get_location(char const* cursor) const -> token::source_location;
     auto get_filename() const -> char const*;
     auto get_line_nr(char const* cursor) const -> int;
-    auto get_column_nr(char const* cursor) const -> int;
+    auto get_column_nr(char const* cursor) const -> int; // treats tabs as single char
 
     /**
      * @brief Returns the number of bytes remaining in the input buffer,

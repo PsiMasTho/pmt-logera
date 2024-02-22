@@ -2,6 +2,7 @@
 
 #include "logera/passes/date_pass.hpp"
 #include "logera/passes/decl_var_val_check_pass.hpp"
+#include "logera/passes/dup_entry_val_check_pass.hpp"
 #include "logera/passes/entry_creation_pass.hpp"
 #include "logera/passes/entry_validation_pass.hpp"
 #include "logera/passes/file_sort_pass.hpp"
@@ -22,7 +23,8 @@ auto apply_all_passes(split_trees trees, std::vector<error::record>& errors) -> 
         rm_dup_decl_vals_pass,
         decl_var_val_check_pass,
         date_pass,
-        entry_validation_pass>(trees, errors);
+        entry_validation_pass,
+        dup_entry_val_check_pass>(trees, errors);
 }
 
 } // namespace sema

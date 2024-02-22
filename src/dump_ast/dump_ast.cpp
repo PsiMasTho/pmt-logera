@@ -109,6 +109,11 @@ void print_ast(ast::multifile_node const& multifile)
             printf("ident_value_pair_node:\n");
             indent();
             print_indent();
+            printf(
+                "- location: (l:%d, c:%d)\n",
+                n.identifier.record.location.line,
+                n.identifier.record.location.column);
+            print_indent();
             printf("- identifier: %s\n", n.identifier.record.lexeme.data());
             print_indent();
             printf("- attr_value: %s\n", n.attr_value.record.lexeme.data());
