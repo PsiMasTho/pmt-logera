@@ -76,7 +76,7 @@ static void test_readallf_big()
     string                buffer;
     vector<error::record> errors;
 
-    assert(!io::readallf(path, buffer, errors).empty());
+    assert(io::readallf(path, buffer, errors));
     assert(buffer.size() == orig_contents.size());
     assert(errors.empty());
     assert(buffer == orig_contents);
@@ -93,7 +93,7 @@ static void test_readallf()
     string                buffer;
     vector<error::record> errors;
 
-    assert(!io::readallf(path, buffer, errors).empty());
+    assert(io::readallf(path, buffer, errors));
     assert(buffer.size() == orig_contents.size());
     assert(errors.empty());
 
