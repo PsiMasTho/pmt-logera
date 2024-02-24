@@ -148,7 +148,7 @@ void entry_validation_pass::report_undeclared_var_in_entry(ast::entry_node const
 
     auto const location = ast::get_source_location(entry.identifier);
 
-    if (*min_lev > sema::SIMILAR_LEV)
+    if (min_lev == m_lev_distances.end() || *min_lev > sema::SIMILAR_LEV)
     {
         errors().emplace_back(
             error::code::SEMA_UNDECLARED_VAR_IN_ENTRY,
@@ -260,7 +260,7 @@ void entry_validation_pass::report_undeclared_attr_globally(ast::identifier_node
 
     auto const location = ast::get_source_location(attr);
 
-    if (*min_lev > sema::SIMILAR_LEV)
+    if (min_lev == m_lev_distances.end() || *min_lev > sema::SIMILAR_LEV)
     {
         errors().emplace_back(
             error::code::SEMA_UNDECLARED_ATTR_IN_ENTRY_GLOBAL,

@@ -3,12 +3,13 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "csv_emitter.hpp"
+#include "csv.hpp"
 #include "logera/algo.hpp"
 
 #include <algorithm>
 #include <numeric> // iota
 #include <ostream>
+#include <string_view>
 #include <utility>
 
 using namespace std;
@@ -19,12 +20,12 @@ namespace
 // be enclosed in double quotes under certain
 // circumstances, for our format, we only
 // need to check for a comma.
-constexpr auto needs_quotes(string const& str) -> bool
+auto needs_quotes(string_view const str) -> bool
 {
-    return str.find(',') != string::npos;
+    return str.find(',') != string_view::npos;
 }
 
-constexpr auto get_width(string const& str) -> int
+auto get_width(string_view const str) -> int
 {
     int const width = static_cast<int>(str.size());
     return width + (needs_quotes(str) ? 2 : 0);
@@ -53,12 +54,12 @@ auto get_field_unaligned(string& field) -> string&
     return field;
 }
 
-auto get_field_aligned(string& field, int width) -> string
+auto get_field_aligned(string& field, int width) -> string&
 {
     return pad(get_field_unaligned(field), width);
 }
 
-void sort_cols_by_width(vector<csv_emitter::row_t>& rows, vector<int>& col_max_width, size_t skip)
+void sort_cols_by_width(vector<csv::row>& rows, vector<int>& col_max_width, size_t skip)
 {
     auto const width_beg = col_max_width.begin() + skip;
 
@@ -75,19 +76,22 @@ void sort_cols_by_width(vector<csv_emitter::row_t>& rows, vector<int>& col_max_w
 
     // apply indices to rows
     for (auto& row : rows)
-        cache = algo::indirect_rearrange(row.begin() + skip, row.end(), indices.begin(), move(cache));
+        cache = algo::indirect_rearrange(row.begin() + skip, row.end(), indices.begin(), std::move(cache));
 }
 
 } // namespace
 
-csv_emitter::csv_emitter(flags f)
+namespace csv
+{
+
+emitter::emitter(flags f)
     : m_flags{ f }
     , m_col_max_width{}
     , m_rows{}
 {
 }
 
-void csv_emitter::emit(ostream& os)
+void emitter::emit(ostream& os)
 {
     // only sort the attribute columns (skip first 3)
     if (m_flags & SORT_COLS_BY_WIDTH)
@@ -99,43 +103,49 @@ void csv_emitter::emit(ostream& os)
         emit_unaligned(os);
 }
 
-void csv_emitter::add_row(row_t row)
+void emitter::add_row(row row)
 {
     update_col_widths(row);
-    m_rows.push_back(move(row));
+    m_rows.push_back(std::move(row));
 }
 
-void csv_emitter::emit_unaligned(ostream& os)
+void emitter::emit_unaligned(ostream& os)
 {
     for (auto& row : m_rows)
-        emit_row_unaligned(os, std::move(row));
+        emit_row_unaligned(os, row);
 }
 
-void csv_emitter::emit_aligned(ostream& os)
+void emitter::emit_aligned(ostream& os)
 {
     for (auto& row : m_rows)
-        emit_row_aligned(os, std::move(row));
+        emit_row_aligned(os, row);
 }
 
-void csv_emitter::emit_row_unaligned(ostream& os, row_t row)
+void emitter::emit_row_unaligned(ostream& os, row const& row)
 {
     string delim;
-    for (auto str : row)
-        os << exchange(delim, ",") << get_field_unaligned(str);
+    for (auto const str : row)
+    {
+        string field(str);
+        os << exchange(delim, ",") << get_field_unaligned(field);
+    }
 
     os << '\n';
 }
 
-void csv_emitter::emit_row_aligned(ostream& os, row_t row)
+void emitter::emit_row_aligned(ostream& os, row const& row)
 {
     string delim;
     for (size_t i = 0; i < row.size(); ++i)
-        os << exchange(delim, ",") << get_field_aligned(row[i], m_col_max_width[i]);
+    {
+        string field(row[i]);
+        os << exchange(delim, ",") << get_field_aligned(field, m_col_max_width[i]);
+    }
 
     os << '\n';
 }
 
-void csv_emitter::update_col_widths(row_t const& row)
+void emitter::update_col_widths(row const& row)
 {
     // resize vec if needed
     m_col_max_width.resize(max(m_col_max_width.size(), row.size()), 0);
@@ -144,3 +154,5 @@ void csv_emitter::update_col_widths(row_t const& row)
     for (size_t i = 0; i < row.size(); ++i)
         m_col_max_width[i] = max(m_col_max_width[i], get_width(row[i]));
 }
+
+} // namespace csv

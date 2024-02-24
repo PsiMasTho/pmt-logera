@@ -20,7 +20,6 @@ class ArgumentParser;
 struct program_opts
 {
     explicit program_opts(argparse::ArgumentParser const& cmdl);
-    program_opts();
 
     bool                                                   align;
     bool                                                   verbose;

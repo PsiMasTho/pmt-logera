@@ -20,7 +20,7 @@ using namespace std;
 namespace
 {
 
-vector<filesystem::path> path_vec_from_args(argparse::ArgumentParser const& cmdl)
+auto path_vec_from_args(argparse::ArgumentParser const& cmdl) -> vector<filesystem::path>
 {
     bool const specified_d = cmdl.present("--directory").has_value();
     bool const specified_m = cmdl.present("--manual").has_value();
@@ -48,27 +48,27 @@ vector<filesystem::path> path_vec_from_args(argparse::ArgumentParser const& cmdl
     return ret;
 }
 
-bool set_align(argparse::ArgumentParser const& cmdl)
+auto set_align(argparse::ArgumentParser const& cmdl) -> bool
 {
     return cmdl.get<bool>("--align");
 }
 
-bool set_verbose(argparse::ArgumentParser const& cmdl)
+auto set_verbose(argparse::ArgumentParser const& cmdl) -> bool
 {
     return cmdl.get<bool>("--verbose");
 }
 
-bool set_color(argparse::ArgumentParser const& cmdl)
+auto set_color(argparse::ArgumentParser const& cmdl) -> bool
 {
     return cmdl.get<bool>("--color");
 }
 
-bool set_sort_cols_by_width(argparse::ArgumentParser const& cmdl)
+auto set_sort_cols_by_width(argparse::ArgumentParser const& cmdl) -> bool
 {
     return cmdl.get<bool>("--sort-cols-by-width");
 }
 
-unique_ptr<ostream, void (*)(ostream*)> set_output_stream(argparse::ArgumentParser const& cmdl)
+auto set_output_stream(argparse::ArgumentParser const& cmdl) -> unique_ptr<ostream, void (*)(ostream*)>
 {
     if (cmdl.present("--output").has_value())
         return unique_ptr<ostream, void (*)(ostream*)>(
@@ -78,7 +78,7 @@ unique_ptr<ostream, void (*)(ostream*)> set_output_stream(argparse::ArgumentPars
         return unique_ptr<ostream, void (*)(ostream*)>(&cout, [](ostream*) { /* do nothing */ });
 }
 
-string set_output_name(argparse::ArgumentParser const& cmdl)
+auto set_output_name(argparse::ArgumentParser const& cmdl) -> string
 {
     if (cmdl.present("--output").has_value())
         return cmdl.get<string>("--output");
@@ -106,17 +106,6 @@ program_opts::program_opts(argparse::ArgumentParser const& cmdl)
     , output_stream{ set_output_stream(cmdl) }
     , output_name{ set_output_name(cmdl) }
     , input_files{ set_input_files(cmdl) }
-{
-}
-
-program_opts::program_opts()
-    : align{ false }
-    , verbose{ false }
-    , color{ false }
-    , sort_cols_by_width{ false }
-    , output_stream{ &cout, [](ostream*) { /* do nothing */ } }
-    , output_name{ "stdout" }
-    , input_files{}
 {
 }
 
