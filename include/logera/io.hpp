@@ -23,8 +23,8 @@ auto basename_from_path(std::string_view const path) -> std::string_view;
  * @param buffer The buffer to store the file contents in. Will replace the
  * existing contents.
  * @param errors Any errors encountered during reading.
- * @return reference to the buffer.
+ * @return true on success, false on failure.
  */
-auto readallf(char const* path, std::string& buffer, std::vector<error::record>& errors) -> std::string&;
+auto readallf(char const* path, std::string& buffer, std::vector<error::record>& errors) -> bool;
 
 } // namespace io
