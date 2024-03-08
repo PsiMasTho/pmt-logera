@@ -29,11 +29,11 @@ using split_trees = std::tuple<ast::multifile_node*, ast::multifile_node*, ast::
 template <typename Derived>
 class pass_base
 {
-    split_trees                 m_trees;
-    std::vector<error::record>& m_errors;
+    split_trees       m_trees;
+    error::container& m_errors;
 
 public:
-    pass_base(split_trees trees, std::vector<error::record>& errors);
+    pass_base(split_trees trees, error::container& errors);
     void operator()();
 
 protected:
@@ -41,13 +41,13 @@ protected:
     auto decl_attr_root() -> ast::multifile_node&;
     auto decl_var_root() -> ast::multifile_node&;
 
-    auto errors() -> std::vector<error::record>&;
+    auto errors() -> error::container&;
 };
 
 template <typename... Ts>
-auto apply_passes(split_trees trees, std::vector<error::record>& errors) -> bool;
+auto apply_passes(split_trees trees, error::container& errors) -> bool;
 
-auto apply_all_passes(split_trees trees, std::vector<error::record>& errors) -> bool;
+auto apply_all_passes(split_trees trees, error::container& errors) -> bool;
 
 } // namespace sema
 

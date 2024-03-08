@@ -60,9 +60,9 @@ void split_decl_pass::run()
             return;
 
         if constexpr (is_same_v<T, ast::decl_attr_node>)
-            errors().emplace_back(error::code::SEMA_NO_ATTRIBUTES_DECLARED);
+            errors().emplace_back(error::make_record<error::no_attributes_declared>());
         else if constexpr (is_same_v<T, ast::decl_var_node>)
-            errors().emplace_back(error::code::SEMA_NO_VARIABLES_DECLARED);
+            errors().emplace_back(error::make_record<error::no_variables_declared>());
     };
 
     impl.operator()<ast::decl_attr_node>();

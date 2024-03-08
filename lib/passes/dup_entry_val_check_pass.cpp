@@ -26,12 +26,10 @@ void dup_entry_val_check_pass::run()
                 if (!encountered.insert(to_string_view(ivp.identifier.record.lexeme)).second)
                 {
                     auto const location = ivp.identifier.record.location;
-                    errors().emplace_back(
-                        error::code::SEMA_DUPLICATE_ATTR_NAME_IN_ENTRY,
-                        location.filename,
-                        location.line,
-                        location.column,
-                        ivp.identifier.record.lexeme.data());
+
+                    errors().emplace_back(error::make_record<error::duplicate_attr_name_in_entry>(
+                        location,
+                        ivp.identifier.record.lexeme.data()));
                 }
             }
         }

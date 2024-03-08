@@ -43,7 +43,7 @@ public:
     /**
      * @brief Tries to lex a sequence of tokens.
      * @param dests Tuple of non-owning pointers to the destination
-     * string_views. Will be ignored if nullptr.
+     * string_views. Individual string_view be ignored if nullptr.
      */
     template <int... toks>
     auto lex_tokens(typename meta::repeat_tuple<sizeof...(toks), std::string_view*>::type dests) -> bool;

@@ -3,15 +3,17 @@
 #include "ast.hpp"
 #include "errors.hpp"
 #include "lexer.hpp"
+#include "logera/tokens.hpp"
+#include "tokens.hpp"
 
 class parser
 {
     lexer&                          m_lexer;
     flyweight_string::storage_type& m_storage;
-    std::vector<error::record>&     m_errors;
+    error::container&               m_errors;
 
 public:
-    parser(lexer& lexer, flyweight_string::storage_type& storage, std::vector<error::record>& errors);
+    parser(lexer& lexer, flyweight_string::storage_type& storage, error::container& errors);
 
     auto parse() -> ast::file_node;
 
@@ -31,3 +33,17 @@ private:
     auto parse_ident_value_pair_list(ast::ident_value_pair_list_node* dest) -> ast::ident_value_pair_list_node*;
     auto parse_ident_value_pair(ast::ident_value_pair_node* dest) -> ast::ident_value_pair_node*;
 };
+
+namespace error
+{
+
+struct unexpected_token : with_column, with_unformatted_msg
+{
+    unexpected_token(token::source_location location)
+        : with_column{ location.filename, location.line, location.column }
+        , with_unformatted_msg{ "unexpected token" }
+    {
+    }
+};
+
+} // namespace error

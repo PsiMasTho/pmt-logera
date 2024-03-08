@@ -1,5 +1,6 @@
 #pragma once
 
+#include "logera/errors.hpp"
 #include "logera/sema.hpp"
 
 /**
@@ -11,3 +12,17 @@ struct file_sort_pass : sema::pass_base<file_sort_pass>
     using sema::pass_base<file_sort_pass>::pass_base;
     void run(); // 1
 };
+
+namespace error
+{
+
+struct duplicate_filename : with_filename, with_unformatted_msg
+{
+    duplicate_filename(std::string_view const filename)
+        : with_filename(filename)
+        , with_unformatted_msg("duplicate filename encountered")
+    {
+    }
+};
+
+} // namespace error

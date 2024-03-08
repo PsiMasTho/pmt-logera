@@ -17,7 +17,7 @@ void file_sort_pass::run()
         [](auto const& lhs, auto const& rhs) { return lhs.filename == rhs.filename; });
 
     for (auto const& excess_dupe : excess_dupes)
-        errors().emplace_back(error::code::SEMA_DUPLICATE_FILENAME, excess_dupe->filename.c_str());
+        errors().emplace_back(error::make_record<error::duplicate_filename>(excess_dupe->filename));
 
     // erase excess dupes from ast
     sort(begin(excess_dupes), end(excess_dupes), [](auto const& lhs, auto const& rhs) { return lhs > rhs; });

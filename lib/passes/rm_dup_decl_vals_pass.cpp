@@ -7,6 +7,21 @@
 
 using namespace std;
 
+template <typename T>
+struct error_type_selector;
+
+template <>
+struct error_type_selector<ast::decl_attr_node>
+{
+    using type = error::duplicate_attr_value;
+};
+
+template <>
+struct error_type_selector<ast::decl_var_node>
+{
+    using type = error::duplicate_var_value;
+};
+
 void rm_dup_decl_vals_pass::run()
 {
     auto const impl = [this]<ast::decl_node T>
@@ -44,13 +59,9 @@ void rm_dup_decl_vals_pass::run()
                 for (auto const& excess_dupe : excess_dupes)
                 {
                     auto const location = ast::get_source_location(*excess_dupe);
-                    errors().emplace_back(
-                        is_same_v<T, ast::decl_attr_node> ? error::SEMA_DUPLICATE_ATTR_VALUE
-                                                          : error::SEMA_DUPLICATE_VAR_VALUE,
-                        location.filename,
-                        location.line,
-                        location.column,
-                        excess_dupe->record.lexeme.data());
+                    errors().emplace_back(error::make_record<typename error_type_selector<T>::type>(
+                        location,
+                        to_string_view(excess_dupe->record.lexeme)));
                 }
 
                 // sort excess dupes in reverse by address to allow erasing

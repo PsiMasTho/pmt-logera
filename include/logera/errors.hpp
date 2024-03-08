@@ -1,88 +1,102 @@
 #pragma once
 
-#include <cstdarg>
-#include <string>
+#include <memory>
+#include <optional>
+#include <string_view>
+#include <type_traits>
+#include <vector>
 
 namespace error
 {
 
-enum code
+struct record_base
 {
-    IO_CANNOT_OPEN_FILE,
-    IO_CANNOT_READ_FILE,
+    auto filename() const -> std::optional<std::string_view>;
+    auto line() const -> std::optional<int>;
+    auto column() const -> std::optional<int>;
+    auto msg() const -> std::optional<std::string_view>;
 
-    PARSER_UNEXPECTED_TOKEN,
+    virtual ~record_base() = default;
 
-    SEMA_DUPLICATE_FILENAME,
-    SEMA_DATE_NOT_IN_FILENAME_ORDER,
-    SEMA_INVALID_DATE,
-    SEMA_VALUE_LIST_WITHOUT_IDENT,
-    SEMA_MULTIPLE_DATES,
-    SEMA_DATE_NOT_FIRST_IN_FILE,
-    SEMA_NO_DATE_BEFORE_ENTRY,
-    SEMA_IDENT_WITHOUT_VALUE_LIST,
-    SEMA_UNDECLARED_ATTR_IN_DECL,
-    SEMA_UNDECLARED_ATTR_IN_DECL_W_HINT,
-    SEMA_UNDECLARED_ATTR_IN_ENTRY_LOCAL,
-    SEMA_UNDECLARED_ATTR_IN_ENTRY_LOCAL_W_HINT,
-    SEMA_UNDECLARED_ATTR_IN_ENTRY_GLOBAL,
-    SEMA_UNDECLARED_ATTR_IN_ENTRY_GLOBAL_W_HINT,
-    SEMA_UNDECLARED_VAR_IN_ENTRY,
-    SEMA_UNDECLARED_VAR_IN_ENTRY_W_HINT,
-    SEMA_DUPLICATE_ATTR,
-    SEMA_DUPLICATE_VAR,
-    SEMA_DUPLICATE_ATTR_VALUE,
-    SEMA_DUPLICATE_VAR_VALUE,
-    SEMA_NO_ATTRIBUTES_DECLARED,
-    SEMA_NO_VARIABLES_DECLARED,
-    SEMA_REGCOMP_FAILED,
-    SEMA_REGEX_MISMATCH,
-    SEMA_DUPLICATE_ATTR_NAME_IN_ENTRY,
-
-    _CODE_COUNT
+private:
+    virtual auto v_filename() const -> std::optional<std::string_view>;
+    virtual auto v_line() const -> std::optional<int>;
+    virtual auto v_column() const -> std::optional<int>;
+    virtual auto v_msg() const -> std::optional<std::string_view> = 0;
 };
 
-// clang-format off
-inline char const* const fmts[_CODE_COUNT] = {
-    "cannot open file \'%s\'",
-    "error reading file \'%s\'",
-
-    "[%s] (l:%d, c:%d) unexpected token",
-
-    "duplicate filename \'%s\' encountered",
-    "[%s] (l:%d, c:%d) date not in filename order",
-    "[%s] (l:%d, c:%d) invalid date encountered \'%s\'",
-    "[%s] (l:%d, c:%d) value list encountered without identifier",
-    "[%s] (l:%d, c:%d) multiple dates encountered",
-    "[%s] (l:%d, c:%d) date not first in file",
-    "[%s] (l:%d, c:%d) no date encountered before entry",
-    "[%s] (l:%d, c:%d) identifier encountered without value list",
-    "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered in declaration for variable \'%s\'",
-    "[%s] (l:%d, c:%d) undeclared attribute \'%s\' encountered in declaration for variable \'%s\', did you mean \'%s\'?",
-    "[%s] (l:%d, c:%d) attribute \'%s\' has not been declared for variable \'%s\'",
-    "[%s] (l:%d, c:%d) attribute \'%s\' has not been declared for variable \'%s\', did you mean \'%s\'?",
-    "[%s] (l:%d, c:%d) no declaration exists for attribute \'%s\'",
-    "[%s] (l:%d, c:%d) no declaration exists for attribute \'%s\', did you mean \'%s\'?",
-    "[%s] (l:%d, c:%d) undeclared variable \'%s\' encountered in entry",
-    "[%s] (l:%d, c:%d) undeclared variable \'%s\' encountered in entry, did you mean \'%s\'?",
-    "[%s] (l:%d, c:%d) duplicate attribute \'%s\' encountered",
-    "[%s] (l:%d, c:%d) duplicate variable \'%s\' encountered",
-    "[%s] (l:%d, c:%d) duplicate attribute value \'%s\' encountered",
-    "[%s] (l:%d, c:%d) duplicate variable value \'%s\' encountered",
-    "no attributes declared",
-    "no variables declared",
-    "[%s] (l:%d, c:%d) failed to compile regex: \'%s\', for attr: \'%s\'. %s",
-    "[%s] (l:%d, c:%d) regex mismatch for attribute: \'%s\', value: \'%s\'",
-    "[%s] (l:%d, c:%d) duplicate attribute name \'%s\' encountered in entry"
-};
-// clang-format on
-
-struct record
+struct with_filename : virtual public record_base
 {
-    std::string msg;
-    int         code;
+    std::string m_filename;
 
-    record(int code, ...);
+protected:
+    with_filename(std::string_view filename);
+
+private:
+    auto v_filename() const -> std::optional<std::string_view> final;
 };
+
+struct with_line : with_filename
+{
+    int m_line;
+
+protected:
+    with_line(std::string_view filename, int line);
+
+private:
+    auto v_line() const -> std::optional<int> final;
+};
+
+struct with_column : with_line
+{
+    int m_column;
+
+protected:
+    with_column(std::string_view filename, int line, int column);
+
+private:
+    auto v_column() const -> std::optional<int> final;
+};
+
+struct with_formatted_msg : virtual public record_base
+{
+    std::string m_msg;
+
+protected:
+    template <typename... Args>
+    with_formatted_msg(Args&&... args);
+
+private:
+    auto v_msg() const -> std::optional<std::string_view> final;
+};
+
+class with_unformatted_msg : virtual public record_base
+{
+    std::string_view m_msg;
+
+protected:
+    with_unformatted_msg(std::string_view msg);
+
+private:
+    auto v_msg() const -> std::optional<std::string_view> final;
+};
+
+template <typename T>
+concept record = std::is_base_of_v<record_base, T>;
+
+template <record T>
+auto record_cast(record_base const* r) -> T const*;
+
+template <record T>
+auto record_cast(record_base* r) -> T*;
+
+using container = std::vector<std::unique_ptr<record_base>>;
+
+template <record T, typename... Args>
+auto make_record(Args&&... args) -> std::unique_ptr<T>;
+
+auto concat(auto&& first, auto&&... rest) -> std::string;
 
 } // namespace error
+
+#include "errors-inl.hpp"

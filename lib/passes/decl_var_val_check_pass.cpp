@@ -68,25 +68,19 @@ void decl_var_val_check_pass::run()
 
             if (*min_lev > sema::SIMILAR_LEV)
             {
-                errors().emplace_back(
-                    error::code::SEMA_UNDECLARED_ATTR_IN_DECL,
-                    loc.filename,
-                    loc.line,
-                    loc.column,
+                errors().emplace_back(error::make_record<error::undeclared_attr_in_var_decl>(
+                    loc,
                     get<ast::decl_var_node>(*var_decl).children[i].record.lexeme.data(),
-                    get<ast::decl_var_node>(*var_decl).identifier.record.lexeme.data());
+                    get<ast::decl_var_node>(*var_decl).identifier.record.lexeme.data()));
             }
             else
             {
-                errors().emplace_back(
-                    error::code::SEMA_UNDECLARED_ATTR_IN_DECL_W_HINT,
-                    loc.filename,
-                    loc.line,
-                    loc.column,
+                errors().emplace_back(error::make_record<error::undeclared_attr_in_var_decl_w_hint>(
+                    loc,
                     get<ast::decl_var_node>(*var_decl).children[i].record.lexeme.data(),
                     get<ast::decl_var_node>(*var_decl).identifier.record.lexeme.data(),
                     get<ast::decl_attr_node>(*flattened_decl_attrs[distance(begin(distances), min_lev)])
-                        .identifier.record.lexeme.data());
+                        .identifier.record.lexeme.data()));
             }
 
             // remove invalid value

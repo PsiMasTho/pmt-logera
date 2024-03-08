@@ -3,7 +3,7 @@
 #include "errors.hpp"
 
 #include <string>
-#include <vector>
+#include <string_view>
 
 namespace io
 {
@@ -25,6 +25,30 @@ auto basename_from_path(std::string_view const path) -> std::string_view;
  * @param errors Any errors encountered during reading.
  * @return true on success, false on failure.
  */
-auto readallf(char const* path, std::string& buffer, std::vector<error::record>& errors) -> bool;
+auto readallf(char const* path, std::string& buffer, error::container& errors) -> bool;
 
 } // namespace io
+
+namespace error
+{
+
+struct cannot_open_file : with_filename, with_unformatted_msg
+{
+public:
+    cannot_open_file(std::string_view const path)
+        : with_filename(path)
+        , with_unformatted_msg("cannot open file")
+    {
+    }
+};
+
+struct failed_reading_file : with_filename, with_unformatted_msg
+{
+    failed_reading_file(std::string_view const path)
+        : with_filename(path)
+        , with_unformatted_msg("failed reading file")
+    {
+    }
+};
+
+} // namespace error

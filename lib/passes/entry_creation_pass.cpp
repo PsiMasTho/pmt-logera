@@ -1,4 +1,6 @@
 #include "logera/passes/entry_creation_pass.hpp"
+#include "logera/errors.hpp"
+#include "logera/tokens.hpp"
 
 #include <cassert>
 
@@ -20,11 +22,7 @@ void entry_creation_pass::run()
 
             if (cur_node != ast::file_node::child_index_v<ast::ident_value_pair_list_node>
                 && prev_node == ast::file_node::child_index_v<ast::identifier_node>)
-                errors().emplace_back(
-                    error::code::SEMA_IDENT_WITHOUT_VALUE_LIST,
-                    prev_location.filename,
-                    prev_location.line,
-                    prev_location.column);
+                errors().emplace_back(error::make_record<error::ident_without_value_list>(prev_location));
 
             visit(
                 overloaded{ [&](ast::date_node& n)
@@ -49,10 +47,7 @@ void entry_creation_pass::run()
                                 {
                                     if (!value_list_without_ident_reported)
                                         errors().emplace_back(
-                                            error::code::SEMA_VALUE_LIST_WITHOUT_IDENT,
-                                            cur_location.filename,
-                                            cur_location.line,
-                                            cur_location.column);
+                                            error::make_record<error::value_list_without_ident>(cur_location));
                                     value_list_without_ident_reported = true;
                                 }
                                 else

@@ -1,7 +1,11 @@
 #include "logera/passes/date_pass.hpp"
 
 #include <cassert>
+#include <cstdio>
 #include <cstring>
+#include <string>
+#include <string_view>
+#include "logera/errors.hpp"
 
 using namespace std;
 
@@ -52,63 +56,43 @@ void date_pass::run()
             auto const cur_location = visit([](auto const& n) { return ast::get_source_location(n); }, child);
 
             visit(
-                overloaded{ [&](ast::date_node& n)
+                overloaded{
+                    [&](ast::date_node& n)
+                    {
+                        ++n_dates_encountered;
+                        if (prev_node != -1)
+                            errors().emplace_back(error::make_record<error::date_not_first_in_file>(cur_location));
+                        if (!is_valid_date(n.record.lexeme.data()))
+                            errors().emplace_back(
+                                error::make_record<error::invalid_date>(cur_location, to_string_view(n.record.lexeme)));
+                        if (prev_date && !date_not_in_filename_order_reported)
+                        {
+                            if (strcmp(prev_date->data(), n.record.lexeme.data()) > 0)
                             {
-                                ++n_dates_encountered;
-                                if (prev_node != -1)
-                                    errors().emplace_back(
-                                        error::code::SEMA_DATE_NOT_FIRST_IN_FILE,
-                                        cur_location.filename,
-                                        cur_location.line,
-                                        cur_location.column);
-                                if (!is_valid_date(n.record.lexeme.data()))
-                                    errors().emplace_back(
-                                        error::code::SEMA_INVALID_DATE,
-                                        cur_location.filename,
-                                        cur_location.line,
-                                        cur_location.column,
-                                        n.record.lexeme.data());
-                                if (prev_date && !date_not_in_filename_order_reported)
-                                {
-                                    if (strcmp(prev_date->data(), n.record.lexeme.data()) > 0)
-                                    {
-                                        errors().emplace_back(
-                                            error::code::SEMA_DATE_NOT_IN_FILENAME_ORDER,
-                                            cur_location.filename,
-                                            cur_location.line,
-                                            cur_location.column);
-                                        date_not_in_filename_order_reported = true;
-                                    }
-                                }
-                                if (n_dates_encountered > 1)
-                                {
-                                    errors().emplace_back(
-                                        error::code::SEMA_MULTIPLE_DATES,
-                                        cur_location.filename,
-                                        cur_location.line,
-                                        cur_location.column);
-
-                                    excess_dates.push_back(&child);
-
-                                    return;
-                                }
-                                prev_date = &n.record.lexeme;
-                            },
-                            [&](ast::entry_node&)
-                            {
-                                if (n_dates_encountered == 0 && !no_date_before_entry_reported)
-                                {
-                                    errors().emplace_back(
-                                        error::code::SEMA_NO_DATE_BEFORE_ENTRY,
-                                        cur_location.filename,
-                                        cur_location.line,
-                                        cur_location.column);
-                                    no_date_before_entry_reported = true;
-                                }
-                            },
-                            [&](auto const&) { /*unreachable*/
-                                               assert(false);
-                            } },
+                                errors().emplace_back(
+                                    error::make_record<error::date_not_in_filename_order>(cur_location));
+                                date_not_in_filename_order_reported = true;
+                            }
+                        }
+                        if (n_dates_encountered > 1)
+                        {
+                            errors().emplace_back(error::make_record<error::multiple_dates>(cur_location));
+                            excess_dates.push_back(&child);
+                            return;
+                        }
+                        prev_date = &n.record.lexeme;
+                    },
+                    [&](ast::entry_node&)
+                    {
+                        if (n_dates_encountered == 0 && !no_date_before_entry_reported)
+                        {
+                            errors().emplace_back(error::make_record<error::no_date_before_entry>(cur_location));
+                            no_date_before_entry_reported = true;
+                        }
+                    },
+                    [&](auto const&) { /*unreachable*/
+                                       assert(false);
+                    } },
                 child);
             prev_node = cur_node;
         }

@@ -1,8 +1,13 @@
 #include "logera/passes/entry_validation_pass.hpp"
 
+#include "logera/errors.hpp"
+#include "logera/tokens.hpp"
 #include "pass_util.hpp"
 
 #include <algorithm>
+#include <cstring>
+#include <string>
+#include <string_view>
 
 using namespace std;
 
@@ -103,14 +108,12 @@ void entry_validation_pass::construct_matchers()
             catch (regex_error const& e)
             {
                 auto const location = ast::get_source_location(value);
-                errors().emplace_back(
-                    error::code::SEMA_REGCOMP_FAILED,
-                    location.filename,
-                    location.line,
-                    location.column,
+
+                errors().emplace_back(error::make_record<error::regcomp_failed>(
+                    location,
                     value.record.lexeme.data(),
                     get<ast::decl_attr_node>(*attr).identifier.record.lexeme.data(),
-                    e.what());
+                    e.what()));
             }
             // let other exceptions propagate
         }
@@ -151,22 +154,15 @@ void entry_validation_pass::report_undeclared_var_in_entry(ast::entry_node const
     if (min_lev == m_lev_distances.end() || *min_lev > sema::SIMILAR_LEV)
     {
         errors().emplace_back(
-            error::code::SEMA_UNDECLARED_VAR_IN_ENTRY,
-            location.filename,
-            location.line,
-            location.column,
-            entry.identifier.record.lexeme.data());
+            error::make_record<error::undeclared_var_in_entry_global>(location, entry.identifier.record.lexeme.data()));
     }
     else
     {
-        errors().emplace_back(
-            error::code::SEMA_UNDECLARED_VAR_IN_ENTRY_W_HINT,
-            location.filename,
-            location.line,
-            location.column,
+        errors().emplace_back(error::make_record<error::undeclared_var_in_entry_global_w_hint>(
+            location,
             entry.identifier.record.lexeme.data(),
             get<ast::decl_var_node>(*m_flat_vars[distance(m_lev_distances.begin(), min_lev)])
-                .identifier.record.lexeme.data());
+                .identifier.record.lexeme.data()));
     }
 }
 
@@ -207,24 +203,18 @@ void entry_validation_pass::report_undeclared_attr_for_var(
 
     if (*min_lev > sema::SIMILAR_LEV)
     {
-        errors().emplace_back(
-            error::code::SEMA_UNDECLARED_ATTR_IN_ENTRY_LOCAL,
-            location.filename,
-            location.line,
-            location.column,
+        errors().emplace_back(error::make_record<error::undeclared_attr_in_entry_local>(
+            location,
             attr.record.lexeme.data(),
-            var.record.lexeme.data());
+            var.record.lexeme.data()));
     }
     else
     {
-        errors().emplace_back(
-            error::code::SEMA_UNDECLARED_ATTR_IN_ENTRY_LOCAL_W_HINT,
-            location.filename,
-            location.line,
-            location.column,
+        errors().emplace_back(error::make_record<error::undeclared_attr_in_entry_local_w_hint>(
+            location,
             attr.record.lexeme.data(),
             var.record.lexeme.data(),
-            var_decl.children[distance(m_lev_distances.begin(), min_lev)].record.lexeme.data());
+            var_decl.children[distance(m_lev_distances.begin(), min_lev)].record.lexeme.data()));
     }
 }
 
@@ -232,13 +222,10 @@ void entry_validation_pass::report_regex_mismatch(ast::ident_value_pair_node con
 {
     auto const location = ivp.attr_value.record.location;
 
-    errors().emplace_back(
-        error::code::SEMA_REGEX_MISMATCH,
-        location.filename,
-        location.line,
-        location.column,
+    errors().emplace_back(error::make_record<error::regex_mismatch>(
+        location,
         ivp.identifier.record.lexeme.data(),
-        ivp.attr_value.record.lexeme.data());
+        ivp.attr_value.record.lexeme.data()));
 }
 
 void entry_validation_pass::report_undeclared_attr_globally(ast::identifier_node const& attr)
@@ -263,22 +250,15 @@ void entry_validation_pass::report_undeclared_attr_globally(ast::identifier_node
     if (min_lev == m_lev_distances.end() || *min_lev > sema::SIMILAR_LEV)
     {
         errors().emplace_back(
-            error::code::SEMA_UNDECLARED_ATTR_IN_ENTRY_GLOBAL,
-            location.filename,
-            location.line,
-            location.column,
-            attr.record.lexeme.data());
+            error::make_record<error::undeclared_attr_in_entry_global>(location, to_string_view(attr.record.lexeme)));
     }
     else
     {
-        errors().emplace_back(
-            error::code::SEMA_UNDECLARED_ATTR_IN_ENTRY_GLOBAL_W_HINT,
-            location.filename,
-            location.line,
-            location.column,
+        errors().emplace_back(error::make_record<error::undeclared_attr_in_entry_global_w_hint>(
+            location,
             attr.record.lexeme.data(),
             get<ast::decl_attr_node>(*m_flat_attrs[distance(m_lev_distances.begin(), min_lev)])
-                .identifier.record.lexeme.data());
+                .identifier.record.lexeme.data()));
     }
 }
 

@@ -11,7 +11,7 @@ namespace sema
 {
 
 template <typename Derived>
-pass_base<Derived>::pass_base(split_trees trees, std::vector<error::record>& errors)
+pass_base<Derived>::pass_base(split_trees trees, error::container& errors)
     : m_trees{ trees }
     , m_errors{ errors }
 {
@@ -46,13 +46,13 @@ auto pass_base<Derived>::decl_var_root() -> ast::multifile_node&
 }
 
 template <typename Derived>
-auto pass_base<Derived>::errors() -> std::vector<error::record>&
+auto pass_base<Derived>::errors() -> error::container&
 {
     return m_errors;
 }
 
 template <typename... Ts>
-auto apply_passes(split_trees trees, std::vector<error::record>& errors) -> bool
+auto apply_passes(split_trees trees, error::container& errors) -> bool
 {
     auto const errors_before = errors.size();
     (Ts{ trees, errors }(), ...);

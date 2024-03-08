@@ -5,6 +5,21 @@
 
 using namespace std;
 
+template <typename T>
+struct error_type_selector;
+
+template <>
+struct error_type_selector<ast::decl_attr_node>
+{
+    using type = error::duplicate_attr_decl;
+};
+
+template <>
+struct error_type_selector<ast::decl_var_node>
+{
+    using type = error::duplicate_var_decl;
+};
+
 void merge_dup_decl_pass::run()
 {
     auto const impl = [this]<ast::decl_node T>
@@ -32,12 +47,9 @@ void merge_dup_decl_pass::run()
         for (auto const& excess_dupe : excess_dupes)
         {
             auto const location = ast::get_source_location(get<T>(*excess_dupe));
-            errors().emplace_back(
-                is_same_v<T, ast::decl_attr_node> ? error::SEMA_DUPLICATE_ATTR : error::SEMA_DUPLICATE_VAR,
-                location.filename,
-                location.line,
-                location.column,
-                (get<T>(*excess_dupe)).identifier.record.lexeme.data());
+            errors().emplace_back(error::make_record<typename error_type_selector<T>::type>(
+                location,
+                to_string_view(get<T>(*excess_dupe).identifier.record.lexeme)));
         }
 
         auto dupes = algo::duplicates_v(
