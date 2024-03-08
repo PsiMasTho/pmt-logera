@@ -23,7 +23,7 @@ struct program_opts
 
     bool                                                   align;
     bool                                                   verbose;
-    bool                                                   color;
+    bool                                                   full_paths;
     bool                                                   sort_cols_by_width;
     std::unique_ptr<std::ostream, void (*)(std::ostream*)> output_stream; // stdout or file
     std::string                                            output_name;   // name of output file or "stdout"

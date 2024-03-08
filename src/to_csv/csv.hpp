@@ -7,10 +7,21 @@
 
 #include <iosfwd>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace csv
 {
+
+template <typename T>
+concept row_iterator = requires(T t) {
+    {
+        *t
+    } -> std::convertible_to<std::string_view>;
+    {
+        ++t
+    };
+};
 
 enum flags
 {
@@ -19,30 +30,40 @@ enum flags
     SORT_COLS_BY_WIDTH = 1u << 2
 };
 
-using row = std::vector<char const*>;
-
-// Writes log lines or vectors of strings to a
-// stream in CSV format according to RFC 4180.
+/// \brief Writes log lines or vectors of strings to a
+/// stream in CSV format according to RFC 4180.
 class emitter
 {
-    flags            m_flags;
-    std::vector<int> m_col_max_width; // used for alignment
-    std::vector<row> m_rows;
+    using internal_row = std::vector<std::string_view>;
+
+    std::vector<int>          m_col_max_width; // used for alignment
+    std::vector<internal_row> m_rows;
+    flags                     m_flags;
+    int                       m_lhs_lock;
+    bool                      m_sorted; // undone by add_row
 
 public:
-    explicit emitter(flags f);
+    /// \param f flags to control the behavior of the emitter
+    /// \param lhs_lock number of columns to not sort when sorting by width
+    emitter(flags f, int lhs_lock);
+
+    template <row_iterator T>
+    void add_row(T first, T last);
 
     void emit(std::ostream& os);
-    void add_row(csv::row row);
 
 private:
     void emit_unaligned(std::ostream& os);
     void emit_aligned(std::ostream& os);
 
-    static void emit_row_unaligned(std::ostream& os, csv::row const& row);
-    void        emit_row_aligned(std::ostream& os, csv::row const& row);
+    static void emit_row_unaligned(std::ostream& os, internal_row const& row);
+    void        emit_row_aligned(std::ostream& os, internal_row const& row);
 
-    void update_col_widths(csv::row const& row);
+    void update_col_widths(internal_row const& row);
+
+    void sort_cols_by_width();
 };
 
 } // namespace csv
+
+#include "csv-inl.hpp"

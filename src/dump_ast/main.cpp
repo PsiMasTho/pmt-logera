@@ -184,21 +184,26 @@ void print_ast(ast::multifile_node const& multifile)
     printer(&printer, multifile);
 }
 
-void print_error(error::record const& e)
+void print_errors(error::container const& errors)
 {
-    printf("Error: %s\n", e.msg.c_str());
+    for (auto const& e : errors)
+        printf(
+            "[%s] (l:%d, c:%d) %s\n",
+            e->filename().value_or("").data(),
+            e->line().value_or(-1),
+            e->column().value_or(-1),
+            e->msg().value_or("").data());
 }
 
 auto process_file(char const* filename, lexer& l, string& buffer, flyweight_string::storage_type& storage)
     -> ast::file_node
 {
-    vector<error::record> errors;
+    error::container errors;
 
     io::readallf(filename, buffer, errors);
     if (!errors.empty())
     {
-        for (auto const& e : errors)
-            print_error(e);
+        print_errors(errors);
         return {};
     }
 
@@ -211,8 +216,7 @@ auto process_file(char const* filename, lexer& l, string& buffer, flyweight_stri
     auto   file = p.parse();
 
     if (!errors.empty())
-        for (auto const& e : errors)
-            print_error(e);
+        print_errors(errors);
 
     return file;
 }
@@ -232,13 +236,12 @@ void process_files(char** filenames, int num_files)
 
     storage.shrink_to_fit();
 
-    vector<error::record> errors;
-    ast::multifile_node   decl_attrs;
-    ast::multifile_node   decl_vars;
+    error::container    errors;
+    ast::multifile_node decl_attrs;
+    ast::multifile_node decl_vars;
 
     if (!sema::apply_all_passes({ &multifile, &decl_attrs, &decl_vars }, errors))
-        for (auto const& e : errors)
-            print_error(e);
+        print_errors(errors);
     errors.clear();
 
     printf("Attributes:\n");

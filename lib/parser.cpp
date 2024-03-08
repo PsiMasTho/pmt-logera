@@ -33,7 +33,7 @@ using namespace std;
 */
 // clang-format on
 
-parser::parser(lexer& lexer, flyweight_string::storage_type& storage, vector<error::record>& errors)
+parser::parser(lexer& lexer, flyweight_string::storage_type& storage, error::container& errors)
     : m_lexer(lexer)
     , m_storage(storage)
     , m_errors(errors)
@@ -57,8 +57,13 @@ auto parser::parser::parse() -> ast::file_node
 
 auto parser::parser::parse_line(parsed_line* dest) -> parsed_line*
 {
-    char const *furthest, *initial = m_lexer.get_cursor();
+    char const *furthest = nullptr, *initial = m_lexer.get_cursor();
     string_view tok;
+    auto const  failure_rewind = [&]
+    {
+        furthest = max(furthest, m_lexer.get_cursor());
+        m_lexer.set_cursor(initial);
+    };
 
     // <NEWLINE>
     if (m_lexer.lex_tokens<lexer::SKIPWS, token::NEWLINE>(make_tuple(nullptr, nullptr)))
@@ -66,8 +71,7 @@ auto parser::parser::parse_line(parsed_line* dest) -> parsed_line*
         *dest = std::monostate{};
         return dest; // success
     }
-    furthest = m_lexer.get_cursor();
-    m_lexer.set_cursor(initial); // failure, rewind
+    failure_rewind();
 
     // <DATE> <NEWLINE>
     if (m_lexer.lex_tokens<lexer::SKIPWS, token::DATE, lexer::SKIPWS, token::NEWLINE>(
@@ -80,8 +84,7 @@ auto parser::parser::parse_line(parsed_line* dest) -> parsed_line*
         };
         return dest; // success
     }
-    furthest = m_lexer.get_cursor();
-    m_lexer.set_cursor(initial); // failure, rewind
+    failure_rewind();
 
     // <declare_attribute> <NEWLINE>
     if (ast::decl_attr_node ret; parse_declare_attribute(&ret))
@@ -92,8 +95,7 @@ auto parser::parser::parse_line(parsed_line* dest) -> parsed_line*
             return dest; // success
         }
     }
-    furthest = max(furthest, m_lexer.get_cursor());
-    m_lexer.set_cursor(initial); // failure, rewind
+    failure_rewind();
 
     // <declare_variable> <NEWLINE>
     if (ast::decl_var_node ret; parse_declare_variable(&ret))
@@ -104,8 +106,7 @@ auto parser::parser::parse_line(parsed_line* dest) -> parsed_line*
             return dest; // success
         }
     }
-    furthest = max(furthest, m_lexer.get_cursor());
-    m_lexer.set_cursor(initial); // failure, rewind
+    failure_rewind();
 
     // <IDENT> <COLON> <NEWLINE>
     if (m_lexer.lex_tokens<lexer::SKIPWS, token::IDENT, token::COLON, lexer::SKIPWS, token::NEWLINE>(
@@ -118,8 +119,7 @@ auto parser::parser::parse_line(parsed_line* dest) -> parsed_line*
         };
         return dest; // success
     }
-    furthest = max(furthest, m_lexer.get_cursor());
-    m_lexer.set_cursor(initial); // failure, rewind
+    failure_rewind();
 
     // <ident_value_pair_list>
     if (ast::ident_value_pair_list_node ret; parse_ident_value_pair_list(&ret))
@@ -130,19 +130,14 @@ auto parser::parser::parse_line(parsed_line* dest) -> parsed_line*
             return dest; // success
         }
     }
-    furthest = max(furthest, m_lexer.get_cursor());
-    m_lexer.set_cursor(initial); // failure, rewind
+    failure_rewind();
 
     // end of file
     if (m_lexer.get_remaining() == 0)
         return nullptr;
 
     // error
-    m_errors.emplace_back(
-        error::PARSER_UNEXPECTED_TOKEN,
-        m_lexer.get_filename(),
-        m_lexer.get_line_nr(furthest),
-        m_lexer.get_column_nr(furthest));
+    m_errors.emplace_back(error::make_record<error::unexpected_token>(m_lexer.get_location(furthest)));
     *dest = std::monostate{};
     m_lexer.skipln();
     return dest;

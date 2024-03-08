@@ -59,54 +59,29 @@ auto get_field_aligned(string& field, int width) -> string&
     return pad(get_field_unaligned(field), width);
 }
 
-void sort_cols_by_width(vector<csv::row>& rows, vector<int>& col_max_width, size_t skip)
-{
-    auto const width_beg = col_max_width.begin() + skip;
-
-    // sort once to get the indices
-    vector<int> indices(distance(width_beg, col_max_width.end()));
-    iota(indices.begin(), indices.end(), 0);
-    sort(
-        indices.begin(),
-        indices.end(),
-        [&width_beg](size_t lhs, size_t rhs) { return width_beg[lhs] < width_beg[rhs]; });
-
-    // apply indices to col_max_width
-    auto cache = algo::indirect_rearrange(width_beg, col_max_width.end(), indices.begin(), nullptr);
-
-    // apply indices to rows
-    for (auto& row : rows)
-        cache = algo::indirect_rearrange(row.begin() + skip, row.end(), indices.begin(), std::move(cache));
-}
-
 } // namespace
 
 namespace csv
 {
 
-emitter::emitter(flags f)
-    : m_flags{ f }
-    , m_col_max_width{}
+emitter::emitter(flags f, int lhs_lock)
+    : m_col_max_width{}
     , m_rows{}
+    , m_flags{ f }
+    , m_lhs_lock{ lhs_lock }
+    , m_sorted{ false }
 {
 }
 
 void emitter::emit(ostream& os)
 {
-    // only sort the attribute columns (skip first 3)
-    if (m_flags & SORT_COLS_BY_WIDTH)
-        sort_cols_by_width(m_rows, m_col_max_width, 3);
+    if (m_flags & SORT_COLS_BY_WIDTH && !m_sorted)
+        sort_cols_by_width();
 
     if (m_flags & ALIGN)
         emit_aligned(os);
     else
         emit_unaligned(os);
-}
-
-void emitter::add_row(row row)
-{
-    update_col_widths(row);
-    m_rows.push_back(std::move(row));
 }
 
 void emitter::emit_unaligned(ostream& os)
@@ -121,7 +96,7 @@ void emitter::emit_aligned(ostream& os)
         emit_row_aligned(os, row);
 }
 
-void emitter::emit_row_unaligned(ostream& os, row const& row)
+void emitter::emit_row_unaligned(ostream& os, internal_row const& row)
 {
     string delim;
     for (auto const str : row)
@@ -133,7 +108,7 @@ void emitter::emit_row_unaligned(ostream& os, row const& row)
     os << '\n';
 }
 
-void emitter::emit_row_aligned(ostream& os, row const& row)
+void emitter::emit_row_aligned(ostream& os, internal_row const& row)
 {
     string delim;
     for (size_t i = 0; i < row.size(); ++i)
@@ -145,7 +120,7 @@ void emitter::emit_row_aligned(ostream& os, row const& row)
     os << '\n';
 }
 
-void emitter::update_col_widths(row const& row)
+void emitter::update_col_widths(internal_row const& row)
 {
     // resize vec if needed
     m_col_max_width.resize(max(m_col_max_width.size(), row.size()), 0);
@@ -153,6 +128,26 @@ void emitter::update_col_widths(row const& row)
     // update widths
     for (size_t i = 0; i < row.size(); ++i)
         m_col_max_width[i] = max(m_col_max_width[i], get_width(row[i]));
+}
+
+void emitter::sort_cols_by_width()
+{
+    auto const width_beg = m_col_max_width.begin() + m_lhs_lock;
+
+    // sort once to get the indices
+    vector<int> indices(distance(width_beg, m_col_max_width.end()));
+    iota(indices.begin(), indices.end(), 0);
+    sort(
+        indices.begin(),
+        indices.end(),
+        [&width_beg](size_t lhs, size_t rhs) { return width_beg[lhs] < width_beg[rhs]; });
+
+    // apply indices to col_max_width
+    auto cache = algo::indirect_rearrange(width_beg, m_col_max_width.end(), indices.begin(), nullptr);
+
+    // apply indices to rows
+    for (auto& row : m_rows)
+        cache = algo::indirect_rearrange(row.begin() + m_lhs_lock, row.end(), indices.begin(), std::move(cache));
 }
 
 } // namespace csv

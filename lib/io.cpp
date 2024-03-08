@@ -17,13 +17,13 @@ auto basename_from_path(string_view const path) -> string_view
     return path.substr(pos + 1);
 }
 
-auto readallf(char const* path, string& buffer, vector<error::record>& errors) -> bool
+auto readallf(char const* path, string& buffer, error::container& errors) -> bool
 {
     ifstream file(path, ios::binary);
 
     if (!file.is_open())
     {
-        errors.emplace_back(error::code::IO_CANNOT_OPEN_FILE, path);
+        errors.emplace_back(error::make_record<error::cannot_open_file>(path));
         return false;
     }
 
@@ -32,7 +32,7 @@ auto readallf(char const* path, string& buffer, vector<error::record>& errors) -
 
     if (file.fail())
     {
-        errors.emplace_back(error::code::IO_CANNOT_READ_FILE, path);
+        errors.emplace_back(error::make_record<error::failed_reading_file>(path));
         return false;
     }
 

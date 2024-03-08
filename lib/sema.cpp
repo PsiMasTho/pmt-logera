@@ -13,7 +13,7 @@
 namespace sema
 {
 
-auto apply_all_passes(split_trees trees, std::vector<error::record>& errors) -> bool
+auto apply_all_passes(split_trees trees, error::container& errors) -> bool
 {
     return apply_passes<
         file_sort_pass,

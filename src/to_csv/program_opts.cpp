@@ -58,9 +58,9 @@ auto set_verbose(argparse::ArgumentParser const& cmdl) -> bool
     return cmdl.get<bool>("--verbose");
 }
 
-auto set_color(argparse::ArgumentParser const& cmdl) -> bool
+auto set_full_paths(argparse::ArgumentParser const& cmdl) -> bool
 {
-    return cmdl.get<bool>("--color");
+    return cmdl.get<bool>("--full-paths");
 }
 
 auto set_sort_cols_by_width(argparse::ArgumentParser const& cmdl) -> bool
@@ -101,7 +101,7 @@ auto set_input_files(argparse::ArgumentParser const& cmdl) -> vector<filesystem:
 program_opts::program_opts(argparse::ArgumentParser const& cmdl)
     : align{ set_align(cmdl) }
     , verbose{ set_verbose(cmdl) }
-    , color{ set_color(cmdl) }
+    , full_paths{ set_full_paths(cmdl) }
     , sort_cols_by_width{ set_sort_cols_by_width(cmdl) }
     , output_stream{ set_output_stream(cmdl) }
     , output_name{ set_output_name(cmdl) }
@@ -114,7 +114,7 @@ void print_program_opts(program_opts const& cfg, std::ostream& os)
     os << "Verbose output:\n";
     os << "\tAlign: " << boolalpha << cfg.align << '\n';
     os << "\tVerbose: " << boolalpha << cfg.verbose << '\n';
-    os << "\tColor: " << boolalpha << cfg.color << '\n';
+    os << "\tFull paths: " << boolalpha << cfg.full_paths << '\n';
     os << "\tSort columns by width: " << boolalpha << cfg.sort_cols_by_width << '\n';
     os << "\tOutput: " << cfg.output_name << '\n';
     os << "\tInput file count: " << cfg.input_files.size() << '\n';

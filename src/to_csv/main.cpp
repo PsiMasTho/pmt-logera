@@ -41,7 +41,11 @@ auto parse_args(int argc, char** argv) -> program_opts
 
     cmdl.add_argument("-v", "--verbose").help("verbose output").implicit_value(true).default_value(false).nargs(0);
 
-    cmdl.add_argument("-c", "--color").help("colored errors").implicit_value(true).default_value(false).nargs(0);
+    cmdl.add_argument("--full-paths")
+        .help("output full paths in the csv")
+        .implicit_value(true)
+        .default_value(false)
+        .nargs(0);
 
     cmdl.add_argument("--sort-cols-by-width")
         .help("sort columns by width, widest to the right")
@@ -85,15 +89,37 @@ auto get_csv_emitter_flags(program_opts const& opts) -> csv::flags
     return ret;
 }
 
-void print_error(error::record const& e)
+void print_error(error::record_base const& e)
 {
-    printf("Error: %s\n", e.msg.c_str());
+    auto const filename_field = [&]() -> string_view
+    {
+        if (auto const filename = e.filename())
+            return io::basename_from_path(*filename);
+        return "N/A";
+    }();
+
+    auto const position_field = [&]() -> string
+    {
+        if (auto const line = e.line())
+        {
+            if (auto const column = e.column())
+                return error::concat("l:", *line, " c:", *column);
+            else
+                return error::concat("c:", *line);
+        }
+        return "N/A";
+    }();
+
+    fprintf(
+        stderr,
+        "%s",
+        error::concat("[", filename_field, "] (", position_field, ") ", e.msg().value_or(""), "\n").c_str());
 }
 
-void print_errors(std::span<error::record const> errors)
+void print_errors(error::container const& errors)
 {
     for (auto const& e : errors)
-        print_error(e);
+        print_error(*e.get());
 }
 
 auto process_file(
@@ -101,7 +127,7 @@ auto process_file(
     lexer&                          l,
     string&                         buffer,
     flyweight_string::storage_type& storage,
-    vector<error::record>&          errors) -> ast::file_node
+    error::container&               errors) -> ast::file_node
 {
     if (!io::readallf(filename, buffer, errors))
         return {};
@@ -115,9 +141,41 @@ auto process_file(
     return p.parse();
 }
 
-void generate_csv(ast::multifile_node const& multifile, csv::flags const flags, ostream& os)
+void emit_csv(
+    ast::multifile_node const& multifile,
+    ast::multifile_node const& decl_attrs,
+    program_opts const&        opts,
+    ostream&                   os)
 {
-    csv::emitter emitter(flags);
+    csv::emitter emitter(get_csv_emitter_flags(opts), 3);
+
+    // construct header row
+    vector<string_view> header{ "date", "filename", "var" };
+    header.reserve(decl_attrs.children.size() + 3);
+
+    auto const flattened_attrs = [&decl_attrs]
+    {
+        vector<string_view> ret;
+        for (auto const& file : decl_attrs.children)
+            for (auto const& node : file.children)
+                if (auto const* rec = std::get_if<ast::decl_attr_node>(&node))
+                    ret.push_back(to_string_view(rec->identifier.record.lexeme));
+
+        sort(ret.begin(), ret.end());
+        return ret;
+    }();
+
+    header.insert(header.end(), flattened_attrs.begin(), flattened_attrs.end());
+
+    emitter.add_row(header.begin(), header.end());
+
+    // construct entry rows
+    auto index_of = [&flattened_attrs](string_view const id)
+    {
+        auto const it = lower_bound(flattened_attrs.begin(), flattened_attrs.end(), id);
+        assert(it != flattened_attrs.end() && *it == id);
+        return distance(flattened_attrs.begin(), it) + 3;
+    };
 
     for (auto const& file : multifile.children)
     {
@@ -125,9 +183,19 @@ void generate_csv(ast::multifile_node const& multifile, csv::flags const flags, 
         {
             if (auto const* rec = std::get_if<ast::entry_node>(&node))
             {
-                csv::row row;
-                for (auto const& attr : rec->ident_value_pair_list.children)
-                    row.push_back(attr.attr_value.record.lexeme.data());
+                ast::date_node const* date = std::get_if<ast::date_node>(&file.children.front());
+                assert(date);
+                vector<string_view> row;
+                row.resize(flattened_attrs.size() + 3);
+                row[0] = to_string_view(date->record.lexeme);
+                row[1] = opts.full_paths ? file.filename : io::basename_from_path(file.filename);
+                row[2] = to_string_view(rec->identifier.record.lexeme);
+
+                for (auto const& ivp : rec->ident_value_pair_list.children)
+                    row[index_of(to_string_view(ivp.identifier.record.lexeme))]
+                        = to_string_view(ivp.attr_value.record.lexeme);
+
+                emitter.add_row(row.begin(), row.end());
             }
         }
     }
@@ -140,7 +208,7 @@ auto process_files(program_opts const& opts) -> int
     flyweight_string::storage_type storage;
     string                         buffer;
     lexer                          l;
-    vector<error::record>          errors;
+    error::container               errors;
     ast::multifile_node            multifile;
     for (auto const& filename : opts.input_files)
     {
@@ -162,7 +230,7 @@ auto process_files(program_opts const& opts) -> int
         return EXIT_FAILURE;
     }
 
-    generate_csv(multifile, get_csv_emitter_flags(opts), *opts.output_stream);
+    emit_csv(multifile, decl_attrs, opts, *opts.output_stream);
 
     return EXIT_SUCCESS;
 }

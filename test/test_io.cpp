@@ -73,8 +73,8 @@ static void test_readallf_big()
         orig_contents.push_back(outchars[i % outchars_count]);
     write_file(path, orig_contents.c_str());
 
-    string                buffer;
-    vector<error::record> errors;
+    string           buffer;
+    error::container errors;
 
     assert(io::readallf(path, buffer, errors));
     assert(buffer.size() == orig_contents.size());
@@ -90,8 +90,8 @@ static void test_readallf()
     char const* path          = "test_readallf.txt";
     write_file(path, orig_contents.c_str());
 
-    string                buffer;
-    vector<error::record> errors;
+    string           buffer;
+    error::container errors;
 
     assert(io::readallf(path, buffer, errors));
     assert(buffer.size() == orig_contents.size());
