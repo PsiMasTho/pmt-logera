@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdio>
 #include <iosfwd>
 #include <string>
 #include <string_view>
@@ -50,14 +51,14 @@ public:
     template <row_iterator T>
     void add_row(T first, T last);
 
-    void emit(std::ostream& os);
+    void emit(FILE* output);
 
 private:
-    void emit_unaligned(std::ostream& os);
-    void emit_aligned(std::ostream& os);
+    void emit_unaligned(FILE* output);
+    void emit_aligned(FILE* output);
 
-    static void emit_row_unaligned(std::ostream& os, internal_row const& row);
-    void        emit_row_aligned(std::ostream& os, internal_row const& row);
+    static void emit_row_unaligned(FILE* output, internal_row const& row);
+    void        emit_row_aligned(FILE* output, internal_row const& row);
 
     void update_col_widths(internal_row const& row);
 

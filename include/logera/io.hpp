@@ -51,4 +51,13 @@ struct failed_reading_file : with_filename, with_unformatted_msg
     }
 };
 
+struct exception_reading_file : with_filename, with_formatted_msg
+{
+    exception_reading_file(std::string_view const path, std::string_view const msg)
+        : with_filename(path)
+        , with_formatted_msg("exception thrown while reading file. .what(): \'", msg, '\'')
+    {
+    }
+};
+
 } // namespace error

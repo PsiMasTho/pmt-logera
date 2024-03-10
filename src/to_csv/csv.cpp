@@ -73,51 +73,56 @@ emitter::emitter(flags f, int lhs_lock)
 {
 }
 
-void emitter::emit(ostream& os)
+void emitter::emit(FILE* output)
 {
     if (m_flags & SORT_COLS_BY_WIDTH && !m_sorted)
         sort_cols_by_width();
 
     if (m_flags & ALIGN)
-        emit_aligned(os);
+        emit_aligned(output);
     else
-        emit_unaligned(os);
+        emit_unaligned(output);
 }
 
-void emitter::emit_unaligned(ostream& os)
+void emitter::emit_unaligned(FILE* output)
 {
     for (auto& row : m_rows)
-        emit_row_unaligned(os, row);
+        emit_row_unaligned(output, row);
 }
 
-void emitter::emit_aligned(ostream& os)
+void emitter::emit_aligned(FILE* output)
 {
     for (auto& row : m_rows)
-        emit_row_aligned(os, row);
+        emit_row_aligned(output, row);
 }
 
-void emitter::emit_row_unaligned(ostream& os, internal_row const& row)
+void emitter::emit_row_unaligned(FILE* output, internal_row const& row)
 {
     string delim;
     for (auto const str : row)
     {
+        fprintf(output, "%s", delim.c_str());
+        delim = ",";
+
         string field(str);
-        os << exchange(delim, ",") << get_field_unaligned(field);
+        fprintf(output, "%s", get_field_unaligned(field).c_str());
     }
 
-    os << '\n';
+    fprintf(output, "\n");
 }
 
-void emitter::emit_row_aligned(ostream& os, internal_row const& row)
+void emitter::emit_row_aligned(FILE* output, internal_row const& row)
 {
     string delim;
     for (size_t i = 0; i < row.size(); ++i)
     {
+        fprintf(output, "%s", delim.c_str());
+        delim = ",";
         string field(row[i]);
-        os << exchange(delim, ",") << get_field_aligned(field, m_col_max_width[i]);
+        fprintf(output, "%s", get_field_aligned(field, m_col_max_width[i]).c_str());
     }
 
-    os << '\n';
+    fprintf(output, "\n");
 }
 
 void emitter::update_col_widths(internal_row const& row)
@@ -148,6 +153,8 @@ void emitter::sort_cols_by_width()
     // apply indices to rows
     for (auto& row : m_rows)
         cache = algo::indirect_rearrange(row.begin() + m_lhs_lock, row.end(), indices.begin(), std::move(cache));
+
+    m_sorted = true;
 }
 
 } // namespace csv

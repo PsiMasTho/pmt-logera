@@ -28,7 +28,16 @@ auto readallf(char const* path, string& buffer, error::container& errors) -> boo
     }
 
     buffer.clear();
-    buffer.assign(istreambuf_iterator<char>(file), istreambuf_iterator<char>());
+
+    try
+    {
+        buffer.assign(istreambuf_iterator<char>(file), istreambuf_iterator<char>());
+    }
+    catch (exception const& e)
+    {
+        errors.emplace_back(error::make_record<error::exception_reading_file>(path, e.what()));
+        return false;
+    }
 
     if (file.fail())
     {

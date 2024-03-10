@@ -1,6 +1,7 @@
 #include "logera/sema.hpp"
 
 #include "logera/passes/date_pass.hpp"
+#include "logera/passes/decl_order_check_pass.hpp"
 #include "logera/passes/decl_var_val_check_pass.hpp"
 #include "logera/passes/dup_entry_val_check_pass.hpp"
 #include "logera/passes/entry_creation_pass.hpp"
@@ -19,6 +20,7 @@ auto apply_all_passes(split_trees trees, error::container& errors) -> bool
         file_sort_pass,
         entry_creation_pass,
         split_decl_pass,
+        decl_order_check_pass,
         merge_dup_decl_pass,
         rm_dup_decl_vals_pass,
         decl_var_val_check_pass,

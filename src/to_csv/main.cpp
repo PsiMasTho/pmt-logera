@@ -5,15 +5,16 @@
 
 #include "argparse/argparse.hpp"
 
-#include "cmdl_exception.hpp"
+#include "args.hpp"
 #include "csv.hpp"
 #include "logera/ast.hpp"
 #include "logera/errors.hpp"
 #include "logera/io.hpp"
 #include "logera/lexer.hpp"
 #include "logera/parser.hpp"
+#include "logera/passes/date_pass.hpp"
+#include "logera/passes/decl_order_check_pass.hpp"
 #include "logera/sema.hpp"
-#include "program_opts.hpp"
 
 #include <cstdio>
 #include <exception>
@@ -27,53 +28,7 @@ using namespace std;
 namespace
 {
 
-auto parse_args(int argc, char** argv) -> program_opts
-{
-    argparse::ArgumentParser cmdl("logera-to-csv", "1.0", argparse::default_arguments::help);
-
-    cmdl.set_assign_chars("=");
-
-    cmdl.add_argument("-a", "--align")
-        .help("align generated csv columns")
-        .implicit_value(true)
-        .default_value(false)
-        .nargs(0);
-
-    cmdl.add_argument("-v", "--verbose").help("verbose output").implicit_value(true).default_value(false).nargs(0);
-
-    cmdl.add_argument("--full-paths")
-        .help("output full paths in the csv")
-        .implicit_value(true)
-        .default_value(false)
-        .nargs(0);
-
-    cmdl.add_argument("--sort-cols-by-width")
-        .help("sort columns by width, widest to the right")
-        .implicit_value(true)
-        .default_value(false)
-        .nargs(0);
-
-    cmdl.add_argument("-d", "--directory").nargs(1).help("directory containing log files");
-
-    cmdl.add_argument("-m", "--manual")
-        .nargs(argparse::nargs_pattern::at_least_one)
-        .help("manually select files (e.g. glob)");
-
-    cmdl.add_argument("-o", "--output").nargs(1).help("output file. stdout if not specified");
-
-    try
-    {
-        cmdl.parse_args(argc, argv); // may throw
-    }
-    catch (std::exception const& e)
-    {
-        throw cmdl_exception(e.what());
-    }
-
-    return program_opts(cmdl);
-}
-
-auto get_csv_emitter_flags(program_opts const& opts) -> csv::flags
+auto get_csv_emitter_flags(args::program_opts const& opts) -> csv::flags
 {
     csv::flags ret = csv::flags::NONE;
 
@@ -141,11 +96,34 @@ auto process_file(
     return p.parse();
 }
 
+void filter_errors(error::container& errors, args::program_opts const& opts)
+{
+    erase_if(
+        errors,
+        [&opts](auto const& e)
+        {
+            if (opts.wno_unordered_dates)
+            {
+                if (error::record_cast<error::date_not_in_filename_order>(e.get()))
+                    return true;
+            }
+            if (opts.wno_unordered_decls)
+            {
+                if (error::record_cast<error::decl_order_violation<ast::decl_attr_node>>(e.get()))
+                    return true;
+                if (error::record_cast<error::decl_order_violation<ast::decl_var_node>>(e.get()))
+                    return true;
+            }
+
+            return false;
+        });
+}
+
 void emit_csv(
     ast::multifile_node const& multifile,
     ast::multifile_node const& decl_attrs,
-    program_opts const&        opts,
-    ostream&                   os)
+    args::program_opts const&  opts,
+    FILE*                      output)
 {
     csv::emitter emitter(get_csv_emitter_flags(opts), 3);
 
@@ -200,10 +178,10 @@ void emit_csv(
         }
     }
 
-    emitter.emit(os);
+    emitter.emit(output);
 }
 
-auto process_files(program_opts const& opts) -> int
+auto process_files(args::program_opts const& opts) -> int
 {
     flyweight_string::storage_type storage;
     string                         buffer;
@@ -224,13 +202,15 @@ auto process_files(program_opts const& opts) -> int
 
     sema::apply_all_passes({ &multifile, &decl_attrs, &decl_vars }, errors);
 
+    filter_errors(errors, opts);
+
     if (!errors.empty())
     {
         print_errors(errors);
         return EXIT_FAILURE;
     }
 
-    emit_csv(multifile, decl_attrs, opts, *opts.output_stream);
+    emit_csv(multifile, decl_attrs, opts, opts.output_stream.get());
 
     return EXIT_SUCCESS;
 }
@@ -240,14 +220,14 @@ auto process_files(program_opts const& opts) -> int
 auto main(int argc, char** argv) -> int
 try
 {
-    program_opts const opts = parse_args(argc, argv);
+    args::program_opts const opts = args::make_program_opts(argc, argv);
 
     if (opts.verbose)
-        print_program_opts(opts, cout);
+        print_program_opts(opts, stdout);
 
     return process_files(opts);
 }
-catch (cmdl_exception const& exc)
+catch (args::invalid_cmdl const& exc)
 {
     fprintf(stderr, "Error parsing commandline arguments:\n\t%s\n", exc.what());
     fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
