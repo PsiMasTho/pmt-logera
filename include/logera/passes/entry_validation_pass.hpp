@@ -29,7 +29,7 @@ class entry_validation_pass : public sema::pass_base<entry_validation_pass>
 
 public:
     using sema::pass_base<entry_validation_pass>::pass_base;
-    void run(); // 8
+    void run();
 
 private:
     void construct_flattened_decls();

@@ -10,7 +10,7 @@
 struct date_pass : sema::pass_base<date_pass>
 {
     using sema::pass_base<date_pass>::pass_base;
-    void run(); // 7
+    void run();
 };
 
 namespace error

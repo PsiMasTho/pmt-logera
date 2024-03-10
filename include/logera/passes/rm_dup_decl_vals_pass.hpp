@@ -10,7 +10,7 @@
 struct rm_dup_decl_vals_pass : sema::pass_base<rm_dup_decl_vals_pass>
 {
     using sema::pass_base<rm_dup_decl_vals_pass>::pass_base;
-    void run(); // 5
+    void run();
 };
 
 namespace error

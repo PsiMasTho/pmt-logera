@@ -43,16 +43,6 @@ void split_decl_pass::run()
             if (!decl_file)
                 continue;
 
-            // sort the decls and return them
-            sort(
-                begin(decl_file->children),
-                end(decl_file->children),
-                [](auto const& lhs, auto const& rhs)
-                {
-                    // compare by decl identifier
-                    return visit(util::get_decl_node_ident{}, lhs) < visit(util::get_decl_node_ident{}, rhs);
-                });
-
             decl_multifile.children.push_back(std::move(*decl_file));
         }
 

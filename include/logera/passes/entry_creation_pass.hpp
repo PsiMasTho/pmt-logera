@@ -8,7 +8,7 @@
 struct entry_creation_pass : sema::pass_base<entry_creation_pass>
 {
     using sema::pass_base<entry_creation_pass>::pass_base;
-    void run(); // 2
+    void run();
 };
 
 namespace error

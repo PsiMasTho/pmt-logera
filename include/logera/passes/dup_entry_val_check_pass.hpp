@@ -12,7 +12,7 @@
 struct dup_entry_val_check_pass : sema::pass_base<dup_entry_val_check_pass>
 {
     using sema::pass_base<dup_entry_val_check_pass>::pass_base;
-    void run(); // 9
+    void run();
 };
 
 namespace error

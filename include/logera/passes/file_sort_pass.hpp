@@ -10,7 +10,7 @@
 struct file_sort_pass : sema::pass_base<file_sort_pass>
 {
     using sema::pass_base<file_sort_pass>::pass_base;
-    void run(); // 1
+    void run();
 };
 
 namespace error

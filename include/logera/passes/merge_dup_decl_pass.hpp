@@ -10,7 +10,7 @@
 struct merge_dup_decl_pass : sema::pass_base<merge_dup_decl_pass>
 {
     using sema::pass_base<merge_dup_decl_pass>::pass_base;
-    void run(); // 4
+    void run();
 };
 
 namespace error

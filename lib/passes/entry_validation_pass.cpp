@@ -201,7 +201,7 @@ void entry_validation_pass::report_undeclared_attr_for_var(
 
     auto const location = ast::get_source_location(attr);
 
-    if (*min_lev > sema::SIMILAR_LEV)
+    if (min_lev == m_lev_distances.end() || *min_lev > sema::SIMILAR_LEV)
     {
         errors().emplace_back(error::make_record<error::undeclared_attr_in_entry_local>(
             location,

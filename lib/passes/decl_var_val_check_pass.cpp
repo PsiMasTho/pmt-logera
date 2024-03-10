@@ -19,26 +19,20 @@ void decl_var_val_check_pass::run()
     {
         for (size_t i = 0; i < get<ast::decl_var_node>(*var_decl).children.size();)
         {
-            bool const found = any_of(
-                begin(decl_attr_root().children),
-                end(decl_attr_root().children),
-                [i, &var_decl](auto const& attr_file)
+            bool const found = binary_search(
+                begin(flattened_decl_attrs),
+                end(flattened_decl_attrs),
+                var_decl,
+                [i](auto const& lhs, auto const& rhs)
                 {
-                    return binary_search(
-                        attr_file.children.begin(),
-                        attr_file.children.end(),
-                        *var_decl,
-                        [i](auto const& lhs, auto const& rhs)
-                        {
-                            assert(lhs.index() != rhs.index());
-                            if (auto const* l = get_if<ast::decl_attr_node>(&lhs))
-                            {
-                                return to_string_view(l->identifier.record.lexeme)
-                                       < to_string_view(get<ast::decl_var_node>(rhs).children[i].record.lexeme);
-                            }
-                            return to_string_view(get<ast::decl_var_node>(lhs).children[i].record.lexeme)
-                                   < to_string_view(get<ast::decl_attr_node>(rhs).identifier.record.lexeme);
-                        });
+                    assert(lhs->index() != rhs->index());
+                    if (auto const* l = get_if<ast::decl_attr_node>(lhs))
+                    {
+                        return to_string_view(l->identifier.record.lexeme)
+                               < to_string_view(get<ast::decl_var_node>(*rhs).children[i].record.lexeme);
+                    }
+                    return to_string_view(get<ast::decl_var_node>(*lhs).children[i].record.lexeme)
+                           < to_string_view(get<ast::decl_attr_node>(*rhs).identifier.record.lexeme);
                 });
 
             if (found)
