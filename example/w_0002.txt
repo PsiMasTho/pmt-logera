@@ -1,24 +1,18 @@
 2022-09-17
-2022-09-16
 
 # This is a comment
 
 bw:
-    weight 78kg q;
+    weight 78kg;
 
 kcal:
-    energy 3500kcal; q
-
+    energy 3500kcal;
 
 leg_extension:
-    weight 100kg ; reps 5s10r ; rpe 10; distance brown;
-   
-neck_bridge:
-	reps 2s10r; reps 50s10r; weight 100g;
+    weight 100kg ; reps 5s10r ; rpe 10;
 
 shoulder_press:
     weight 60kg ; reps 5s10r ; rpe 8; #comment
 
 leg_curl:
     weight 60kg ; reps 4,4,4,5 ; rpe 7;
-
