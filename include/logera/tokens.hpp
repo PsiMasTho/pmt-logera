@@ -22,7 +22,7 @@ enum type
 
 struct source_location
 {
-    char const* filename; // non-owning, todo: remove this redundancy
+    char const* filename;
     int         line;
     int         column;
 };

@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <numeric> // iota
-#include <ostream>
 #include <string_view>
 #include <utility>
 
