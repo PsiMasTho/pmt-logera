@@ -1,3 +1,8 @@
+//          Copyright (C) 2022 PsiMasTho (1cbb875@gmail.com)
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include "logera/flyweight_string.hpp"
 
 #include "logera/overloaded.hpp"
@@ -23,14 +28,14 @@ flyweight_string::flyweight_string(const string_view str, storage_type& storage)
         str,
         [](const auto& lhs, const auto& rhs) { return compare{}(lhs, rhs) < 0; });
 
-    if (it != end(storage) && compare{}(*it, str) == 0)
+    if (it != storage.end() && compare{}(*it, str) == 0)
         m_str = it->get();
     else
     {
         auto elem = storage.emplace(
             it,
             make_unique<string_type>(make_unique_for_overwrite<char[]>(str.size() + 1), str.size()));
-        copy(begin(str), end(str), elem->get()->first.get());
+        copy(str.begin(), str.end(), elem->get()->first.get());
         elem->get()->first[str.size()] = '\0';
         m_str                          = elem->get();
     }
