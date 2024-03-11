@@ -33,4 +33,13 @@ public:
     }
 };
 
+struct mixing_decls_and_nondecls : with_filename, with_unformatted_msg
+{
+    mixing_decls_and_nondecls(std::string_view const filename)
+        : with_filename(filename)
+        , with_unformatted_msg("mixing declarations and non-declarations in one file not allowed")
+    {
+    }
+};
+
 } // namespace error

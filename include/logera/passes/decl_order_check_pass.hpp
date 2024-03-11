@@ -22,14 +22,9 @@ struct decl_order_violation;
 template <>
 struct decl_order_violation<ast::decl_var_node> : with_column, with_formatted_msg
 {
-    decl_order_violation(token::source_location location, std::string_view prev, std::string_view curr)
+    decl_order_violation(token::source_location location, std::string_view curr)
         : with_column(location.filename, location.line, location.column)
-        , with_formatted_msg(
-              "variable declaration: \'",
-              curr,
-              "\' is out of order. Previous declaration: \'",
-              prev,
-              "\'")
+        , with_formatted_msg("variable declaration: \'", curr, "\' is out of order")
     {
     }
 };
@@ -37,14 +32,9 @@ struct decl_order_violation<ast::decl_var_node> : with_column, with_formatted_ms
 template <>
 struct decl_order_violation<ast::decl_attr_node> : with_column, with_formatted_msg
 {
-    decl_order_violation(token::source_location location, std::string_view prev, std::string_view curr)
+    decl_order_violation(token::source_location location, std::string_view curr)
         : with_column(location.filename, location.line, location.column)
-        , with_formatted_msg(
-              "attribute declaration: \'",
-              curr,
-              "\' is out of order. Previous declaration: \'",
-              prev,
-              "\'")
+        , with_formatted_msg("attribute declaration: \'", curr, "\' is out of order")
     {
     }
 };

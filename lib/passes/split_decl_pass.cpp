@@ -1,5 +1,6 @@
 #include "logera/passes/split_decl_pass.hpp"
 
+#include "logera/ast.hpp"
 #include "pass_util.hpp"
 
 #include <algorithm>
@@ -9,52 +10,63 @@
 
 using namespace std;
 
+namespace
+{
+
+auto is_decl_index(size_t index) -> bool
+{
+    assert(index < variant_size_v<ast::file_node::children_type>);
+    return index == ast::file_node::child_index_v<ast::decl_attr_node>
+           || index == ast::file_node::child_index_v<ast::decl_var_node>;
+}
+
+auto to_array_index(size_t index) -> size_t
+{
+    assert(is_decl_index(index));
+    return index == ast::file_node::child_index_v<ast::decl_attr_node> ? 0 : 1;
+}
+
+} // namespace
+
 void split_decl_pass::run()
 {
-    auto const impl = [this]<ast::decl_node T>
+    ast::multifile_node* decl_multifiles[2] = { &decl_attr_root(), &decl_var_root() };
+
+    for (auto& file : entry_root().children)
     {
-        ast::multifile_node& decl_multifile = [this]() -> ast::multifile_node&
-        {
-            if constexpr (is_same_v<T, ast::decl_attr_node>)
-                return decl_attr_root();
-            else if constexpr (is_same_v<T, ast::decl_var_node>)
-                return decl_var_root();
-        }();
+        optional<ast::file_node> decl_files[2];
+        int                      nondecls = 0, decls = 0;
 
-        for (auto& file : entry_root().children)
+        for (auto itr = file.children.begin(); itr != file.children.end();)
         {
-            optional<ast::file_node> decl_file;
-
-            for (auto itr = file.children.begin(); itr != file.children.end();)
+            if (is_decl_index(itr->index()))
             {
-                if (itr->index() != ast::file_node::child_index_v<T>)
-                {
-                    ++itr;
-                    continue;
-                }
-
+                auto& decl_file = decl_files[to_array_index(itr->index())];
                 if (!decl_file)
                     decl_file = ast::file_node{ .filename = file.filename, .children = {} };
 
                 decl_file->children.push_back(std::move(*itr));
                 itr = file.children.erase(itr);
+                ++decls;
             }
-
-            if (!decl_file)
-                continue;
-
-            decl_multifile.children.push_back(std::move(*decl_file));
+            else
+            {
+                ++itr;
+                ++nondecls;
+            }
         }
 
-        if (!decl_multifile.children.empty())
-            return;
+        if (nondecls > 0 && decls > 0)
+            errors().emplace_back(error::make_record<error::mixing_decls_and_nondecls>(file.filename));
 
-        if constexpr (is_same_v<T, ast::decl_attr_node>)
-            errors().emplace_back(error::make_record<error::no_attributes_declared>());
-        else if constexpr (is_same_v<T, ast::decl_var_node>)
-            errors().emplace_back(error::make_record<error::no_variables_declared>());
-    };
+        for (int i = 0; i < 2; ++i)
+            if (decl_files[i])
+                decl_multifiles[i]->children.push_back(std::move(*decl_files[i]));
+    }
 
-    impl.operator()<ast::decl_attr_node>();
-    impl.operator()<ast::decl_var_node>();
+    if (decl_attr_root().children.empty())
+        errors().emplace_back(error::make_record<error::no_attributes_declared>());
+
+    if (decl_var_root().children.empty())
+        errors().emplace_back(error::make_record<error::no_variables_declared>());
 }

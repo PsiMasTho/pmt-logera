@@ -23,10 +23,8 @@ void decl_order_check_pass::run()
 
                 if (prev > curr)
                 {
-                    errors().emplace_back(error::make_record<error::decl_order_violation<T>>(
-                        get_source_location(get<T>(*it)),
-                        prev,
-                        curr));
+                    errors().emplace_back(
+                        error::make_record<error::decl_order_violation<T>>(get_source_location(get<T>(*it)), curr));
                 }
                 prev = curr;
             }

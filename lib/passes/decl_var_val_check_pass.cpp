@@ -60,7 +60,7 @@ void decl_var_val_check_pass::run()
 
             auto const loc = ast::get_source_location(get<ast::decl_var_node>(*var_decl).children[i]);
 
-            if (*min_lev > sema::SIMILAR_LEV)
+            if (min_lev == distances.end() || *min_lev > sema::SIMILAR_LEV)
             {
                 errors().emplace_back(error::make_record<error::undeclared_attr_in_var_decl>(
                     loc,
