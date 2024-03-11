@@ -168,9 +168,13 @@ auto parser::parser::parse_declare_attribute(ast::decl_attr_node* dest) -> ast::
     // (<REGEX> <SEMICOLON>)*
     while (1)
     {
+        char const* initial = m_lexer.get_cursor();
         if (!m_lexer.lex_tokens<lexer::SKIPWS, token::REGEX, lexer::SKIPWS, token::SEMICOLON>(
                 make_tuple(nullptr, &tok, nullptr, nullptr)))
+        {
+            m_lexer.set_cursor(initial);
             break;
+        }
 
         dest->children.push_back(ast::regex_node{
             .record = token::record{.location = m_lexer.get_location(tok.data()),
@@ -207,9 +211,13 @@ auto parser::parse_declare_variable(ast::decl_var_node* dest) -> ast::decl_var_n
     // (<IDENT> <SEMICOLON>)*
     while (1)
     {
+        char const* initial = m_lexer.get_cursor();
         if (!m_lexer.lex_tokens<lexer::SKIPWS, token::IDENT, lexer::SKIPWS, token::SEMICOLON>(
                 make_tuple(nullptr, &tok, nullptr, nullptr)))
+        {
+            m_lexer.set_cursor(initial);
             break;
+        }
 
         dest->children.push_back(ast::identifier_node{
             .record = token::record{.location = m_lexer.get_location(tok.data()),
