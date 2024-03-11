@@ -7,4 +7,6 @@ $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
 
 target_link_libraries(${PROJECT_NAME}-dump-ast ${PROJECT_NAME})
 
-install(TARGETS ${PROJECT_NAME}-dump-ast DESTINATION bin)
+if (LOGERA_INSTALL AND LOGERA_IS_TOP_LEVEL)
+    install(TARGETS ${PROJECT_NAME}-dump-ast DESTINATION bin)
+endif()
