@@ -10,7 +10,6 @@
 #include <exception>
 #include <fstream>
 #include <iterator>
-#include <ostream>
 
 using namespace std;
 
@@ -53,7 +52,7 @@ auto make_program_opts(int argc, char** argv) -> program_opts
         .default_value(false)
         .nargs(0);
 
-    cmdl.add_argument("--sort-cols-by-width")
+    cmdl.add_argument("-s", "--sort-by-width")
         .help("sort columns by width, widest to the right")
         .implicit_value(true)
         .default_value(false)
@@ -82,7 +81,7 @@ auto make_program_opts(int argc, char** argv) -> program_opts
         .full_paths          = cmdl.get<bool>("--full-paths"),
         .wno_unordered_dates = cmdl.get<bool>("--Wno-unordered-dates"),
         .wno_unordered_decls = cmdl.get<bool>("--Wno-unordered-decls"),
-        .sort_cols_by_width  = cmdl.get<bool>("--sort-cols-by-width"),
+        .sort_by_width       = cmdl.get<bool>("--sort-by-width"),
         .output_stream       = [&]() -> decltype(program_opts::output_stream)
         {
             if (cmdl.present("--output").has_value())
@@ -141,7 +140,7 @@ void print_program_opts(program_opts const& cfg, FILE* output)
     fprintf(output, "\tFull paths: %s\n", boolalpha[cfg.full_paths]);
     fprintf(output, "\tSuppress warnings about unordered dates: %s\n", boolalpha[cfg.wno_unordered_dates]);
     fprintf(output, "\tSuppress warnings about unordered declarations: %s\n", boolalpha[cfg.wno_unordered_decls]);
-    fprintf(output, "\tSort columns by width: %s\n", boolalpha[cfg.sort_cols_by_width]);
+    fprintf(output, "\tSort columns by width: %s\n", boolalpha[cfg.sort_by_width]);
     fprintf(output, "\tOutput: %s\n", cfg.output_name.c_str());
     fprintf(output, "\tInput file count: %zu\n", cfg.input_files.size());
     fprintf(output, "\tInput files:\n");

@@ -18,7 +18,7 @@
 
 #include <cstdio>
 #include <exception>
-#include <iostream>
+#include <map>
 #include <span>
 #include <string>
 #include <vector>
@@ -39,20 +39,13 @@ auto get_csv_emitter_flags(args::program_opts const& opts) -> csv::flags
     };
 
     combine_flags.operator()<csv::flags::ALIGN>(ret, opts.align);
-    combine_flags.operator()<csv::flags::SORT_COLS_BY_WIDTH>(ret, opts.sort_cols_by_width);
+    combine_flags.operator()<csv::flags::SORT_COLS_BY_WIDTH>(ret, opts.sort_by_width);
 
     return ret;
 }
 
-void print_error(error::record_base const& e)
+void print_error(error::record_base const& e, int indent)
 {
-    auto const filename_field = [&]() -> string_view
-    {
-        if (auto const filename = e.filename())
-            return io::basename_from_path(*filename);
-        return "N/A";
-    }();
-
     auto const position_field = [&]() -> string
     {
         if (auto const line = e.line())
@@ -68,13 +61,44 @@ void print_error(error::record_base const& e)
     fprintf(
         stderr,
         "%s",
-        error::concat("[", filename_field, "] (", position_field, ") ", e.msg().value_or(""), "\n").c_str());
+        error::concat(string(indent, ' '), "(", position_field, ") ", e.msg().value_or(""), "\n").c_str());
 }
 
 void print_errors(error::container const& errors)
 {
+    // split by file
+    map<optional<string_view>, std::vector<error::record_base const*>> by_file;
     for (auto const& e : errors)
-        print_error(*e.get());
+        by_file[e->filename()].push_back(e.get());
+
+    // sort errors by position
+    for (auto& [_, v] : by_file)
+        sort(
+            v.begin(),
+            v.end(),
+            [](auto const* lhs, auto const* rhs)
+            {
+                auto l_lhs = lhs->line().value_or(0);
+                auto l_rhs = rhs->line().value_or(0);
+                auto c_lhs = lhs->column().value_or(0);
+                auto c_rhs = rhs->column().value_or(0);
+
+                return std::tie(l_lhs, c_lhs) < std::tie(l_rhs, c_rhs);
+            });
+
+    fprintf(stderr, "%s", error::concat(errors.size(), " errors encountered:\n").c_str());
+    for (auto const& [filename, v] : by_file)
+    {
+        auto const filename_field = [&]() -> string_view
+        {
+            if (filename)
+                return io::basename_from_path(*filename);
+            return "N/A";
+        }();
+        fprintf(stderr, "%s\n", error::concat(string(2, ' '), "[", filename_field, "]").c_str());
+        for (auto const* e : v)
+            print_error(*e, 4);
+    }
 }
 
 auto process_file(
