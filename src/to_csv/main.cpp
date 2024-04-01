@@ -9,6 +9,7 @@
 #include "csv.hpp"
 #include "logera/ast.hpp"
 #include "logera/errors.hpp"
+#include "logera/flyweight_string.hpp"
 #include "logera/io.hpp"
 #include "logera/lexer.hpp"
 #include "logera/parser.hpp"
@@ -212,9 +213,13 @@ auto process_files(args::program_opts const& opts) -> int
     lexer                          l;
     error::container               errors;
     ast::multifile_node            multifile;
-    for (auto const& filename : opts.input_files)
+    for (auto const& input_path : opts.input_files)
     {
-        ast::file_node file = process_file(filename.c_str(), l, buffer, storage, errors);
+        // filesystem::path::value_type may be different between platforms, so convert to string
+        // here and store them in the flyweight_string storage
+        flyweight_string const input_path_str(input_path.string(), storage);
+
+        ast::file_node file = process_file(input_path_str.data(), l, buffer, storage, errors);
         if (!file.children.empty())
             multifile.children.push_back(std::move(file));
     }
