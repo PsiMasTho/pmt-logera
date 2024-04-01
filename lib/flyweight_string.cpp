@@ -12,21 +12,21 @@
 using namespace std;
 
 using compare
-    = decltype(overloaded{ [](const unique_ptr<flyweight_string::string_type>& lhs, const string_view& rhs) {
+    = decltype(overloaded{ [](unique_ptr<flyweight_string::string_type> const& lhs, string_view const& rhs) {
                               return string_view{ lhs->first.get(), static_cast<size_t>(lhs->second) } <=> rhs;
                           },
-                           [](const string_view& lhs, const unique_ptr<flyweight_string::string_type>& rhs) {
+                           [](string_view const& lhs, unique_ptr<flyweight_string::string_type> const& rhs) {
                                return lhs <=> string_view{ rhs->first.get(), static_cast<size_t>(rhs->second) };
                            } });
 
 flyweight_string::flyweight_string(const string_view str, storage_type& storage)
     : m_str{ nullptr }
 {
-    const auto it = lower_bound(
+    auto const it = lower_bound(
         storage.begin(),
         storage.end(),
         str,
-        [](const auto& lhs, const auto& rhs) { return compare{}(lhs, rhs) < 0; });
+        [](auto const& lhs, auto const& rhs) { return compare{}(lhs, rhs) < 0; });
 
     if (it != storage.end() && compare{}(*it, str) == 0)
         m_str = it->get();
