@@ -19,7 +19,7 @@ namespace io
  * @param path The input path.
  * @return The basename of the path.
  */
-auto basename_from_path(std::string_view const path) -> std::string_view;
+[[nodiscard]] auto basename_from_path(std::string_view const path) -> std::string_view;
 
 /**
  * @brief Reads the entire file into a buffer.
