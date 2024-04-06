@@ -50,7 +50,8 @@ void date_pass::run()
 
     for (ast::file_node& file : entry_root().children)
     {
-        int                                    n_dates_encountered = 0;
+        int                                    n_dates_encountered   = 0;
+        int                                    n_entries_encountered = 0;
         vector<ast::file_node::children_type*> excess_dates;
         int                                    prev_node                           = -1;
         bool                                   date_not_in_filename_order_reported = false;
@@ -89,6 +90,7 @@ void date_pass::run()
                     },
                     [&](ast::entry_node&)
                     {
+                        ++n_entries_encountered;
                         if (n_dates_encountered == 0 && !no_date_before_entry_reported)
                         {
                             errors().emplace_back(error::make_record<error::no_date_before_entry>(cur_location));
@@ -101,6 +103,10 @@ void date_pass::run()
                 child);
             prev_node = cur_node;
         }
+
+        if (n_dates_encountered > 0 && n_entries_encountered == 0)
+            errors().emplace_back(error::make_record<error::no_entries_in_file>(file.filename));
+
         // erase excess dates
         sort(begin(excess_dates), end(excess_dates), [](auto const& lhs, auto const& rhs) { return lhs > rhs; });
 

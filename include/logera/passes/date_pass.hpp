@@ -66,4 +66,13 @@ struct no_date_before_entry : with_column, with_unformatted_msg
     }
 };
 
+struct no_entries_in_file : with_filename, with_unformatted_msg
+{
+    no_entries_in_file(std::string_view filename)
+        : with_filename(filename)
+        , with_unformatted_msg("no entries found in file")
+    {
+    }
+};
+
 } // namespace error
