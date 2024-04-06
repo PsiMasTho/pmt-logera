@@ -244,7 +244,17 @@ auto process_files(args::program_opts const& opts) -> int
         return EXIT_FAILURE;
     }
 
-    emit_csv(multifile, decl_attrs, opts, opts.output_stream.get());
+    if (!opts.dry_run)
+        emit_csv(multifile, decl_attrs, opts, opts.output_stream.get());
+    else
+        fprintf(
+            stderr,
+            "%s",
+            error::concat(
+                "No errors encountered in ",
+                multifile.children.size(),
+                " files. Dry run mode, not outputting CSV.\n")
+                .c_str());
 
     return EXIT_SUCCESS;
 }

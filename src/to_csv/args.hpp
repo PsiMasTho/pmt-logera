@@ -29,6 +29,7 @@ struct program_opts
     bool                                   wno_unordered_decls;
     bool                                   wno_file_without_entries;
     bool                                   sort_by_width; // sort CSV columns by width
+    bool                                   dry_run;
     std::unique_ptr<FILE, void (*)(FILE*)> output_stream; // stdout or file
     std::string                            output_name;   // name of output file or "stdout"
     std::vector<std::filesystem::path>     input_files;

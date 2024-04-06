@@ -64,6 +64,13 @@ auto make_program_opts(int argc, char** argv) -> program_opts
         .default_value(false)
         .nargs(0);
 
+    cmdl.add_argument("--dry-run")
+        .help("do not produce any CSV output, only print errors or lack thereof to std(out/err). Conflicts with "
+              "-o/--output")
+        .implicit_value(true)
+        .default_value(false)
+        .nargs(0);
+
     cmdl.add_argument("-d", "--directory").nargs(1).help("directory containing log files");
 
     cmdl.add_argument("-m", "--manual")
@@ -89,7 +96,15 @@ auto make_program_opts(int argc, char** argv) -> program_opts
         .wno_unordered_decls      = cmdl.get<bool>("--Wno-unordered-decls"),
         .wno_file_without_entries = cmdl.get<bool>("--Wno-file-without-entries"),
         .sort_by_width            = cmdl.get<bool>("--sort-by-width"),
-        .output_stream            = [&]() -> decltype(program_opts::output_stream)
+        .dry_run                  = [&]() -> bool
+        {
+            bool const specified_dry_run = cmdl.get<bool>("--dry-run");
+            bool const specified_output  = cmdl.present("--output").has_value();
+            if (specified_dry_run && specified_output)
+                throw invalid_cmdl("Cannot specify both --dry-run and --output");
+            return specified_dry_run;
+        }(),
+        .output_stream = [&]() -> decltype(program_opts::output_stream)
         {
             if (cmdl.present("--output").has_value())
                 return unique_ptr<FILE, void (*)(FILE*)>(
@@ -133,6 +148,8 @@ auto make_program_opts(int argc, char** argv) -> program_opts
             if (paths.empty())
                 throw invalid_cmdl("No log files provided");
 
+            sort(begin(paths), end(paths));
+
             return paths;
         }()
     };
@@ -147,7 +164,12 @@ void print_program_opts(program_opts const& cfg, FILE* output)
     fprintf(output, "\tFull paths: %s\n", boolalpha[cfg.full_paths]);
     fprintf(output, "\tSuppress warnings about unordered dates: %s\n", boolalpha[cfg.wno_unordered_dates]);
     fprintf(output, "\tSuppress warnings about unordered declarations: %s\n", boolalpha[cfg.wno_unordered_decls]);
+    fprintf(
+        output,
+        "\tSuppress warnings about files that contain a date but no entries: %s\n",
+        boolalpha[cfg.wno_file_without_entries]);
     fprintf(output, "\tSort columns by width: %s\n", boolalpha[cfg.sort_by_width]);
+    fprintf(output, "\tDry run: %s\n", boolalpha[cfg.dry_run]);
     fprintf(output, "\tOutput: %s\n", cfg.output_name.c_str());
     fprintf(output, "\tInput file count: %zu\n", cfg.input_files.size());
     fprintf(output, "\tInput files:\n");
