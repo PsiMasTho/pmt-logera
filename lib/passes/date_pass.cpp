@@ -10,6 +10,7 @@
 #include <array>
 #include <cassert>
 #include <cctype>
+#include <limits>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -63,20 +64,20 @@ void date_pass::run()
         int                                    n_dates_encountered   = 0;
         int                                    n_entries_encountered = 0;
         vector<ast::file_node::children_type*> excess_dates;
-        int                                    prev_node                           = -1;
+        size_t                                 prev_node                           = numeric_limits<size_t>::max();
         bool                                   date_not_in_filename_order_reported = false;
         bool                                   no_date_before_entry_reported       = false;
         for (auto& child : file.children)
         {
-            int const  cur_node     = child.index();
-            auto const cur_location = visit([](auto const& n) { return ast::get_source_location(n); }, child);
+            size_t const cur_node     = child.index();
+            auto const   cur_location = visit([](auto const& n) { return ast::get_source_location(n); }, child);
 
             visit(
                 overloaded{
                     [&](ast::date_node const& n)
                     {
                         ++n_dates_encountered;
-                        if (prev_node != -1)
+                        if (prev_node != numeric_limits<size_t>::max())
                             errors().emplace_back(error::make_record<error::date_not_first_in_file>(cur_location));
                         if (!is_valid_date(to_string_view(n.record.lexeme)))
                             errors().emplace_back(

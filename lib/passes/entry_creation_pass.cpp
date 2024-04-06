@@ -8,12 +8,13 @@
 #include "logera/tokens.hpp"
 
 #include <cassert>
+#include <limits>
 
 void entry_creation_pass::run()
 {
     for (ast::file_node& file : entry_root().children)
     {
-        int                    prev_node     = -1;
+        size_t                 prev_node     = std::numeric_limits<size_t>::max();
         token::source_location prev_location = ast::get_source_location(file);
         ast::identifier_node*  cur_ident     = nullptr;
         ast::file_node         modified_file{ .filename = file.filename, .children = {} };
@@ -21,7 +22,7 @@ void entry_creation_pass::run()
 
         for (auto& child : file.children)
         {
-            int                    cur_node = child.index();
+            size_t                 cur_node = child.index();
             token::source_location cur_location
                 = visit([](auto const& n) { return ast::get_source_location(n); }, child);
 

@@ -9,6 +9,8 @@
 #endif
 // clang-format on
 
+#include "numeric_cast.hpp"
+
 #include <algorithm>
 #include <iterator>
 
@@ -19,8 +21,8 @@ template <typename T, typename U>
     requires(std::is_integral_v<typename U::value_type>)
 auto indirect_rearrange(T data_begin, T data_end, U indices_begin, std::unique_ptr<typename U::value_type[]> buf)
 {
-    using index_type      = typename U::value_type;
-    index_type const size = distance(data_begin, data_end);
+    using index_type = typename U::value_type;
+    auto const size  = numeric_cast<index_type>(distance(data_begin, data_end));
 
     buf = buf ? std::move(buf) : std::make_unique_for_overwrite<typename U::value_type[]>(size);
 

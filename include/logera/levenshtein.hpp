@@ -10,8 +10,8 @@
 
 class levenshtein
 {
-    std::vector<int> m_matrix;
+    std::vector<std::size_t> m_matrix;
 
 public:
-    auto distance(std::string_view const lhs, std::string_view const rhs) -> int;
+    auto distance(std::string_view const lhs, std::string_view const rhs) -> std::size_t;
 };

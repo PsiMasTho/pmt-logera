@@ -10,24 +10,24 @@
 
 using namespace std;
 
-auto levenshtein::distance(string_view const lhs, string_view const rhs) -> int
+auto levenshtein::distance(string_view const lhs, string_view const rhs) -> size_t
 {
     if (lhs.size() > rhs.size())
         return distance(rhs, lhs);
 
-    int const min_size = lhs.size(), max_size = rhs.size();
+    size_t const min_size = lhs.size(), max_size = rhs.size();
     m_matrix.resize(min_size + 1);
 
     iota(m_matrix.begin(), m_matrix.end(), 0);
 
-    for (int j = 1; j <= max_size; ++j)
+    for (size_t j = 1; j <= max_size; ++j)
     {
-        int previous_diagonal = m_matrix[0];
+        size_t previous_diagonal = m_matrix[0];
         ++m_matrix[0];
 
-        for (int i = 1; i <= min_size; ++i)
+        for (size_t i = 1; i <= min_size; ++i)
         {
-            int const previous_diagonal_save = m_matrix[i];
+            size_t const previous_diagonal_save = m_matrix[i];
             if (lhs[i - 1] == rhs[j - 1])
                 m_matrix[i] = previous_diagonal;
             else

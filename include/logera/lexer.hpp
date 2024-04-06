@@ -21,7 +21,7 @@ class lexer
     char const*              m_filename;
     char const*              m_buffer;
     char const*              m_cursor;
-    int                      m_buffer_size;
+    std::size_t              m_buffer_size;
 
 public:
     enum // for use with lex_token(s)
@@ -62,7 +62,7 @@ public:
      *
      * @note May be called multiple times. Resets the lexer's state.
      */
-    void set_buffer(char const* filename, char const* buffer, int bufsz);
+    void set_buffer(char const* filename, char const* buffer, std::size_t bufsz);
     void set_cursor(char const* cursor);
 
     auto get_cursor() const -> char const*;

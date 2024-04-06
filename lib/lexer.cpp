@@ -5,6 +5,8 @@
 
 #include "logera/lexer.hpp"
 
+#include "logera/numeric_cast.hpp"
+
 #include <algorithm>
 #include <cassert>
 
@@ -58,7 +60,7 @@ void lexer::skipln()
         m_cursor = it + 1;
 }
 
-void lexer::set_buffer(char const* filename, char const* buffer, int bufsz)
+void lexer::set_buffer(char const* filename, char const* buffer, size_t bufsz)
 {
     assert(filename != nullptr);
     assert(buffer != NULL);
@@ -106,7 +108,7 @@ auto lexer::get_line_nr(char const* cursor) const -> int
     assert(cursor != NULL);
 
     auto const it = lower_bound(m_nl_locations.begin(), m_nl_locations.end(), cursor);
-    return distance(m_nl_locations.begin(), it) + 1;
+    return numeric_cast<int>(distance(m_nl_locations.begin(), it) + 1);
 }
 
 auto lexer::get_column_nr(char const* cursor) const -> int
@@ -116,12 +118,12 @@ auto lexer::get_column_nr(char const* cursor) const -> int
     return get_column_nr_on_line(get_line_nr(cursor), cursor);
 }
 
-auto lexer::get_remaining() const -> std::size_t
+auto lexer::get_remaining() const -> size_t
 {
-    return m_buffer + m_buffer_size - m_cursor;
+    return numeric_cast<size_t>(m_buffer + m_buffer_size - m_cursor);
 }
 
-auto lexer::match_literal(std::string_view const literal, std::string_view* dest) -> bool
+auto lexer::match_literal(string_view const literal, string_view* dest) -> bool
 {
     assert(literal.size() > 0);
 
@@ -167,11 +169,13 @@ auto lexer::get_column_nr_on_line(int line_nr, char const* cursor) const -> int
     assert(line_nr > 0);
     assert(cursor != NULL);
 
-    char const* count_from;
-    if (line_nr == 1)
-        count_from = m_buffer;
-    else
-        count_from = m_nl_locations[line_nr - 2] + 1;
+    char const* count_from = [&]
+    {
+        if (line_nr == 1)
+            return m_buffer;
+        else
+            return m_nl_locations[line_nr - 2] + 1;
+    }();
 
-    return cursor - count_from;
+    return numeric_cast<int>(cursor - count_from);
 }
