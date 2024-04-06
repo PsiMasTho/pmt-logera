@@ -64,11 +64,9 @@ For both types of files, lines starting with # are comments.
 
 For more examples see the example/ folder.
 
-## Useful flags
-### Flags
-* -h, --help: Display the full list of available flags and their descriptions.
-* -s, --sort-by-width: Sort the output by the width of the entries.
-* -a, --align: Pads the output so that all columns are aligned.
+## Usage tips
+### Program options
+Invoke 'logera-to-csv' with the '--help' flag to see a list of all available options.
 
 ### Optional checks
 By default, log files are expected to be named in increasing lexicographical order with respect to the dates, e.g. log_0001.log, log_0002.log, log_0003.log, etc.
