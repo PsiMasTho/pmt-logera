@@ -5,38 +5,48 @@
 
 #include "logera/passes/date_pass.hpp"
 
-#include <cassert>
-#include <cstdio>
-#include <cstring>
-#include <string>
-#include <string_view>
 #include "logera/errors.hpp"
 
+#include <array>
+#include <cassert>
+#include <cctype>
+#include <string>
+#include <string_view>
+#include <tuple>
+
 using namespace std;
+
+static auto date_atoi(char const* str) -> int
+{
+    int result = 0;
+    while (*str != '\0' && *str != '-')
+    {
+        assert(isdigit(*str));
+        result = result * 10 + (*str++ - '0');
+    }
+    return result;
+}
+
+static auto scan_date(string_view const str) -> tuple<int, int, int>
+{
+    assert(str.size() == 10);
+    return { date_atoi(str.data()), date_atoi(str.data() + 5), date_atoi(str.data() + 8) };
+}
 
 /**
  * @brief Checks if the given string is a valid date.
  * @param str The string assumed to be in the format "YYYY-MM-DD".
  * @return True if the given string is a valid date, false otherwise.
  */
-static auto is_valid_date(char const* str) -> bool
+static auto is_valid_date(string_view const str) -> bool
 {
-    assert(str != NULL);
-    assert(strlen(str) == 10);
-
-    int       y, m, d;
-    int const matched = sscanf(str, "%d-%d-%d", &y, &m, &d);
-
-    assert(matched == 3);
-
-    int mon_day[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    auto const [y, m, d] = scan_date(str);
 
     if (y < 1 || m < 1 || m > 12)
         return false;
 
-    bool const leap = (((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0));
-
-    mon_day[1] += leap;
+    array<int, 12> mon_day{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    mon_day[1] += (((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)); // leap year
 
     if ((d > mon_day[m - 1]) || (d < 1))
         return false;
@@ -46,7 +56,7 @@ static auto is_valid_date(char const* str) -> bool
 
 void date_pass::run()
 {
-    flyweight_string* prev_date = nullptr;
+    flyweight_string const* prev_date = nullptr;
 
     for (ast::file_node& file : entry_root().children)
     {
@@ -63,17 +73,17 @@ void date_pass::run()
 
             visit(
                 overloaded{
-                    [&](ast::date_node& n)
+                    [&](ast::date_node const& n)
                     {
                         ++n_dates_encountered;
                         if (prev_node != -1)
                             errors().emplace_back(error::make_record<error::date_not_first_in_file>(cur_location));
-                        if (!is_valid_date(n.record.lexeme.data()))
+                        if (!is_valid_date(to_string_view(n.record.lexeme)))
                             errors().emplace_back(
                                 error::make_record<error::invalid_date>(cur_location, to_string_view(n.record.lexeme)));
                         if (prev_date && !date_not_in_filename_order_reported)
                         {
-                            if (strcmp(prev_date->data(), n.record.lexeme.data()) > 0)
+                            if (to_string_view(*prev_date) > to_string_view(n.record.lexeme))
                             {
                                 errors().emplace_back(
                                     error::make_record<error::date_not_in_filename_order>(cur_location));
@@ -88,7 +98,7 @@ void date_pass::run()
                         }
                         prev_date = &n.record.lexeme;
                     },
-                    [&](ast::entry_node&)
+                    [&](ast::entry_node const&)
                     {
                         ++n_entries_encountered;
                         if (n_dates_encountered == 0 && !no_date_before_entry_reported)
