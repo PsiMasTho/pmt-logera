@@ -52,6 +52,12 @@ auto make_program_opts(int argc, char** argv) -> program_opts
         .default_value(false)
         .nargs(0);
 
+    cmdl.add_argument("--Wno-file-without-entries")
+        .help("suppress warnings about files that contain a date but no entries")
+        .implicit_value(true)
+        .default_value(false)
+        .nargs(0);
+
     cmdl.add_argument("-s", "--sort-by-width")
         .help("sort columns by width, widest to the right")
         .implicit_value(true)
@@ -76,13 +82,14 @@ auto make_program_opts(int argc, char** argv) -> program_opts
     }
 
     return program_opts{
-        .align               = cmdl.get<bool>("--align"),
-        .verbose             = cmdl.get<bool>("--verbose"),
-        .full_paths          = cmdl.get<bool>("--full-paths"),
-        .wno_unordered_dates = cmdl.get<bool>("--Wno-unordered-dates"),
-        .wno_unordered_decls = cmdl.get<bool>("--Wno-unordered-decls"),
-        .sort_by_width       = cmdl.get<bool>("--sort-by-width"),
-        .output_stream       = [&]() -> decltype(program_opts::output_stream)
+        .align                    = cmdl.get<bool>("--align"),
+        .verbose                  = cmdl.get<bool>("--verbose"),
+        .full_paths               = cmdl.get<bool>("--full-paths"),
+        .wno_unordered_dates      = cmdl.get<bool>("--Wno-unordered-dates"),
+        .wno_unordered_decls      = cmdl.get<bool>("--Wno-unordered-decls"),
+        .wno_file_without_entries = cmdl.get<bool>("--Wno-file-without-entries"),
+        .sort_by_width            = cmdl.get<bool>("--sort-by-width"),
+        .output_stream            = [&]() -> decltype(program_opts::output_stream)
         {
             if (cmdl.present("--output").has_value())
                 return unique_ptr<FILE, void (*)(FILE*)>(

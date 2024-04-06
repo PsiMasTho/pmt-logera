@@ -139,6 +139,11 @@ void filter_errors(error::container& errors, args::program_opts const& opts)
                 if (error::record_cast<error::decl_order_violation<ast::decl_var_node>>(e.get()))
                     return true;
             }
+            if (opts.wno_file_without_entries)
+            {
+                if (error::record_cast<error::no_entries_in_file>(e.get()))
+                    return true;
+            }
 
             return false;
         });
