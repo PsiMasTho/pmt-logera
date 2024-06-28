@@ -5,7 +5,7 @@
 
 import os
 
-directories = ["test/", "include/", "src/", "lib/"]
+directories = ["test/", "logera/", "logera_to_csv/", "logera_dump_ast/", "logera_format"]
 
 extensions = ["cpp", "hpp"]
 
