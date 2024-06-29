@@ -161,41 +161,40 @@ void file_builder::do_push_identifier(token& identifier_)
 {
   switch (_state)
   {
-    case BEGIN_ENTRY:
+  case BEGIN_ENTRY:
     switch (_previous)
     {
-      case BEGIN_ENTRY:
+    case BEGIN_ENTRY:
       _entries.emplace_back(std::move(identifier_));
       break;
-      case PUSH_IDENTIFIER:
-      case PUSH_ATTRIBUTE_VALUE:
+    case PUSH_IDENTIFIER:
+    case PUSH_ATTRIBUTE_VALUE:
       _entries.back()._pairs.emplace_back(std::move(identifier_));
       break;
-      default:
+    default:
       std::terminate();
-
     }
     break;
-    case BEGIN_ATTRIBUTE_DECLARATION:
+  case BEGIN_ATTRIBUTE_DECLARATION:
     switch (_previous)
     {
-      case BEGIN_ATTRIBUTE_DECLARATION:
+    case BEGIN_ATTRIBUTE_DECLARATION:
       _attributes.emplace_back(std::move(identifier_));
       break;
-      default:
+    default:
       std::terminate();
     }
     break;
-    case BEGIN_VARIABLE_DECLARATION:
+  case BEGIN_VARIABLE_DECLARATION:
     switch (_previous)
     {
-      case BEGIN_VARIABLE_DECLARATION:
+    case BEGIN_VARIABLE_DECLARATION:
       _variables.emplace_back(std::move(identifier_));
       break;
-      case PUSH_IDENTIFIER:
+    case PUSH_IDENTIFIER:
       _variables.back()._values.emplace_back(std::move(identifier_));
       break;
-      default:
+    default:
       std::terminate();
     }
     break;
@@ -206,18 +205,18 @@ void file_builder::do_push_regex(token& regex_)
 {
   switch (_state)
   {
-    case BEGIN_ATTRIBUTE_DECLARATION:
+  case BEGIN_ATTRIBUTE_DECLARATION:
     switch (_previous)
     {
-      case PUSH_IDENTIFIER:
-      case PUSH_REGEX:
+    case PUSH_IDENTIFIER:
+    case PUSH_REGEX:
       _attributes.back()._values.emplace_back(std::move(regex_));
       break;
-      default:
+    default:
       std::terminate();
     }
     break;
-    default:
+  default:
     std::terminate();
   }
 }
@@ -226,17 +225,17 @@ void file_builder::do_push_attribute_value(token& value_)
 {
   switch (_state)
   {
-    case BEGIN_ENTRY:
+  case BEGIN_ENTRY:
     switch (_previous)
     {
-      case PUSH_IDENTIFIER:
+    case PUSH_IDENTIFIER:
       _entries.back()._pairs.back()._value = std::move(value_);
       break;
-      default:
+    default:
       std::terminate();
     }
     break;
-    default:
+  default:
     std::terminate();
   }
 }
@@ -248,7 +247,9 @@ auto file_builder::assemble_log_file() -> log_file
 
 auto file_builder::assemble_header_file() -> header_file
 {
-  return header_file{ ._filepath = _filepath, ._attributes = std::move(_attributes), ._variables = std::move(_variables) };
+  return header_file{ ._filepath   = _filepath,
+                      ._attributes = std::move(_attributes),
+                      ._variables  = std::move(_variables) };
 }
 
 } // namespace pmt

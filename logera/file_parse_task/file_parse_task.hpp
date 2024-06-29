@@ -26,10 +26,10 @@ public:
 private:
   void execute_impl() override;
 
-  i_file_reader&        _file_reader;
-  i_warning_collector&  _warning_collector;
-  std::filesystem::path _filepath;
-  std::optional<log_file>   _result;
+  i_file_reader&          _file_reader;
+  i_warning_collector&    _warning_collector;
+  std::filesystem::path   _filepath;
+  std::optional<log_file> _result;
 };
 
 } // namespace pmt

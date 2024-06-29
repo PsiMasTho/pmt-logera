@@ -12,12 +12,12 @@
 #include "external/pegtl/pegtl/contrib/parse_tree_to_dot.hpp"
 
 #include <cassert>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <vector>
 #include <string_view>
-#include <chrono>
+#include <vector>
 
 namespace
 {
@@ -185,7 +185,8 @@ struct my_action<term_regex>
 
 // Parse function
 template <typename RULE>
-auto parse_input(std::string_view input_, pmt::file_builder& builder_, pmt::i_warning_collector& warning_collector_) -> bool
+auto parse_input(std::string_view input_, pmt::file_builder& builder_, pmt::i_warning_collector& warning_collector_)
+  -> bool
 {
   memory_input in(input_, "filename.txt");
   return tao::pegtl::parse<RULE, my_action>(in, builder_, warning_collector_);
@@ -210,12 +211,12 @@ auto main(int argc, char** argv) -> int
   std::string input_string((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
 
   pmt::serial_warning_collector warning_collector;
-  pmt::file_builder builder(warning_collector, argv[1]); 
+  pmt::file_builder             builder(warning_collector, argv[1]);
 
   // Parse the input
   auto const start = std::chrono::high_resolution_clock::now();
-  auto root = parse_input<rule_file>(input_string, builder, warning_collector);
-  auto const end = std::chrono::high_resolution_clock::now();
+  auto       root  = parse_input<rule_file>(input_string, builder, warning_collector);
+  auto const end   = std::chrono::high_resolution_clock::now();
 
   std::cout << "\n\nTime taken: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << "\n";
 
@@ -227,7 +228,8 @@ auto main(int argc, char** argv) -> int
   {
     std::cout << "\t- " << warning._msg << " at ";
     std::string filename = warning._location._filepath.has_value() ? warning._location._filepath.value().string() : "-";
-    std::string lineno = warning._location._lineno.has_value() ? std::to_string(warning._location._lineno.value()) : "-";
+    std::string lineno
+      = warning._location._lineno.has_value() ? std::to_string(warning._location._lineno.value()) : "-";
     std::string colno = warning._location._colno.has_value() ? std::to_string(warning._location._colno.value()) : "-";
 
     std::cout << filename << ":" << lineno << ":" << colno << "\n";

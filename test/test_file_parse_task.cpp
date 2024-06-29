@@ -51,4 +51,6 @@ auto main(int argc, char** argv) -> int
 
 #endif
 
-int main(){}
+int main()
+{
+}

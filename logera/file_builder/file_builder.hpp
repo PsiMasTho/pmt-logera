@@ -4,11 +4,11 @@
 #include "logera/multifile/multifile.hpp"
 #include "logera/token/token.hpp"
 
+#include <cstdint>
 #include <filesystem>
 #include <optional>
-#include <vector>
 #include <variant>
-#include <cstdint>
+#include <vector>
 
 NS_FW_DECL_CLASS(pmt, i_warning_collector)
 
@@ -51,7 +51,7 @@ private:
 
   i_warning_collector& _warning_collector;
 
-  std::filesystem::path              _filepath;
+  std::filesystem::path _filepath;
 
   std::optional<token>               _date;
   std::vector<entry>                 _entries;
