@@ -14,15 +14,10 @@ struct identifier_value_pair
   token _value;
 };
 
-struct identifier_value_pair_list
-{
-  std::vector<identifier_value_pair> _pairs;
-};
-
 struct entry
 {
-  token                      _entry_identifier;
-  identifier_value_pair_list _pairs;
+  token                              _entry_identifier;
+  std::vector<identifier_value_pair> _pairs;
 };
 
 struct attribute_declaration

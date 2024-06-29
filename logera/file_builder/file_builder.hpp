@@ -41,6 +41,9 @@ private:
   void do_push_regex(token& regex_);
   void do_push_attribute_value(token& value_);
 
+  auto assemble_log_file() -> log_file;
+  auto assemble_header_file() -> header_file;
+
   std::uint8_t _state;    // begin_X
   std::uint8_t _previous; // the last action
   std::uint8_t _all;      // all actions encountered
