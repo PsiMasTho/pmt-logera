@@ -20,34 +20,24 @@ class file_builder
 public:
   file_builder(i_warning_collector& warning_collector_, std::filesystem::path filepath_);
 
-  void begin_entry();
-  void begin_attribute_declaration();
-  void begin_variable_declaration();
+  void end_date();
+  void end_entry_identifier();
+  void end_ivpl();
+  void end_attribute_declaration();
+  void end_variable_declaration();
 
-  void push_date(token date_);
-  void push_identifier(token identifier_);
-  void push_regex(token regex_);
-  void push_attribute_value(token value_);
+  void enqueue_token(token token_);
+  void clear_queue();
 
   auto get_result() -> std::optional<std::variant<log_file, header_file>>;
 
 private:
-  void do_begin_entry();
-  void do_begin_attribute_declaration();
-  void do_begin_variable_declaration();
-
-  void do_push_date(token& date_);
-  void do_push_identifier(token& identifier_);
-  void do_push_regex(token& regex_);
-  void do_push_attribute_value(token& value_);
-
+  auto identify_filetype() -> std::uint8_t;
   auto assemble_log_file() -> log_file;
   auto assemble_header_file() -> header_file;
 
-  std::uint8_t _state;    // begin_X
-  std::uint8_t _previous; // the last action
-  std::uint8_t _all;      // all actions encountered
-  std::uint8_t _filetype; // e.g. log_file, header_file
+  std::vector<token> _queued_tokens;
+  std::uint8_t       _all; // all actions encountered
 
   i_warning_collector& _warning_collector;
 

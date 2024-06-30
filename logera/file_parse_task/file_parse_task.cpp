@@ -1,304 +1,213 @@
 #include "file_parse_task.hpp"
-#if 0
-#include "logera/combi_lex/combi_lex.hpp"
-#include "logera/combi_parse/combi_parse.hpp"
+
+#include "external/pegtl/pegtl/rules.hpp"
+#include "logera/file_builder/file_builder.hpp"
 #include "logera/i_file_reader/i_file_reader.hpp"
 #include "logera/i_warning_collector/i_warning_collector.hpp"
-#include "logera/overloaded/overloaded.hpp"
 #include "logera/warning_code/warning_code.hpp"
+
+#include "external/pegtl/pegtl.hpp"
 
 namespace pmt
 {
 
 namespace
 {
-using lex = combi_lex;
+using namespace tao::pegtl;
+// clang-format off
+
+// Actions
+struct end_date
+{
+  static void apply0(pmt::file_builder& builder_, pmt::i_warning_collector&)
+  {
+    builder_.end_date();
+  }
+};
+
+struct end_entry_identifier
+{
+  static void apply0(pmt::file_builder& builder_, pmt::i_warning_collector&)
+  {
+    builder_.end_entry_identifier();
+  }
+};
+
+struct end_ivpl
+{
+  static void apply0(pmt::file_builder& builder_, pmt::i_warning_collector&)
+  {
+    builder_.end_ivpl();
+  }
+};
+
+struct end_attribute_declaration
+{
+  static void apply0(pmt::file_builder& builder_, pmt::i_warning_collector&)
+  {
+    builder_.end_attribute_declaration();
+  }
+};
+
+struct end_variable_declaration
+{
+  static void apply0(pmt::file_builder& builder_, pmt::i_warning_collector&)
+  {
+    builder_.end_variable_declaration();
+  }
+};
+
+struct clear_queue
+{
+  static void apply0(pmt::file_builder& builder_, pmt::i_warning_collector&)
+  {
+    builder_.clear_queue();
+  }
+};
+
+template <typename RULE>
+struct action_for_every : nothing<RULE>
+{
+};
 
 // Charsets
-using charset_ws     = lex::match_in_group<" \t">;
-using charset_digit  = lex::match_in_range<'0', '9'>;
-using charset_alpha  = lex::one_of<lex::match_in_range<'a', 'z'>, lex::match_in_range<'A', 'Z'>>;
-using charset_alnum  = lex::one_of<charset_alpha, charset_digit>;
-using charset_alphau = lex::one_of<charset_alpha, lex::match_char<'_'>>;
-using charset_alnumu = lex::one_of<charset_alnum, lex::match_char<'_'>>;
+struct charset_ws : one< ' ', '\t' > {};
+struct charset_identifier_first : ranges< 'a', 'z', 'A', 'Z' > {};
+struct charset_identifier_rest : sor< charset_identifier_first, digit, one< '_', '-', '.' > > {};
 
 // Terminals
-using term_ws = lex::one_or_more<charset_ws>;
-
-using term_eol = lex::one_of<lex::match_literal<"\r\n">, lex::match_char<'\n'>>;
-
-using term_eol_comment
-  = lex::sequence<lex::match_char<'#'>, lex::zero_or_more<lex::match_not_in_group<"\r\n">>, term_eol>;
-
-using term_attr_value = lex::one_or_more<lex::match_not_in_group<";# \t">>;
-
-using term_regex = term_attr_value;
-
-using term_identifier = lex::sequence<charset_alpha, lex::zero_or_more<charset_alnumu>>;
-
-using term_date = lex::sequence<
-  lex::exactly_n<charset_digit, 4>,
-  lex::match_char<'-'>,
-  lex::exactly_n<charset_digit, 2>,
-  lex::match_char<'-'>,
-  lex::exactly_n<charset_digit, 2>>;
-
-struct parsing_context
-{
-  i_warning_collector& _warning_collector;
-  std::string_view     _buffer;
-
-  auto capture_state() -> std::string_view
-  {
-    return _buffer;
-  }
-
-  void restore_state(std::string_view state_)
-  {
-    _buffer = state_;
-  }
-};
-
-template <typename T>
-struct lex_with_token
-{
-  using return_type = token;
-  auto operator()(parsing_context& ctx_) -> std::optional<return_type>
-  {
-    lex::context lex_ctx(ctx_._buffer);
-
-    if (T{}(lex_ctx))
-    {
-      ctx_._buffer = lex_ctx.get_remaining();
-
-      std::string_view const match{ lex_ctx.get_match() };
-      return token{
-        ._lexeme = std::string{match.begin(), match.end()},
-        ._colno  = 0
-      };
-    }
-
-    return std::nullopt;
-  }
-};
-
-template <typename T>
-struct lex_without_token
-{
-  struct return_type
-  {
-  };
-  auto operator()(parsing_context& ctx_) -> std::optional<return_type>
-  {
-    lex::context lex_ctx(ctx_._buffer);
-
-    if (T{}(lex_ctx))
-    {
-      ctx_._buffer = lex_ctx.get_remaining();
-      return return_type{};
-    }
-    return std::nullopt;
-  }
-};
-
-struct on_error
-{
-  using return_type = invalid_line;
-  auto operator()(parsing_context&) -> std::optional<return_type>
-  {
-    /*
-    ctx_._warning_collector.add_warning(
-      warning_code::SKIPPING_LINE,
-      warning::location{ ctx_._filepath, ctx_._lineno },
-      "Skipping line");
-      */
-    return return_type{};
-  }
-};
+struct term_ws
+  : plus< charset_ws > {};
+struct term_eol :
+  sor<eol, seq<eof, failure>> {};
+struct term_eol_comment :
+  seq< one< '#' >, until<term_eol>> {};
+struct term_semicolon :
+  one< ';' > {};
+struct term_colon :
+  one< ':' > {};
+struct term_attr_value :
+  plus< not_one< ';', '#', ' ', '\t', '\n', '\r'> > {};
+struct term_regex :
+  term_attr_value {};
+struct term_identifier :
+  minus<seq<charset_identifier_first, star<charset_identifier_rest>>, sor<string<'v', 'a', 'r'>, string<'a', 't', 't', 'r'>>> {};
+struct term_date :
+  seq<rep<4, digit>, one<'-'>, rep<2, digit>, one<'-'>, rep<2, digit> > {};
+struct term_kw_var :
+  string<'v', 'a', 'r', ':'> {};
+struct term_kw_attr :
+  string<'a', 't', 't', 'r', ':'> {};
 
 // Rules
-using prs = combi_parse<parsing_context>;
 
-using parse_ws = lex_without_token<term_ws>;
+struct rule_eol :
+  sor<term_eol, term_eol_comment> {};
 
-using parse_comment = lex_with_token<term_eol_comment>;
+struct rule_skip_line :
+  until<rule_eol, any> {};
 
-struct parse_blank_line
-  : prs::converter<parse_blank_line, blank_line, prs::sequence<prs::maybe<parse_ws>, prs::maybe<parse_comment>>>
+struct rule_date :
+  seq<term_date, apply0<end_date>> {};
+
+struct rule_entry_start :
+  seq<term_identifier, term_colon, apply0<end_entry_identifier>>{};
+
+struct rule_identifier_value_pair :
+  seq<term_identifier, term_ws, term_attr_value> {};
+
+struct rule_identifier_value_pair_list :
+  seq<list<rule_identifier_value_pair, term_semicolon, term_ws>, term_semicolon, apply0<end_ivpl>> {};
+
+struct rule_regex_list :
+  star<seq<pad<term_regex, term_ws>, term_semicolon>> {};
+
+struct rule_declare_attribute :
+  seq<term_kw_attr, term_ws, term_identifier, opt<term_ws>, term_semicolon, rule_regex_list, apply0<end_attribute_declaration>>{};
+
+struct rule_identifier_list :
+  star<seq<pad<term_identifier, term_ws>, term_semicolon>> {};
+
+struct rule_declare_variable :
+  seq<term_kw_var, term_ws, term_identifier, opt<term_ws>, term_semicolon, rule_identifier_list, apply0<end_variable_declaration>>{};
+
+struct rule_line_core :
+  sor<
+    seq<apply0<clear_queue>, rule_date>,
+    seq<apply0<clear_queue>, rule_declare_attribute>,
+    seq<apply0<clear_queue>, rule_declare_variable>,
+    seq<apply0<clear_queue>, rule_entry_start>,
+    seq<apply0<clear_queue>, rule_identifier_value_pair_list>
+  > {};
+
+struct rule_line :
+  seq<pad_opt<rule_line_core, term_ws>, rule_eol> {};
+
+struct rule_line_or_skip :
+  sor<rule_line, rule_skip_line> {};
+
+struct rule_file :
+  must<star<rule_line_or_skip>> {};
+// clang-format on
+
+// Actions
+
+template <>
+struct action_for_every<rule_skip_line>
 {
-  static auto convert(input_type&, parsing_context&) -> return_type
+  template <typename INPUT>
+  static void apply(INPUT const& in_, pmt::file_builder& builder_, pmt::i_warning_collector& warning_collector_)
   {
-    return blank_line{};
+    warning_collector_.add_warning(
+      pmt::warning_code::SKIPPING_LINE,
+      pmt::warning::location{ ._filepath = in_.position().source, ._lineno = in_.position().line },
+      "skipping line");
+
+    builder_.clear_queue();
   }
 };
 
-struct parse_date_line : prs::converter<
-                           parse_date_line,
-                           date_line,
-                           prs::sequence<lex_with_token<term_date>, parse_ws, prs::maybe<parse_comment>>>
+template <>
+struct action_for_every<term_date>
 {
-  static auto convert(input_type& item_, parsing_context&) -> return_type
+  template <typename INPUT>
+  static void apply(INPUT const& in_, pmt::file_builder& builder_, pmt::i_warning_collector&)
   {
-    date_line ret;
-    ret._date = std::move(get<0>(item_));
-    return ret;
+    builder_.enqueue_token(
+      pmt::token{ ._lexeme = in_.string(), ._colno = in_.position().column, ._lineno = in_.position().line });
   }
 };
 
-struct parse_entry_start_line : prs::converter<
-                                  parse_entry_start_line,
-                                  entry_start_line,
-                                  prs::sequence<
-                                    lex_with_token<term_identifier>,
-                                    lex_without_token<lex::match_char<':'>>,
-                                    parse_ws,
-                                    prs::maybe<parse_comment>>>
+template <>
+struct action_for_every<term_identifier>
 {
-  static auto convert(input_type& item_, parsing_context&) -> return_type
+  template <typename INPUT>
+  static void apply(INPUT const& in_, pmt::file_builder& builder_, pmt::i_warning_collector&)
   {
-    entry_start_line ret;
-    ret._entry_identifier = std::move(get<0>(item_));
-    return ret;
+    builder_.enqueue_token(
+      pmt::token{ ._lexeme = in_.string(), ._colno = in_.position().column, ._lineno = in_.position().line });
   }
 };
 
-struct parse_identifier_value_pair : prs::converter<
-                                       parse_identifier_value_pair,
-                                       identifier_value_pair,
-                                       prs::sequence<
-                                         parse_ws,
-                                         lex_with_token<term_identifier>,
-                                         parse_ws,
-                                         lex_with_token<term_attr_value>,
-                                         parse_ws,
-                                         lex_without_token<lex::match_char<';'>>>>
+template <>
+struct action_for_every<term_attr_value>
 {
-  static auto convert(input_type& item_, parsing_context&) -> return_type
+  template <typename INPUT>
+  static void apply(INPUT const& in_, pmt::file_builder& builder_, pmt::i_warning_collector&)
   {
-    identifier_value_pair ret;
-    ret._identifier = std::move(get<1>(item_));
-    ret._value      = std::move(get<3>(item_));
-    return ret;
+    builder_.enqueue_token(
+      pmt::token{ ._lexeme = in_.string(), ._colno = in_.position().column, ._lineno = in_.position().line });
   }
 };
 
-struct parse_identifier_value_pair_list
-  : prs::converter<
-      parse_identifier_value_pair_list,
-      identifier_value_pair_list_line,
-      prs::sequence<prs::one_or_more<parse_identifier_value_pair>, parse_ws, prs::maybe<parse_comment>>>
+template <>
+struct action_for_every<term_regex>
 {
-  static auto convert(input_type& item_, parsing_context&) -> return_type
+  template <typename INPUT>
+  static void apply(INPUT const& in_, pmt::file_builder& builder_, pmt::i_warning_collector&)
   {
-    identifier_value_pair_list_line ret;
-    ret._pairs = std::move(get<0>(item_));
-    return ret;
-  }
-};
-
-struct parse_regex_list
-  : prs::converter<
-      parse_regex_list,
-      std::vector<token>,
-      prs::zero_or_more<
-        prs::sequence<parse_ws, lex_with_token<term_regex>, parse_ws, lex_without_token<lex::match_char<';'>>>>>
-{
-  static auto convert(input_type& item_, parsing_context&) -> return_type
-  {
-    std::vector<token> ret;
-    ret.reserve(item_.size());
-    for (auto& sequence : item_)
-      ret.push_back(std::move(get<1>(sequence)));
-    return ret;
-  }
-};
-
-struct parse_declare_attribute_line : prs::converter<
-                                        parse_declare_attribute_line,
-                                        declare_attribute_line,
-                                        prs::sequence<
-                                          lex_without_token<lex::match_literal<"attr:">>,
-                                          parse_ws,
-                                          lex_with_token<term_identifier>,
-                                          parse_ws,
-                                          lex_without_token<lex::match_char<';'>>,
-                                          parse_regex_list,
-                                          parse_ws,
-                                          prs::maybe<parse_comment>>>
-{
-  static auto convert(input_type& item_, parsing_context&) -> return_type
-  {
-    declare_attribute_line ret;
-    ret._attribute_identifier = std::move(get<2>(item_));
-    ret._values               = std::move(get<5>(item_));
-    return ret;
-  }
-};
-
-struct parse_identifier_list
-  : prs::converter<
-      parse_identifier_list,
-      std::vector<token>,
-      prs::zero_or_more<
-        prs::sequence<parse_ws, lex_with_token<term_identifier>, parse_ws, lex_without_token<lex::match_char<';'>>>>>
-{
-  static auto convert(input_type& item_, parsing_context&) -> return_type
-  {
-    std::vector<token> ret;
-    ret.reserve(item_.size());
-    for (auto& sequence : item_)
-      ret.push_back(std::move(get<1>(sequence)));
-    return ret;
-  }
-};
-
-struct parse_declare_variable_line : prs::converter<
-                                       parse_declare_variable_line,
-                                       declare_variable_line,
-                                       prs::sequence<
-                                         lex_without_token<lex::match_literal<"var:">>,
-                                         parse_ws,
-                                         lex_with_token<term_identifier>,
-                                         parse_ws,
-                                         lex_without_token<lex::match_char<';'>>,
-                                         parse_identifier_list,
-                                         parse_ws,
-                                         prs::maybe<parse_comment>>>
-{
-  static auto convert(input_type& item_, parsing_context&) -> return_type
-  {
-    declare_variable_line ret;
-    ret._variable_identifier = std::move(get<2>(item_));
-    ret._values              = std::move(get<5>(item_));
-    return ret;
-  }
-};
-
-struct parse_line : prs::converter<
-                      parse_line,
-                      line,
-                      prs::one_of<
-                        parse_blank_line,
-                        parse_date_line,
-                        parse_entry_start_line,
-                        parse_identifier_value_pair_list,
-                        parse_declare_attribute_line,
-                        parse_declare_variable_line,
-                        on_error>>
-{
-  static auto convert(input_type& item_, parsing_context&) -> return_type
-  {
-    return visit(overloaded{ [](auto& x_) -> line { return std::move(x_); } }, item_);
-  }
-};
-
-struct parse_file : prs::converter<parse_file, file, prs::zero_or_more<parse_line>>
-{
-  static auto convert(input_type& item_, parsing_context&) -> return_type
-  {
-    file ret;
-    ret._lines = std::move(item_);
-    return ret;
+    builder_.enqueue_token(
+      pmt::token{ ._lexeme = in_.string(), ._colno = in_.position().column, ._lineno = in_.position().line });
   }
 };
 
@@ -315,23 +224,20 @@ file_parse_task::file_parse_task(
 {
 }
 
-auto file_parse_task::get_result() -> std::optional<file>&
+auto file_parse_task::get_result() -> std::optional<std::variant<log_file, header_file>>&
 {
   return _result;
 }
 
 void file_parse_task::execute_impl()
 {
-  std::string_view buffer = _file_reader.read(_filepath.c_str());
+  std::string_view  buffer = _file_reader.read(_filepath.c_str());
+  pmt::file_builder builder(_warning_collector, _filepath);
 
-  parsing_context ctx{ _warning_collector, buffer };
+  memory_input in(buffer, _filepath);
+  tao::pegtl::parse<rule_file, action_for_every>(in, builder, _warning_collector);
 
-  _result = parse_file{}(ctx);
-
-  if (_result.has_value())
-    _result->_filepath = _filepath;
+  _result = builder.get_result();
 }
 
 } // namespace pmt
-
-#endif
